@@ -1,0 +1,79 @@
+@import 'tailwindcss';
+@import './theme/themes.css';
+
+@theme inline {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: var(--theme-background);
+  --color-surface: var(--theme-surface);
+  --color-foreground: var(--theme-foreground);
+  --color-muted: var(--theme-muted);
+  --color-muted-foreground: var(--theme-muted-foreground);
+  --color-border: var(--theme-border);
+  --color-ring: var(--theme-ring);
+
+  --color-primary: var(--theme-primary);
+  --color-primary-hover: var(--theme-primary-hover);
+  --color-primary-foreground: var(--theme-primary-foreground);
+  --color-primary-soft: var(--theme-primary-soft);
+
+  --color-brand: var(--theme-brand);
+  --color-brand-foreground: var(--theme-brand-foreground);
+  --color-brand-muted: var(--theme-brand-muted);
+
+  --color-sidebar: var(--theme-sidebar);
+  --color-sidebar-foreground: var(--theme-sidebar-foreground);
+  --color-sidebar-muted: var(--theme-sidebar-muted);
+  --color-sidebar-hover: var(--theme-sidebar-hover);
+  --color-sidebar-border: var(--theme-sidebar-border);
+
+  --color-overlay: var(--theme-overlay);
+
+  --color-danger: var(--theme-danger);
+  --color-danger-foreground: var(--theme-danger-foreground);
+  --color-danger-soft: var(--theme-danger-soft);
+
+  --color-success: var(--theme-success);
+  --color-success-foreground: var(--theme-success-foreground);
+  --color-success-soft: var(--theme-success-soft);
+
+  --color-warning: var(--theme-warning);
+  --color-warning-foreground: var(--theme-warning-foreground);
+  --color-warning-soft: var(--theme-warning-soft);
+
+  --color-info: var(--theme-info);
+  --color-info-foreground: var(--theme-info-foreground);
+  --color-info-soft: var(--theme-info-soft);
+
+  --shadow-card: var(--theme-shadow-card);
+}
+
+body {
+  @apply bg-background text-foreground antialiased;
+}
+
+/* Shared summary cards across the role dashboards. */
+.dashboard-stat-card {
+  --stat-accent: var(--theme-primary);
+  @apply grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-4 rounded-2xl border border-border bg-surface p-5 shadow-sm;
+  border-top: 3px solid var(--stat-accent);
+  background-image: linear-gradient(135deg, color-mix(in srgb, var(--stat-accent) 4%, transparent), transparent 65%);
+}
+
+.dashboard-stat-card:has(> .text-success) { --stat-accent: var(--theme-success); }
+.dashboard-stat-card:has(> .text-info) { --stat-accent: var(--theme-info); }
+.dashboard-stat-card:has(> .text-warning) { --stat-accent: var(--theme-warning); }
+.dashboard-stat-card:has(> .text-danger) { --stat-accent: var(--theme-danger); }
+
+.dashboard-stat-card > div {
+  @apply col-start-2 row-start-1 rounded-xl p-3;
+}
+
+.dashboard-stat-card > p:first-of-type {
+  @apply col-span-2 row-start-2 m-0 text-3xl font-semibold leading-tight tracking-tight text-foreground tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-stat-card > p:last-of-type {
+  @apply col-start-1 row-start-1 text-sm font-medium text-muted-foreground;
+}

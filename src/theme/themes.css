@@ -1,0 +1,94 @@
+/* Theme tokens — change colors here, not in components. */
+
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+
+  --theme-background: #f4f7fb;
+  --theme-surface: #ffffff;
+  --theme-foreground: #0b1f4a;
+  --theme-muted: #e8eef7;
+  --theme-muted-foreground: #4a5d7a;
+  --theme-border: #c9d4e8;
+  --theme-ring: #0b1f4a;
+
+  --theme-primary: #0b1f4a;
+  --theme-primary-hover: #081636;
+  --theme-primary-foreground: #ffffff;
+  --theme-primary-soft: #e4eaf6;
+
+  --theme-brand: #0b1f4a;
+  --theme-brand-foreground: #ffffff;
+  --theme-brand-muted: #c5d3ea;
+
+  --theme-sidebar: #0b1f4a;
+  --theme-sidebar-foreground: #ffffff;
+  --theme-sidebar-muted: #9bb0d0;
+  --theme-sidebar-hover: #16305f;
+  --theme-sidebar-border: #1a3263;
+
+  --theme-overlay: rgb(11 31 74 / 0.55);
+  --theme-shadow-card: 0 12px 40px rgb(11 31 74 / 0.08);
+
+  --theme-danger: #b42318;
+  --theme-danger-foreground: #ffffff;
+  --theme-danger-soft: #fde8e6;
+
+  --theme-success: #067647;
+  --theme-success-foreground: #ffffff;
+  --theme-success-soft: #e6f6ee;
+
+  --theme-warning: #b54708;
+  --theme-warning-foreground: #ffffff;
+  --theme-warning-soft: #fef4e6;
+
+  --theme-info: #175cd3;
+  --theme-info-foreground: #ffffff;
+  --theme-info-soft: #e8effc;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --theme-background: #071226;
+  --theme-surface: #0e1c38;
+  --theme-foreground: #f4f7fb;
+  --theme-muted: #16305f;
+  --theme-muted-foreground: #a8b8d0;
+  --theme-border: #2a4370;
+  --theme-ring: #5b8def;
+
+  --theme-primary: #5b8def;
+  --theme-primary-hover: #4c7cde;
+  --theme-primary-foreground: #071226;
+  --theme-primary-soft: #16305f;
+
+  --theme-brand: #081636;
+  --theme-brand-foreground: #f4f7fb;
+  --theme-brand-muted: #9bb0d0;
+
+  --theme-sidebar: #061022;
+  --theme-sidebar-foreground: #f4f7fb;
+  --theme-sidebar-muted: #8aa0c0;
+  --theme-sidebar-hover: #122445;
+  --theme-sidebar-border: #1a3263;
+
+  --theme-overlay: rgb(4 10 22 / 0.7);
+  --theme-shadow-card: 0 12px 40px rgb(0 0 0 / 0.35);
+
+  --theme-danger: #f97066;
+  --theme-danger-foreground: #071226;
+  --theme-danger-soft: #3a1a1a;
+
+  --theme-success: #75e0a7;
+  --theme-success-foreground: #071226;
+  --theme-success-soft: #16382a;
+
+  --theme-warning: #f7b27a;
+  --theme-warning-foreground: #071226;
+  --theme-warning-soft: #3a2a16;
+
+  --theme-info: #84adff;
+  --theme-info-foreground: #071226;
+  --theme-info-soft: #1a2f5c;
+}
