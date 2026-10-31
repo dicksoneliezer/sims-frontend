@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiEdit2, FiPlus, FiRefreshCw, FiSearch, FiTrash2, FiPaperclip, FiTrendingDown } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -9,6 +11,7 @@ import { formatDate, formatMoney } from '../../utils/format'
 const PAGE_SIZE = 10
 
 export default function Expenses() {
+  useLanguage()
   const [expenses, setExpenses] = useState([])
   const [meta, setMeta] = useState({ current_page: 1, per_page: PAGE_SIZE, total: 0, last_page: 1 })
   const [search, setSearch] = useState('')
@@ -20,7 +23,7 @@ export default function Expenses() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setQuery((current) => ({ ...current, search }))
+      setQuery((current) => current.search === search ? current : { ...current, search })
       setPage(1)
     }, 350)
 
@@ -38,7 +41,7 @@ export default function Expenses() {
         setMeta(response.meta)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load expenses.')
+        if (active) toast.error(t("Unable to load expenses."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -50,14 +53,14 @@ export default function Expenses() {
   }, [query, page, refreshKey])
 
   const handleDelete = async (expense) => {
-    if (!window.confirm(`Delete expense ${expense.expense_number}?`)) return
+    if (!window.confirm(t("Delete expense {0}?", [expense.expense_number]))) return
 
     try {
       await deleteExpense(expense.id)
-      toast.success('Expense deleted')
+      toast.success(t("Expense deleted"))
       setRefreshKey((key) => key + 1)
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to delete expense.')
+      toast.error(error.response?.data?.message ?? t("Unable to delete expense."))
     }
   }
 
@@ -72,17 +75,14 @@ export default function Expenses() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiTrendingDown className="h-5 w-5 text-danger" /> Expenses
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">Track school spending and attach receipts.</p>
+            <FiTrendingDown className="h-5 w-5 text-danger" />{t(" Expenses")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Track school spending and attach receipts.")}</p>
         </div>
         <div className="flex items-center gap-2">
           <button type="button" onClick={() => setRefreshKey((key) => key + 1)} className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted">
-            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-          </button>
+            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
           <button type="button" onClick={() => setForm({ expense: null })} className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover">
-            <FiPlus className="h-4 w-4" /> Record expense
-          </button>
+            <FiPlus className="h-4 w-4" />{t(" Record expense")}</button>
         </div>
       </section>
 
@@ -94,31 +94,31 @@ export default function Expenses() {
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search expense, category or payee"
+              placeholder={t("Search expense, category or payee")}
               className="w-full rounded-lg border border-border py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </div>
-          <input type="date" value={query.from} onChange={(event) => updateFilter('from', event.target.value)} className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" aria-label="From date" />
-          <input type="date" value={query.to} onChange={(event) => updateFilter('to', event.target.value)} className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" aria-label="To date" />
+          <input type="date" value={query.from} onChange={(event) => updateFilter('from', event.target.value)} className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" aria-label={t("From date")} />
+          <input type="date" value={query.to} onChange={(event) => updateFilter('to', event.target.value)} className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" aria-label={t("To date")} />
         </div>
 
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-4 py-3">Expense</th>
-                <th className="px-4 py-3">Category</th>
-                <th className="px-4 py-3">Paid to</th>
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3 text-right">Amount</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-4 py-3">{t("Expense")}</th>
+                <th className="px-4 py-3">{t("Category")}</th>
+                <th className="px-4 py-3">{t("Paid to")}</th>
+                <th className="px-4 py-3">{t("Date")}</th>
+                <th className="px-4 py-3 text-right">{t("Amount")}</th>
+                <th className="px-4 py-3 text-right">{t("Actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading ? (
-                <tr><td colSpan={6} className="px-4 py-14 text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></td></tr>
+                <tr><td colSpan={6} className="px-4 py-14 text-center"><div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></td></tr>
               ) : expenses.length === 0 ? (
-                <tr><td colSpan={6} className="px-4 py-14 text-center text-muted-foreground">No expenses found.</td></tr>
+                <tr><td colSpan={6} className="px-4 py-14 text-center text-muted-foreground">{t("No expenses found.")}</td></tr>
               ) : expenses.map((expense) => (
                 <tr key={expense.id} className="hover:bg-muted/70">
                   <td className="px-4 py-3">
@@ -132,14 +132,14 @@ export default function Expenses() {
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
                       {expense.receipt_url && (
-                        <a href={expense.receipt_url} target="_blank" rel="noreferrer" className="rounded-lg p-2 text-muted-foreground hover:bg-primary-soft hover:text-primary" aria-label={`View receipt for ${expense.expense_number}`}>
+                        <a href={expense.receipt_url} target="_blank" rel="noreferrer" className="rounded-lg p-2 text-muted-foreground hover:bg-primary-soft hover:text-primary" aria-label={t("View receipt for {0}", [expense.expense_number])}>
                           <FiPaperclip className="h-4 w-4" />
                         </a>
                       )}
-                      <button type="button" onClick={() => setForm({ expense })} className="rounded-lg p-2 text-muted-foreground hover:bg-warning-soft hover:text-warning" aria-label={`Edit ${expense.expense_number}`}>
+                      <button type="button" onClick={() => setForm({ expense })} className="rounded-lg p-2 text-muted-foreground hover:bg-warning-soft hover:text-warning" aria-label={t("Edit {0}", [expense.expense_number])}>
                         <FiEdit2 className="h-4 w-4" />
                       </button>
-                      <button type="button" onClick={() => handleDelete(expense)} className="rounded-lg p-2 text-muted-foreground hover:bg-danger-soft hover:text-danger" aria-label={`Delete ${expense.expense_number}`}>
+                      <button type="button" onClick={() => handleDelete(expense)} className="rounded-lg p-2 text-muted-foreground hover:bg-danger-soft hover:text-danger" aria-label={t("Delete {0}", [expense.expense_number])}>
                         <FiTrash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -151,17 +151,17 @@ export default function Expenses() {
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-sm text-muted-foreground">
-          <p>Showing <span className="font-medium text-foreground">{meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1}</span>–<span className="font-medium text-foreground">{Math.min(meta.current_page * meta.per_page, meta.total)}</span> of <span className="font-medium text-foreground">{meta.total}</span></p>
+          <p>{t("Showing ")}<span className="font-medium text-foreground">{meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1}</span>–<span className="font-medium text-foreground">{Math.min(meta.current_page * meta.per_page, meta.total)}</span>{t(" of ")}<span className="font-medium text-foreground">{meta.total}</span></p>
           <div className="flex items-center gap-2">
-            <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={meta.current_page <= 1 || loading} className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50">Previous</button>
-            <span>Page {meta.current_page} of {Math.max(meta.last_page, 1)}</span>
-            <button type="button" onClick={() => setPage((current) => Math.min(meta.last_page, current + 1))} disabled={meta.current_page >= meta.last_page || loading} className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50">Next</button>
+            <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={meta.current_page <= 1 || loading} className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50">{t("Previous")}</button>
+            <span>{t("Page ")}{meta.current_page}{t(" of ")}{Math.max(meta.last_page, 1)}</span>
+            <button type="button" onClick={() => setPage((current) => Math.min(meta.last_page, current + 1))} disabled={meta.current_page >= meta.last_page || loading} className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50">{t("Next")}</button>
           </div>
         </div>
       </section>
 
       {form && (
-        <Modal title={form.expense ? 'Edit expense' : 'Record expense'} onClose={() => setForm(null)}>
+        <Modal title={form.expense ? t("Edit expense") : t("Record expense")} onClose={() => setForm(null)}>
           <ExpenseForm expense={form.expense} onClose={() => setForm(null)} onSaved={() => setRefreshKey((key) => key + 1)} />
         </Modal>
       )}

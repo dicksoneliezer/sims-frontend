@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiMessageSquare, FiSend, FiRefreshCw, FiInbox } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -24,6 +26,7 @@ const SAMPLE_MESSAGES = [
 ]
 
 export default function Messages() {
+  useLanguage()
   const [tab, setTab] = useState('inbox')
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
@@ -71,10 +74,10 @@ export default function Messages() {
       // Kwa sasa tunahifadhi kwenye local state tu (API haipo bado)
       setMessages((current) => [newMessage, ...current])
       setForm({ subject: '', body: '', recipient: 'teacher' })
-      toast.success('Message sent successfully')
+      toast.success(t("Message sent successfully"))
       setTab('inbox')
     } catch (error) {
-      toast.error('Unable to send message.')
+      toast.error(t("Unable to send message."))
     } finally {
       setSending(false)
     }
@@ -85,19 +88,15 @@ export default function Messages() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiMessageSquare className="h-5 w-5 text-primary" /> Messages
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Read messages from teachers and send new ones.
-          </p>
+            <FiMessageSquare className="h-5 w-5 text-primary" />{t(" Messages")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Read messages from teachers and send new ones.")}</p>
         </div>
         <button
           type="button"
           onClick={() => setRefreshKey((key) => key + 1)}
           className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
         >
-          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-        </button>
+          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
       </section>
 
       <div className="flex gap-1 rounded-lg bg-muted p-1">
@@ -106,26 +105,23 @@ export default function Messages() {
           onClick={() => setTab('inbox')}
           className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium ${tab === 'inbox' ? 'bg-surface text-foreground shadow-sm' : 'text-muted-foreground'}`}
         >
-          <FiInbox className="h-4 w-4" /> Inbox ({messages.length})
+          <FiInbox className="h-4 w-4" />{t(" Inbox (")}{messages.length})
         </button>
         <button
           type="button"
           onClick={() => setTab('compose')}
           className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium ${tab === 'compose' ? 'bg-surface text-foreground shadow-sm' : 'text-muted-foreground'}`}
         >
-          <FiSend className="h-4 w-4" /> Compose
-        </button>
+          <FiSend className="h-4 w-4" />{t(" Compose")}</button>
       </div>
 
       {tab === 'inbox' ? (
         loading ? (
           <div className="rounded-xl border border-border bg-surface p-14 text-center shadow-sm">
-            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+            <div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
           </div>
         ) : messages.length === 0 ? (
-          <div className="rounded-xl border border-border bg-surface p-14 text-center text-muted-foreground shadow-sm">
-            No messages yet.
-          </div>
+          <div className="rounded-xl border border-border bg-surface p-14 text-center text-muted-foreground shadow-sm">{t("No messages yet.")}</div>
         ) : (
           <div className="space-y-3">
             {messages.map((msg) => (
@@ -133,7 +129,7 @@ export default function Messages() {
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <h3 className="font-semibold text-foreground">{msg.subject}</h3>
                   {!msg.is_read && (
-                    <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold text-primary">New</span>
+                    <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold text-primary">{t("New")}</span>
                   )}
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
@@ -147,19 +143,19 @@ export default function Messages() {
       ) : (
         <form onSubmit={handleSend} className="rounded-xl border border-border bg-surface p-5 shadow-sm space-y-4">
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">Recipient</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Recipient")}</span>
             <select
               value={form.recipient}
               onChange={(e) => setForm({ ...form, recipient: e.target.value })}
               className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary"
             >
-              <option value="teacher">Teacher</option>
-              <option value="admin">School Administration</option>
-              <option value="accountant">Accountant</option>
+              <option value="teacher">{t("Teacher")}</option>
+              <option value="admin">{t("School Administration")}</option>
+              <option value="accountant">{t("Accountant")}</option>
             </select>
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">Subject</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Subject")}</span>
             <input
               required
               value={form.subject}
@@ -168,7 +164,7 @@ export default function Messages() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">Message</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Message")}</span>
             <textarea
               required
               rows={5}
@@ -183,7 +179,7 @@ export default function Messages() {
               disabled={sending}
               className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
             >
-              <FiSend className="h-4 w-4" /> {sending ? 'Sending...' : 'Send Message'}
+              <FiSend className="h-4 w-4" /> {sending ? t("Sending...") : t("Send Message")}
             </button>
           </div>
         </form>

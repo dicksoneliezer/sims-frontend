@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiBell, FiRefreshCw, FiCalendar } from 'react-icons/fi'
 import api from '../../api/axios'
@@ -9,6 +11,7 @@ const SAMPLE_ANNOUNCEMENTS = [
 ]
 
 export default function StudentAnnouncements() {
+  useLanguage()
   const [announcements, setAnnouncements] = useState([])
   const [loading, setLoading] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
@@ -39,27 +42,23 @@ export default function StudentAnnouncements() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiBell className="h-5 w-5 text-primary" /> Announcements
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">School notices and important dates.</p>
+            <FiBell className="h-5 w-5 text-primary" />{t(" Announcements")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("School notices and important dates.")}</p>
         </div>
         <button
           type="button"
           onClick={() => setRefreshKey((key) => key + 1)}
           className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
         >
-          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-        </button>
+          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
       </section>
 
       {loading ? (
         <div className="rounded-xl border border-border bg-surface p-14 text-center shadow-sm">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+          <div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
         </div>
       ) : announcements.length === 0 ? (
-        <div className="rounded-xl border border-border bg-surface p-14 text-center text-muted-foreground shadow-sm">
-          No announcements yet.
-        </div>
+        <div className="rounded-xl border border-border bg-surface p-14 text-center text-muted-foreground shadow-sm">{t("No announcements yet.")}</div>
       ) : (
         <div className="space-y-3">
           {announcements.map((a) => (

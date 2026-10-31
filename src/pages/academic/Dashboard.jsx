@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 // src/pages/academic/Dashboard.jsx
 import { useEffect, useState } from 'react'
 import {
@@ -22,6 +24,7 @@ const STAT_META = [
 ]
 
 export default function AcademicDashboard() {
+  useLanguage()
   const [stats, setStats] = useState({
     exams: 0,
     active_exams: 0,
@@ -52,7 +55,7 @@ export default function AcademicDashboard() {
         })
       })
       .catch(() => {
-        if (active) toast.error('Unable to load dashboard data.')
+        if (active) toast.error(t("Unable to load dashboard data."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -64,20 +67,16 @@ export default function AcademicDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <section className="overflow-hidden rounded-2xl bg-gradient-to-r from-brand to-primary px-6 py-7 text-primary-foreground sm:px-8">
-        <p className="text-xs font-medium uppercase tracking-widest text-brand-muted">
-          Academic workspace
-        </p>
-        <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">Welcome back!</h2>
-        <p className="mt-2 max-w-2xl text-sm text-brand-muted">
-          Manage teachers, students, subjects, exams, results, and syllabus.
-        </p>
+      <section className="overflow-hidden rounded-2xl bg-gradient-to-r from-brand to-primary px-6 py-7 text-brand-foreground sm:px-8">
+        <p className="text-xs font-medium uppercase tracking-widest text-brand-muted">{t("Academic workspace")}</p>
+        <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">{t("Welcome back!")}</h2>
+        <p className="mt-2 max-w-2xl text-sm text-brand-muted">{t("Manage teachers, students, subjects, exams, results, and syllabus.")}</p>
       </section>
 
       {/* Stats */}
       {loading ? (
         <div className="flex items-center justify-center py-14">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+          <div role="status" aria-label={t("Loading data")} className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
         </div>
       ) : (
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -87,7 +86,7 @@ export default function AcademicDashboard() {
                 <meta.icon className="h-5 w-5" />
               </div>
               <p className="mt-4 text-2xl font-semibold text-foreground">{stats[meta.key] ?? 0}</p>
-              <p className="text-sm text-muted-foreground">{meta.label}</p>
+              <p className="text-sm text-muted-foreground">{t(meta.label)}</p>
             </article>
           ))}
         </section>
@@ -95,57 +94,48 @@ export default function AcademicDashboard() {
 
       {/* Quick Actions */}
       <section className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-        <h3 className="font-semibold text-foreground">Quick actions</h3>
-        <p className="mt-1 text-sm text-muted-foreground">Jump to the most common academic tasks.</p>
+        <h3 className="font-semibold text-foreground">{t("Quick actions")}</h3>
+        <p className="mt-1 text-sm text-muted-foreground">{t("Jump to the most common academic tasks.")}</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link
             to="/academic/exams"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover transition"
-          >
-            Manage exams <FiArrowRight className="h-4 w-4" />
+          >{t("Manage exams")}<FiArrowRight className="h-4 w-4" />
           </Link>
           <Link
             to="/academic/students"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiUsers className="h-4 w-4" /> All Students
-          </Link>
+            <FiUsers className="h-4 w-4" />{t(" All Students")}</Link>
           <Link
             to="/academic/teachers"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiUserCheck className="h-4 w-4" /> All Teachers
-          </Link>
+            <FiUserCheck className="h-4 w-4" />{t(" All Teachers")}</Link>
           <Link
             to="/academic/allocation"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiLayers className="h-4 w-4" /> Subject Allocation
-          </Link>
+            <FiLayers className="h-4 w-4" />{t(" Subject Allocation")}</Link>
           <Link
             to="/academic/results"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiBarChart2 className="h-4 w-4" /> Results analysis
-          </Link>
+            <FiBarChart2 className="h-4 w-4" />{t(" Results analysis")}</Link>
           <Link
             to="/academic/syllabus"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiBookOpen className="h-4 w-4" /> Syllabus tracker
-          </Link>
+            <FiBookOpen className="h-4 w-4" />{t(" Syllabus tracker")}</Link>
           <Link
             to="/academic/timetable"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiCalendar className="h-4 w-4" /> Timetable
-          </Link>
+            <FiCalendar className="h-4 w-4" />{t(" Timetable")}</Link>
           <Link
             to="/academic/announcements"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
-          >
-            Announcements
-          </Link>
+          >{t("Announcements")}</Link>
         </div>
       </section>
     </div>

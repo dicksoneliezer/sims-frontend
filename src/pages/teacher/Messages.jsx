@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiMessageSquare, FiSend, FiRefreshCw } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -5,6 +7,7 @@ import api from '../../api/axios'
 import { formatDate } from '../../utils/format'
 
 export default function TeacherMessages() {
+  useLanguage()
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
@@ -36,7 +39,7 @@ export default function TeacherMessages() {
         setStudents(studentsData)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load messages.')
+        if (active) toast.error(t("Unable to load messages."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -51,7 +54,7 @@ export default function TeacherMessages() {
 
     try {
       const res = await api.post('/teacher/messages', form)
-      toast.success('Message sent successfully')
+      toast.success(t("Message sent successfully"))
       setForm({ student_id: '', subject: '', body: '' })
       setRefreshKey((key) => key + 1)
     } catch (error) {
@@ -59,7 +62,7 @@ export default function TeacherMessages() {
       toast.error(
         errors
           ? Object.values(errors).flat()[0]
-          : error.response?.data?.message ?? 'Unable to send message.',
+          : error.response?.data?.message ?? t("Unable to send message."),
       )
     } finally {
       setSending(false)
@@ -71,32 +74,28 @@ export default function TeacherMessages() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiMessageSquare className="h-5 w-5 text-primary" /> Parent Messages
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Send messages to parents about their child's progress, attendance, or behaviour.
-          </p>
+            <FiMessageSquare className="h-5 w-5 text-primary" />{t(" Parent Messages")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Send messages to parents about their child's progress, attendance, or behaviour.")}</p>
         </div>
         <button
           type="button"
           onClick={() => setRefreshKey((key) => key + 1)}
           className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
         >
-          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-        </button>
+          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
       </section>
 
       <form onSubmit={handleSend} className="rounded-xl border border-border bg-surface p-6 shadow-sm space-y-4">
-        <h3 className="font-semibold text-foreground">Compose message</h3>
+        <h3 className="font-semibold text-foreground">{t("Compose message")}</h3>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-foreground">Student (parent recipient)</span>
+          <span className="mb-1 block font-medium text-foreground">{t("Student (parent recipient)")}</span>
           <select
             required
             value={form.student_id}
             onChange={(e) => setForm({ ...form, student_id: e.target.value })}
             className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary"
           >
-            <option value="">Select a student</option>
+            <option value="">{t("Select a student")}</option>
             {students.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.full_name} — {s.student_number} ({s.class ?? '—'})
@@ -105,7 +104,7 @@ export default function TeacherMessages() {
           </select>
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-foreground">Subject</span>
+          <span className="mb-1 block font-medium text-foreground">{t("Subject")}</span>
           <input
             required
             value={form.subject}
@@ -114,7 +113,7 @@ export default function TeacherMessages() {
           />
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-foreground">Message</span>
+          <span className="mb-1 block font-medium text-foreground">{t("Message")}</span>
           <textarea
             required
             rows={5}
@@ -129,23 +128,21 @@ export default function TeacherMessages() {
             disabled={sending}
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
           >
-            <FiSend className="h-4 w-4" /> {sending ? 'Sending...' : 'Send Message'}
+            <FiSend className="h-4 w-4" /> {sending ? t("Sending...") : t("Send Message")}
           </button>
         </div>
       </form>
 
       <section className="rounded-xl border border-border bg-surface shadow-sm">
         <div className="border-b border-border px-6 py-4">
-          <h3 className="font-semibold text-foreground">Sent messages</h3>
+          <h3 className="font-semibold text-foreground">{t("Sent messages")}</h3>
         </div>
         {loading ? (
           <div className="rounded-xl border border-border bg-surface p-14 text-center shadow-sm">
-            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+            <div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
           </div>
         ) : messages.length === 0 ? (
-          <p className="px-6 py-10 text-center text-sm text-muted-foreground">
-            No messages sent yet.
-          </p>
+          <p className="px-6 py-10 text-center text-sm text-muted-foreground">{t("No messages sent yet.")}</p>
         ) : (
           <div className="divide-y divide-slate-100">
             {messages.map((msg) => (
@@ -154,8 +151,7 @@ export default function TeacherMessages() {
                   <h3 className="font-semibold text-foreground">{msg.subject}</h3>
                   <span className="text-xs text-muted-foreground">{formatDate(msg.created_at)}</span>
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  To: {msg.parent?.full_name ?? 'Parent'}
+                <p className="mt-1 text-xs text-muted-foreground">{t("To:")}{msg.parent?.full_name ?? t("Parent")}
                 </p>
                 <p className="mt-2 text-sm text-muted-foreground">{msg.body}</p>
               </article>

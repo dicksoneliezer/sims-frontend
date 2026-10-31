@@ -1,16 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ThemeContext } from './theme-context'
-
-export const THEME_KEY = 'sims_theme'
-export const THEMES = ['light', 'dark']
+import { resolveTheme, THEME_KEY, THEMES } from '../utils/theme'
 
 function readStoredTheme() {
+  let stored
   try {
-    const stored = localStorage.getItem(THEME_KEY)
-    return THEMES.includes(stored) ? stored : 'light'
-  } catch {
-    return 'light'
-  }
+    stored = localStorage.getItem(THEME_KEY)
+  } catch { /* Fall back to the device preference. */ }
+  return resolveTheme(stored, window.matchMedia('(prefers-color-scheme: dark)').matches)
 }
 
 function applyTheme(theme) {
@@ -22,8 +19,16 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     applyTheme(theme)
-    localStorage.setItem(THEME_KEY, theme)
+    try { localStorage.setItem(THEME_KEY, theme) } catch { /* The switch still works when storage is unavailable. */ }
   }, [theme])
+
+  useEffect(() => {
+    const syncTheme = (event) => {
+      if (event.key === THEME_KEY && THEMES.includes(event.newValue)) setThemeState(event.newValue)
+    }
+    window.addEventListener('storage', syncTheme)
+    return () => window.removeEventListener('storage', syncTheme)
+  }, [])
 
   const setTheme = useCallback((next) => {
     if (THEMES.includes(next)) {

@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 // src/pages/matron/RollCall.jsx
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -22,6 +24,7 @@ const SESSIONS = [
 ]
 
 export default function MatronRollCall() {
+  useLanguage()
   const [rollCalls, setRollCalls] = useState([])
   const [meta, setMeta] = useState({ current_page: 1, per_page: PAGE_SIZE, total: 0, last_page: 1 })
   const [dormitories, setDormitories] = useState([])
@@ -61,7 +64,7 @@ export default function MatronRollCall() {
         dormsLoaded.current = true
       })
       .catch(() => {
-        if (active) toast.error('Unable to load dormitories.')
+        if (active) toast.error(t("Unable to load dormitories."))
       })
       .finally(() => {
         if (active) setDormsLoading(false)
@@ -91,7 +94,7 @@ export default function MatronRollCall() {
           setMeta(res.data.meta || { current_page: page, per_page: PAGE_SIZE, total: data.length, last_page: 1 })
         })
         .catch(() => {
-          if (active) toast.error('Unable to load roll call data.')
+          if (active) toast.error(t("Unable to load roll call data."))
         })
         .finally(() => {
           if (active) setLoading(false)
@@ -125,15 +128,15 @@ export default function MatronRollCall() {
     e.preventDefault()
 
     if (!form.dormitory_id) {
-      toast.error('Please select a dormitory.')
+      toast.error(t("Please select a dormitory."))
       return
     }
     if (!form.date) {
-      toast.error('Please select a date.')
+      toast.error(t("Please select a date."))
       return
     }
     if (form.total_present === '' || form.total_absent === '') {
-      toast.error('Please enter present and absent counts.')
+      toast.error(t("Please enter present and absent counts."))
       return
     }
 
@@ -147,7 +150,7 @@ export default function MatronRollCall() {
         total_absent: Number(form.total_absent),
         notes: form.notes || null,
       })
-      toast.success('Roll call recorded.')
+      toast.success(t("Roll call recorded."))
       setShowForm(false)
       setForm({
         dormitory_id: '',
@@ -181,11 +184,8 @@ export default function MatronRollCall() {
       <section className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiCheckSquare className="h-5 w-5 text-primary" /> Roll Call
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Take morning, evening, and night roll calls for the dormitories.
-          </p>
+            <FiCheckSquare className="h-5 w-5 text-primary" />{t(" Roll Call")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Take morning, evening, and night roll calls for the dormitories.")}</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -193,15 +193,14 @@ export default function MatronRollCall() {
             onClick={() => setRefreshKey((k) => k + 1)}
             className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
           >
-            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-          </button>
+            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
           <button
             type="button"
             onClick={() => setShowForm((v) => !v)}
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover transition"
           >
             {showForm ? <FiX className="h-4 w-4" /> : <FiPlus className="h-4 w-4" />}
-            {showForm ? 'Close' : 'New Roll Call'}
+            {showForm ? t("Close") : t("New Roll Call")}
           </button>
         </div>
       </section>
@@ -213,35 +212,33 @@ export default function MatronRollCall() {
             <FiCheckSquare className="h-5 w-5" />
           </div>
           <p className="mt-4 text-2xl font-semibold text-foreground">{meta.total ?? 0}</p>
-          <p className="text-sm text-muted-foreground">Total entries</p>
+          <p className="text-sm text-muted-foreground">{t("Total entries")}</p>
         </article>
         <article className="rounded-xl border border-border bg-surface p-5 shadow-sm">
           <div className="inline-flex rounded-lg bg-success-soft p-2.5 text-success">
             <FiUsers className="h-5 w-5" />
           </div>
           <p className="mt-4 text-2xl font-semibold text-foreground">{summary.present}</p>
-          <p className="text-sm text-muted-foreground">Present (this page)</p>
+          <p className="text-sm text-muted-foreground">{t("Present (this page)")}</p>
         </article>
         <article className="rounded-xl border border-border bg-surface p-5 shadow-sm">
           <div className="inline-flex rounded-lg bg-danger-soft p-2.5 text-danger">
             <FiUserX className="h-5 w-5" />
           </div>
           <p className="mt-4 text-2xl font-semibold text-foreground">{summary.absent}</p>
-          <p className="text-sm text-muted-foreground">Absent (this page)</p>
+          <p className="text-sm text-muted-foreground">{t("Absent (this page)")}</p>
         </article>
       </section>
 
       {/* Form */}
       {showForm && (
         <section className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-          <h3 className="font-semibold text-foreground">Record new roll call</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Choose a dormitory, session and date, then enter the counts.
-          </p>
+          <h3 className="font-semibold text-foreground">{t("Record new roll call")}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Choose a dormitory, session and date, then enter the counts.")}</p>
 
           <form onSubmit={handleSubmit} className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-muted-foreground">Dormitory</span>
+              <span className="text-muted-foreground">{t("Dormitory")}</span>
               <select
                 name="dormitory_id"
                 value={form.dormitory_id}
@@ -250,7 +247,7 @@ export default function MatronRollCall() {
                 className="rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-primary disabled:opacity-60"
                 required
               >
-                <option value="">{dormsLoading ? 'Loading...' : 'Select dormitory'}</option>
+                <option value="">{dormsLoading ? t("Loading...") : t("Select dormitory")}</option>
                 {dormitories.map((d) => (
                   <option key={d.id} value={d.id}>{d.name}</option>
                 ))}
@@ -258,7 +255,7 @@ export default function MatronRollCall() {
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-muted-foreground">Session</span>
+              <span className="text-muted-foreground">{t("Session")}</span>
               <select
                 name="session"
                 value={form.session}
@@ -267,13 +264,13 @@ export default function MatronRollCall() {
                 required
               >
                 {SESSIONS.map((s) => (
-                  <option key={s.value} value={s.value}>{s.label}</option>
+                  <option key={s.value} value={s.value}>{t(s.label)}</option>
                 ))}
               </select>
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-muted-foreground">Date</span>
+              <span className="text-muted-foreground">{t("Date")}</span>
               <input
                 type="date"
                 name="date"
@@ -285,7 +282,7 @@ export default function MatronRollCall() {
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-muted-foreground">Total present</span>
+              <span className="text-muted-foreground">{t("Total present")}</span>
               <input
                 type="number"
                 name="total_present"
@@ -298,7 +295,7 @@ export default function MatronRollCall() {
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-muted-foreground">Total absent</span>
+              <span className="text-muted-foreground">{t("Total absent")}</span>
               <input
                 type="number"
                 name="total_absent"
@@ -311,14 +308,14 @@ export default function MatronRollCall() {
             </label>
 
             <label className="flex flex-col gap-1 text-sm sm:col-span-2 lg:col-span-3">
-              <span className="text-muted-foreground">Notes (optional)</span>
+              <span className="text-muted-foreground">{t("Notes (optional)")}</span>
               <textarea
                 name="notes"
                 rows={2}
                 value={form.notes}
                 onChange={handleChange}
                 className="rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-primary"
-                placeholder="Any remarks..."
+                placeholder={t("Any remarks...")}
               />
             </label>
 
@@ -328,15 +325,13 @@ export default function MatronRollCall() {
                 disabled={saving}
                 className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover transition disabled:opacity-60"
               >
-                <FiCheckSquare className="h-4 w-4" /> {saving ? 'Saving...' : 'Save roll call'}
+                <FiCheckSquare className="h-4 w-4" /> {saving ? t("Saving...") : t("Save roll call")}
               </button>
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
                 className="rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
-              >
-                Cancel
-              </button>
+              >{t("Cancel")}</button>
             </div>
           </form>
         </section>
@@ -346,10 +341,9 @@ export default function MatronRollCall() {
       <section className="rounded-xl border border-border bg-surface p-4 shadow-sm">
         <div className="flex flex-wrap items-end gap-3">
           <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <FiFilter className="h-4 w-4" /> Filters
-          </div>
+            <FiFilter className="h-4 w-4" />{t(" Filters")}</div>
           <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            <span>Date</span>
+            <span>{t("Date")}</span>
             <input
               type="date"
               value={filters.date}
@@ -358,26 +352,26 @@ export default function MatronRollCall() {
             />
           </label>
           <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            <span>Session</span>
+            <span>{t("Session")}</span>
             <select
               value={filters.session}
               onChange={(e) => { setFilters((p) => ({ ...p, session: e.target.value })); setPage(1) }}
               className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-foreground outline-none focus:border-primary"
             >
-              <option value="">All sessions</option>
+              <option value="">{t("All sessions")}</option>
               {SESSIONS.map((s) => (
-                <option key={s.value} value={s.value}>{s.label}</option>
+                <option key={s.value} value={s.value}>{t(s.label)}</option>
               ))}
             </select>
           </label>
           <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            <span>Dormitory</span>
+            <span>{t("Dormitory")}</span>
             <select
               value={filters.dormitory_id}
               onChange={(e) => { setFilters((p) => ({ ...p, dormitory_id: e.target.value })); setPage(1) }}
               className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-foreground outline-none focus:border-primary"
             >
-              <option value="">All dormitories</option>
+              <option value="">{t("All dormitories")}</option>
               {dormitories.map((d) => (
                 <option key={d.id} value={d.id}>{d.name}</option>
               ))}
@@ -387,9 +381,7 @@ export default function MatronRollCall() {
             type="button"
             onClick={clearFilters}
             className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted"
-          >
-            Clear
-          </button>
+          >{t("Clear")}</button>
         </div>
       </section>
 
@@ -399,27 +391,25 @@ export default function MatronRollCall() {
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">Session</th>
-                <th className="px-4 py-3">Dormitory</th>
-                <th className="px-4 py-3 text-right">Present</th>
-                <th className="px-4 py-3 text-right">Absent</th>
-                <th className="px-4 py-3">Taken by</th>
-                <th className="px-4 py-3">Notes</th>
+                <th className="px-4 py-3">{t("Date")}</th>
+                <th className="px-4 py-3">{t("Session")}</th>
+                <th className="px-4 py-3">{t("Dormitory")}</th>
+                <th className="px-4 py-3 text-right">{t("Present")}</th>
+                <th className="px-4 py-3 text-right">{t("Absent")}</th>
+                <th className="px-4 py-3">{t("Taken by")}</th>
+                <th className="px-4 py-3">{t("Notes")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-14 text-center">
-                    <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+                    <div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
                   </td>
                 </tr>
               ) : rollCalls.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-14 text-center text-muted-foreground">
-                    No roll calls recorded yet.
-                  </td>
+                  <td colSpan={7} className="px-4 py-14 text-center text-muted-foreground">{t("No roll calls recorded yet.")}</td>
                 </tr>
               ) : (
                 rollCalls.map((rc) => (
@@ -441,29 +431,23 @@ export default function MatronRollCall() {
         {/* Pagination */}
         {!loading && rollCalls.length > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-sm text-muted-foreground">
-            <p>
-              Showing <span className="font-medium text-foreground">{from}</span>–
-              <span className="font-medium text-foreground">{to}</span> of{' '}
-              <span className="font-medium text-foreground">{meta.total}</span> roll calls
-            </p>
+            <p>{t("Showing")}<span className="font-medium text-foreground">{from}</span>–
+              <span className="font-medium text-foreground">{to}</span>{t(" of")}{' '}
+              <span className="font-medium text-foreground">{meta.total}</span>{t(" roll calls")}</p>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={meta.current_page <= 1}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <span className="px-1">Page {meta.current_page} of {Math.max(meta.last_page, 1)}</span>
+              >{t("Previous")}</button>
+              <span className="px-1">{t("Page ")}{meta.current_page}{t(" of ")}{Math.max(meta.last_page, 1)}</span>
               <button
                 type="button"
                 onClick={() => setPage((p) => Math.min(meta.last_page, p + 1))}
                 disabled={meta.current_page >= meta.last_page}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Next
-              </button>
+              >{t("Next")}</button>
             </div>
           </div>
         )}

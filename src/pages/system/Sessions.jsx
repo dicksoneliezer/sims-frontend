@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useMemo, useState } from 'react'
 import { FiUsers, FiRefreshCw, FiSearch, FiLogOut, FiSmartphone, FiMonitor } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -77,6 +79,7 @@ const ROLE_TONE = {
 }
 
 export default function SystemAdminSessions() {
+  useLanguage()
   const [sessions, setSessions] = useState([])
   const [search, setSearch] = useState('')
   const [role, setRole] = useState('')
@@ -98,16 +101,16 @@ export default function SystemAdminSessions() {
   const handleRefresh = () => {
     const refreshed = loadSessions()
     setSessions(refreshed)
-    toast.success('Sessions refreshed')
+    toast.success(t("Sessions refreshed"))
   }
 
   const handleTerminate = (session) => {
-    if (!window.confirm(`Terminate session for ${session.user_name}?`)) return
+    if (!window.confirm(t("Terminate session for {0}?", [session.user_name]))) return
 
     const updated = sessions.filter((s) => s.id !== session.id)
     setSessions(updated)
     saveSessions(updated)
-    toast.success(`Session for ${session.user_name} terminated`)
+    toast.success(t("Session for {0} terminated", [session.user_name]))
   }
 
   const formatDate = (dateStr) => {
@@ -120,17 +123,15 @@ export default function SystemAdminSessions() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiUsers className="h-5 w-5 text-primary" /> User Sessions
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">View active user sessions and manage logins.</p>
+            <FiUsers className="h-5 w-5 text-primary" />{t(" User Sessions")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("View active user sessions and manage logins.")}</p>
         </div>
         <button
           type="button"
           onClick={handleRefresh}
           className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
         >
-          <FiRefreshCw className="h-4 w-4" /> Refresh
-        </button>
+          <FiRefreshCw className="h-4 w-4" />{t(" Refresh")}</button>
       </section>
 
       <section className="rounded-xl border border-border bg-surface shadow-sm">
@@ -141,7 +142,7 @@ export default function SystemAdminSessions() {
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, username or IP"
+              placeholder={t("Search by name, username or IP")}
               className="w-full rounded-lg border border-border py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </div>
@@ -150,16 +151,16 @@ export default function SystemAdminSessions() {
             onChange={(e) => setRole(e.target.value)}
             className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary"
           >
-            <option value="">All roles</option>
-            <option value="super_admin">Super Admin</option>
-            <option value="system_admin">System Admin</option>
-            <option value="academic_teacher">Academic Teacher</option>
-            <option value="teacher">Teacher</option>
-            <option value="accountant">Accountant</option>
-            <option value="store_keeper">Store Keeper</option>
-            <option value="matron">Matron</option>
-            <option value="student">Student</option>
-            <option value="parent">Parent</option>
+            <option value="">{t("All roles")}</option>
+            <option value="super_admin">{t("Super Admin")}</option>
+            <option value="system_admin">{t("System Admin")}</option>
+            <option value="academic_teacher">{t("Academic Teacher")}</option>
+            <option value="teacher">{t("Teacher")}</option>
+            <option value="accountant">{t("Accountant")}</option>
+            <option value="store_keeper">{t("Store Keeper")}</option>
+            <option value="matron">{t("Matron")}</option>
+            <option value="student">{t("Student")}</option>
+            <option value="parent">{t("Parent")}</option>
           </select>
         </div>
 
@@ -167,20 +168,18 @@ export default function SystemAdminSessions() {
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-4 py-3">User</th>
-                <th className="px-4 py-3">Role</th>
-                <th className="px-4 py-3">Device</th>
-                <th className="px-4 py-3">IP Address</th>
-                <th className="px-4 py-3">Last Activity</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-4 py-3">{t("User")}</th>
+                <th className="px-4 py-3">{t("Role")}</th>
+                <th className="px-4 py-3">{t("Device")}</th>
+                <th className="px-4 py-3">{t("IP Address")}</th>
+                <th className="px-4 py-3">{t("Last Activity")}</th>
+                <th className="px-4 py-3 text-right">{t("Actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-14 text-center text-muted-foreground">
-                    No active sessions found.
-                  </td>
+                  <td colSpan={6} className="px-4 py-14 text-center text-muted-foreground">{t("No active sessions found.")}</td>
                 </tr>
               ) : (
                 filtered.map((session) => (
@@ -191,7 +190,7 @@ export default function SystemAdminSessions() {
                     </td>
                     <td className="px-4 py-3">
                       <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${ROLE_TONE[session.role] ?? 'bg-muted text-muted-foreground'}`}>
-                        {session.role.replace('_', ' ')}
+                        {t(session.role.replace('_', ' '))}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
@@ -208,8 +207,7 @@ export default function SystemAdminSessions() {
                         onClick={() => handleTerminate(session)}
                         className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-danger hover:bg-danger-soft"
                       >
-                        <FiLogOut className="h-3.5 w-3.5" /> Terminate
-                      </button>
+                        <FiLogOut className="h-3.5 w-3.5" />{t(" Terminate")}</button>
                     </td>
                   </tr>
                 ))

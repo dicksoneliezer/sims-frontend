@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiAlertTriangle, FiRefreshCw, FiTrendingUp } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -5,6 +7,7 @@ import { getParentBalance } from '../../api/finance'
 import { formatDate, formatMoney, statusClass } from '../../utils/format'
 
 export default function Balance() {
+  useLanguage()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
@@ -18,7 +21,7 @@ export default function Balance() {
         if (active) setData(response)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load balance.')
+        if (active) toast.error(t("Unable to load balance."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -34,17 +37,15 @@ export default function Balance() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiTrendingUp className="h-5 w-5 text-primary" /> Fee balance
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">Outstanding fees across all your children.</p>
+            <FiTrendingUp className="h-5 w-5 text-primary" />{t(" Fee balance")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Outstanding fees across all your children.")}</p>
         </div>
         <button
           type="button"
           onClick={() => setRefreshKey((key) => key + 1)}
           className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
         >
-          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-        </button>
+          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
       </section>
 
       {/* Total Outstanding – styled like a StatCard, not a gradient banner */}
@@ -55,20 +56,17 @@ export default function Balance() {
         <p className="mt-4 text-2xl font-semibold text-foreground">
           {formatMoney(data?.total_outstanding ?? 0)}
         </p>
-        <p className="text-sm text-muted-foreground">Total outstanding</p>
+        <p className="text-sm text-muted-foreground">{t("Total outstanding")}</p>
         <p className="mt-2 text-xs text-muted-foreground">
-          {data?.children?.length ?? 0} {data?.children?.length === 1 ? 'child' : 'children'} linked to your account
-        </p>
+          {data?.children?.length ?? 0} {data?.children?.length === 1 ? t("child") : t("children")}{t(" linked to your account")}</p>
       </section>
 
       {loading ? (
         <div className="rounded-xl border border-border bg-surface p-14 text-center shadow-sm">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+          <div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
         </div>
       ) : !data || data.children.length === 0 ? (
-        <div className="rounded-xl border border-border bg-surface p-14 text-center text-muted-foreground shadow-sm">
-          No children linked to your account.
-        </div>
+        <div className="rounded-xl border border-border bg-surface p-14 text-center text-muted-foreground shadow-sm">{t("No children linked to your account.")}</div>
       ) : (
         <div className="space-y-5">
           {data.children.map((child) => (
@@ -77,20 +75,20 @@ export default function Balance() {
                 <div>
                   <h3 className="font-semibold text-foreground">{child.student_name}</h3>
                   <p className="text-xs text-muted-foreground">
-                    {child.student_number} · {child.class ?? 'No class'}
+                    {child.student_number} · {child.class ?? t("No class")}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-4 text-sm">
                   <div className="text-right">
-                    <p className="text-xs text-muted-foreground">Invoiced</p>
+                    <p className="text-xs text-muted-foreground">{t("Invoiced")}</p>
                     <p className="font-medium text-foreground">{formatMoney(child.total_invoiced)}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-muted-foreground">Paid</p>
+                    <p className="text-xs text-muted-foreground">{t("Paid")}</p>
                     <p className="font-medium text-success">{formatMoney(child.total_paid)}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-muted-foreground">Outstanding</p>
+                    <p className="text-xs text-muted-foreground">{t("Outstanding")}</p>
                     <p className={`font-semibold ${child.outstanding > 0 ? 'text-danger' : 'text-success'}`}>
                       {formatMoney(child.outstanding)}
                     </p>
@@ -102,20 +100,18 @@ export default function Balance() {
                 <table className="min-w-full divide-y divide-slate-200 text-sm">
                   <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
                     <tr>
-                      <th className="px-4 py-3">Invoice</th>
-                      <th className="px-4 py-3">Due date</th>
-                      <th className="px-4 py-3 text-right">Amount</th>
-                      <th className="px-4 py-3 text-right">Paid</th>
-                      <th className="px-4 py-3 text-right">Balance</th>
-                      <th className="px-4 py-3">Status</th>
+                      <th className="px-4 py-3">{t("Invoice")}</th>
+                      <th className="px-4 py-3">{t("Due date")}</th>
+                      <th className="px-4 py-3 text-right">{t("Amount")}</th>
+                      <th className="px-4 py-3 text-right">{t("Paid")}</th>
+                      <th className="px-4 py-3 text-right">{t("Balance")}</th>
+                      <th className="px-4 py-3">{t("Status")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {child.invoices.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
-                          No invoices.
-                        </td>
+                        <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">{t("No invoices.")}</td>
                       </tr>
                     ) : (
                       child.invoices.map((invoice) => (
@@ -130,8 +126,7 @@ export default function Balance() {
                             <p>{formatDate(invoice.due_date)}</p>
                             {invoice.is_overdue && (
                               <p className="flex items-center gap-1 text-xs font-medium text-danger">
-                                <FiAlertTriangle className="h-3 w-3" /> Overdue
-                              </p>
+                                <FiAlertTriangle className="h-3 w-3" />{t(" Overdue")}</p>
                             )}
                           </td>
                           <td className="px-4 py-3 text-right text-foreground">{formatMoney(invoice.amount)}</td>
@@ -139,7 +134,7 @@ export default function Balance() {
                           <td className="px-4 py-3 text-right font-semibold text-foreground">{formatMoney(invoice.balance)}</td>
                           <td className="px-4 py-3">
                             <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusClass(invoice.status)}`}>
-                              {invoice.status}
+                              {t(invoice.status)}
                             </span>
                           </td>
                         </tr>

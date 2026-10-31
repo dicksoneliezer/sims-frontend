@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import {
   FiAlertTriangle,
@@ -104,6 +106,7 @@ function buildRow(tab, item) {
 }
 
 export default function Inventory() {
+  useLanguage()
   const [overview, setOverview] = useState(null)
   const [tab, setTab] = useState('assets')
   const [rows, setRows] = useState([])
@@ -116,7 +119,7 @@ export default function Inventory() {
   useEffect(() => {
     getInventoryOverview()
       .then(setOverview)
-      .catch(() => toast.error('Unable to load inventory overview.'))
+      .catch(() => toast.error(t("Unable to load inventory overview.")))
   }, [refreshKey])
 
   useEffect(() => {
@@ -132,7 +135,7 @@ export default function Inventory() {
         setMeta(response.meta)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load inventory records.')
+        if (active) toast.error(t("Unable to load inventory records."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -150,18 +153,16 @@ export default function Inventory() {
   }
 
   return (
-    <AppLayout modules={MODULES_BY_ROLE.super_admin} title="Inventory">
+    <AppLayout modules={MODULES_BY_ROLE.super_admin} title={t("Inventory")}>
       <div className="space-y-5">
         <section className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-              <FiArchive className="h-5 w-5 text-primary" /> Inventory oversight
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">Read-only view of assets, stock, alerts and maintenance. Store keepers manage inventory operations.</p>
+              <FiArchive className="h-5 w-5 text-primary" />{t(" Inventory oversight")}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t("Read-only view of assets, stock, alerts and maintenance. Store keepers manage inventory operations.")}</p>
           </div>
           <button type="button" onClick={() => setRefreshKey((key) => key + 1)} className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted">
-            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-          </button>
+            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
         </section>
 
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -173,7 +174,7 @@ export default function Inventory() {
               <p className="mt-4 text-2xl font-semibold text-foreground">
                 {overview ? (item.money ? formatMoney(overview[item.key]) : formatNumber(overview[item.key])) : '-'}
               </p>
-              <p className="text-sm text-muted-foreground">{item.label}</p>
+              <p className="text-sm text-muted-foreground">{t(item.label)}</p>
             </article>
           ))}
         </section>
@@ -182,8 +183,8 @@ export default function Inventory() {
           <section className="flex items-start gap-3 rounded-xl border border-amber-200 bg-warning-soft p-4 text-sm text-amber-800">
             <FiAlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
             <div>
-              <p className="font-semibold">{overview.open_alerts} open low-stock alert(s)</p>
-              <p className="text-warning">Review the Low Stock tab for items that need replenishment.</p>
+              <p className="font-semibold">{overview.open_alerts}{t(" open low-stock alert(s)")}</p>
+              <p className="text-warning">{t("Review the Low Stock tab for items that need replenishment.")}</p>
             </div>
           </section>
         )}
@@ -198,7 +199,7 @@ export default function Inventory() {
                   onClick={() => changeTab(item.key)}
                   className={`rounded-lg px-3 py-2 text-sm font-medium transition ${tab === item.key ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
                 >
-                  {item.label}
+                  {t(item.label)}
                 </button>
               ))}
             </div>
@@ -208,7 +209,7 @@ export default function Inventory() {
                 type="search"
                 value={search}
                 onChange={(event) => { setSearch(event.target.value); setPage(1) }}
-                placeholder="Search records"
+                placeholder={t("Search records")}
                 className="w-full rounded-lg border border-border py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
@@ -218,18 +219,18 @@ export default function Inventory() {
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-3">Record</th>
-                  <th className="px-4 py-3">Details</th>
-                  <th className="px-4 py-3 text-right">Value / Qty</th>
-                  <th className="px-4 py-3">Date</th>
-                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">{t("Record")}</th>
+                  <th className="px-4 py-3">{t("Details")}</th>
+                  <th className="px-4 py-3 text-right">{t("Value / Qty")}</th>
+                  <th className="px-4 py-3">{t("Date")}</th>
+                  <th className="px-4 py-3">{t("Status")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
-                  <tr><td colSpan={5} className="px-4 py-14 text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></td></tr>
+                  <tr><td colSpan={5} className="px-4 py-14 text-center"><div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></td></tr>
                 ) : rows.length === 0 ? (
-                  <tr><td colSpan={5} className="px-4 py-14 text-center text-muted-foreground">No records found.</td></tr>
+                  <tr><td colSpan={5} className="px-4 py-14 text-center text-muted-foreground">{t("No records found.")}</td></tr>
                 ) : rows.map((row) => (
                   <tr key={row.id} className="hover:bg-muted/70">
                     <td className="px-4 py-3">
@@ -242,7 +243,7 @@ export default function Inventory() {
                     </td>
                     <td className="px-4 py-3 text-right font-medium text-foreground">
                       {row.value !== undefined ? formatMoney(row.value) : '-'}
-                      {row.quantity !== undefined && <p className="text-xs font-normal text-muted-foreground">{formatNumber(row.quantity)} units</p>}
+                      {row.quantity !== undefined && <p className="text-xs font-normal text-muted-foreground">{formatNumber(row.quantity)}{t(" units")}</p>}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{formatDate(row.date)}</td>
                     <td className="px-4 py-3">
@@ -255,10 +256,10 @@ export default function Inventory() {
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-sm text-muted-foreground">
-            <p>Page <span className="font-medium text-foreground">{meta.current_page}</span> of <span className="font-medium text-foreground">{Math.max(meta.last_page, 1)}</span> · {meta.total} records</p>
+            <p>{t("Page ")}<span className="font-medium text-foreground">{meta.current_page}</span>{t(" of ")}<span className="font-medium text-foreground">{Math.max(meta.last_page, 1)}</span> · {meta.total}{t(" records")}</p>
             <div className="flex items-center gap-2">
-              <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={meta.current_page <= 1 || loading} className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50">Previous</button>
-              <button type="button" onClick={() => setPage((current) => Math.min(meta.last_page, current + 1))} disabled={meta.current_page >= meta.last_page || loading} className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50">Next</button>
+              <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={meta.current_page <= 1 || loading} className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50">{t("Previous")}</button>
+              <button type="button" onClick={() => setPage((current) => Math.min(meta.last_page, current + 1))} disabled={meta.current_page >= meta.last_page || loading} className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50">{t("Next")}</button>
             </div>
           </div>
         </section>

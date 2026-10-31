@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiUsers, FiDollarSign, FiAlertCircle, FiClock } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
@@ -6,6 +8,7 @@ import api from '../../api/axios'
 import { formatMoney } from '../../utils/format'
 
 export default function ParentDashboard() {
+  useLanguage()
   const [stats, setStats] = useState({
     childrenCount: 0,
     totalOutstanding: 0,
@@ -48,7 +51,7 @@ export default function ParentDashboard() {
         })
         setChildren(childrenData)
       } catch (err) {
-        toast.error('Unable to load dashboard data.')
+        toast.error(t("Unable to load dashboard data."))
       } finally {
         setLoading(false)
       }
@@ -58,7 +61,7 @@ export default function ParentDashboard() {
 
   return (
     <div className="space-y-5">
-      <h2 className="text-xl font-semibold text-foreground">Welcome back!</h2>
+      <h2 className="text-xl font-semibold text-foreground">{t("Welcome back!")}</h2>
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
@@ -68,17 +71,17 @@ export default function ParentDashboard() {
         <>
           {/* Takwimu */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard title="My Children" value={stats.childrenCount} icon={FiUsers} color="text-blue-600" bg="bg-blue-50" />
-            <StatCard title="Outstanding Fees" value={formatMoney(stats.totalOutstanding)} icon={FiAlertCircle} color="text-red-600" bg="bg-red-50" isText />
-            <StatCard title="Total Paid" value={formatMoney(stats.totalPaid)} icon={FiDollarSign} color="text-green-600" bg="bg-green-50" isText />
-            <StatCard title="Pending Payments" value={stats.pendingPayments} icon={FiClock} color="text-orange-600" bg="bg-orange-50" />
+            <StatCard title={t("My Children")} value={stats.childrenCount} icon={FiUsers} color="text-blue-600" bg="bg-blue-50" />
+            <StatCard title={t("Outstanding Fees")} value={formatMoney(stats.totalOutstanding)} icon={FiAlertCircle} color="text-red-600" bg="bg-red-50" isText />
+            <StatCard title={t("Total Paid")} value={formatMoney(stats.totalPaid)} icon={FiDollarSign} color="text-green-600" bg="bg-green-50" isText />
+            <StatCard title={t("Pending Payments")} value={stats.pendingPayments} icon={FiClock} color="text-orange-600" bg="bg-orange-50" />
           </div>
 
           {/* Orodha ya Watoto */}
           <div className="bg-surface p-6 rounded-xl border border-border">
-            <h2 className="text-lg font-semibold mb-4 text-foreground">My Children</h2>
+            <h2 className="text-lg font-semibold mb-4 text-foreground">{t("My Children")}</h2>
             {children.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No children linked to your account yet.</p>
+              <p className="text-sm text-muted-foreground">{t("No children linked to your account yet.")}</p>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
                 {children.map((child) => (
@@ -90,9 +93,7 @@ export default function ParentDashboard() {
                       <p className="font-medium text-foreground">{child.full_name}</p>
                       <p className="text-xs text-muted-foreground">{child.student_number} · {child.class || '—'}</p>
                     </div>
-                    <Link to={`/parent/children/${child.id}`} className="text-sm font-medium text-primary hover:underline">
-                      View
-                    </Link>
+                    <Link to={`/parent/children/${child.id}`} className="text-sm font-medium text-primary hover:underline">{t("View")}</Link>
                   </div>
                 ))}
               </div>
@@ -101,17 +102,11 @@ export default function ParentDashboard() {
 
           {/* Quick Actions */}
           <div className="bg-surface p-6 rounded-xl border border-border">
-            <h2 className="text-lg font-semibold mb-4 text-foreground">Quick Actions</h2>
+            <h2 className="text-lg font-semibold mb-4 text-foreground">{t("Quick Actions")}</h2>
             <div className="flex flex-wrap gap-4">
-              <Link to="/parent/payments" className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition">
-                Make a Payment
-              </Link>
-              <Link to="/parent/balance" className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition">
-                View Balance
-              </Link>
-              <Link to="/parent/history" className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition">
-                Payment History
-              </Link>
+              <Link to="/parent/payments" className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition">{t("Make a Payment")}</Link>
+              <Link to="/parent/balance" className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition">{t("View Balance")}</Link>
+              <Link to="/parent/history" className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition">{t("Payment History")}</Link>
             </div>
           </div>
         </>
@@ -121,13 +116,14 @@ export default function ParentDashboard() {
 }
 
 function StatCard({ title, value, icon: Icon, color, bg, isText = false }) {
+  useLanguage()
   return (
     <div className="bg-surface p-5 rounded-xl border border-border shadow-sm flex items-center gap-4">
       <div className={`p-3 rounded-lg ${bg} ${color}`}>
         <Icon className="h-6 w-6" />
       </div>
       <div>
-        <p className="text-sm text-muted-foreground">{title}</p>
+        <p className="text-sm text-muted-foreground">{t(title)}</p>
         <p className={`font-bold text-foreground ${isText ? 'text-lg' : 'text-2xl'}`}>
           {value}
         </p>

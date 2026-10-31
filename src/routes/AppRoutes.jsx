@@ -1,133 +1,136 @@
+import { lazy } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import Dashboard from '../pages/Dashboard'
-import Students from '../pages/Students'
-import Subjects from '../pages/Subjects'
-import Teachers from '../pages/Teachers'
-import Timetables from '../pages/Timetables'
-import Login from '../pages/auth/Login'
-import NotFound from '../pages/NotFound'
-import Parents from '../pages/admin/Parents'
-import Accountants from '../pages/admin/Accountants'
-import FeeStructure from '../pages/admin/FeeStructure'
-import Users from '../pages/admin/Users'
-import Finance from '../pages/admin/Finance'
-import Inventory from '../pages/admin/Inventory'
-import AdminReports from '../pages/admin/Reports'
-import Settings from '../pages/admin/Settings'
-
-// Accountant Pages
-import AccountantDashboard from '../pages/accountant/Dashboard'
-import AccountantStudents from '../pages/accountant/Students'
-import AccountantPayments from '../pages/accountant/Payments'
-import Invoices from '../pages/accountant/Invoices'
-import Expenses from '../pages/accountant/Expenses'
-import Debts from '../pages/accountant/Debts'
-import Transactions from '../pages/accountant/Transactions'
-import Reports from '../pages/accountant/Reports'
-import ControlNumbers from '../pages/accountant/ControlNumbers'
-import AccountantReconciliation from '../pages/accountant/Reconciliation'  // <-- MPYA
-import AccountantProfile from '../pages/accountant/Profile'                // <-- MPYA
 import { AccountantLayout } from '../components/layouts/AccountantLayout'
-
-// Student Pages
-import StudentDashboard from '../pages/student/Dashboard'
-import StudentResults from '../pages/student/Results'
-import StudentAttendance from '../pages/student/Attendance'
-import StudentNotes from '../pages/student/Notes'
-import StudentTimetable from '../pages/student/Timetable'
-import StudentProfile from '../pages/student/Profile'
-import StudentAssignments from '../pages/student/Assignments'
-import StudentReportCard from '../pages/student/ReportCard'
-import StudentCertificates from '../pages/student/Certificates'
-import StudentAnnouncements from '../pages/student/Announcements'
 import { StudentLayout } from '../components/layouts/StudentLayout'
-
-// Teacher Pages
-import TeacherDashboard from '../pages/teacher/Dashboard'
-import TeacherAttendance from '../pages/teacher/Attendance'
-import TeacherMarks from '../pages/teacher/Marks'
-import TeacherNotes from '../pages/teacher/Notes'
-import TeacherBehavior from '../pages/teacher/Behavior'
-import TeacherStudents from '../pages/teacher/Students'
-import TeacherSubjects from '../pages/teacher/Subjects'
-import TeacherTimetable from '../pages/teacher/Timetable'
-import TeacherMessages from '../pages/teacher/Messages'
-import TeacherProfile from '../pages/teacher/Profile'
 import { TeacherLayout } from '../components/layouts/TeacherLayout'
-
-// Parent Pages
-import ParentDashboard from '../pages/parent/Dashboard'
-import Children from '../pages/parent/Children'
-import ChildDetail from '../pages/parent/ChildDetail'
-import Payments from '../pages/parent/Payments'
-import History from '../pages/parent/History'
-import Balance from '../pages/parent/Balance'
-import ParentStatement from '../pages/parent/Statement'
-import ParentAnnouncements from '../pages/parent/Announcements'
-import ParentMessages from '../pages/parent/Messages'
-import ParentGallery from '../pages/parent/Gallery'
-import ParentDocuments from '../pages/parent/Documents'
-import ParentReportCard from '../pages/parent/ReportCard'
-import ParentProfile from '../pages/parent/Profile'
 import { ParentLayout } from '../components/layouts/ParentLayout'
-
-// Academic Pages (MPYA)
-import AcademicDashboard from '../pages/academic/Dashboard'
-import AcademicExams from '../pages/academic/Exams'
-import AcademicResults from '../pages/academic/Results'
-import AcademicSyllabus from '../pages/academic/Syllabus'
-import AcademicTeachers from '../pages/academic/Teachers'
-import AcademicStudents from '../pages/academic/Students'
-import AcademicTimetable from '../pages/academic/Timetable'
-import AcademicAnnouncements from '../pages/academic/Announcements'
-import AcademicProfile from '../pages/academic/Profile'
-import AcademicAllocation from '../pages/academic/Allocation' // <-- MPYA
 import { AcademicLayout } from '../components/layouts/AcademicLayout'
-
-// Store Keeper Pages
-import StoreKeeperDashboard from '../pages/storekeeper/Dashboard'
-import StoreKeeperAssets from '../pages/storekeeper/Assets'
-import StoreKeeperInventory from '../pages/storekeeper/Inventory'
-import StoreKeeperStock from '../pages/storekeeper/Stock'
-import StoreKeeperMaintenance from '../pages/storekeeper/Maintenance'
-import StoreKeeperSettings from '../pages/storekeeper/Settings'
-import StoreKeeperAlerts from '../pages/storekeeper/Alerts'      // <-- MPYA
-import StoreKeeperReports from '../pages/storekeeper/Reports'    // <-- MPYA
-import StoreKeeperProfile from '../pages/storekeeper/Profile'    // <-- MPYA
 import { StoreKeeperLayout } from '../components/layouts/StoreKeeperLayout'
-
-// System Admin Pages
-import SystemAdminDashboard from '../pages/system/Dashboard'
-import SystemAdminSettings from '../pages/system/Settings'
-import SystemAdminBackup from '../pages/system/Backup'
-import SystemAdminLogs from '../pages/system/Logs'
-import SystemAdminSessions from '../pages/system/Sessions'
-import SystemAdminCache from '../pages/system/Cache'
-import SystemAdminErrors from '../pages/system/Errors'
-import SystemAdminQueue from '../pages/system/Queue'
-import SystemAdminApiKeys from '../pages/system/ApiKeys'
-import SystemAdminProfile from '../pages/system/Profile'         // <-- MPYA
-import SystemPlaceholder from '../pages/system/Placeholder'
 import { SystemLayout } from '../components/layouts/SystemLayout'
-
-// Matron Pages
-import MatronDashboard from '../pages/matron/Dashboard'
-import MatronDormitories from '../pages/matron/Dormitories'
-import MatronBeds from '../pages/matron/Beds'
-import MatronRollCall from '../pages/matron/RollCall'
-import MatronLeaves from '../pages/matron/Leaves'           // <-- MPYA
-import MatronSickBay from '../pages/matron/SickBay'
-import MatronIncidents from '../pages/matron/Incidents'
-import MatronInspections from '../pages/matron/Inspections' // <-- MPYA
-import MatronMessages from '../pages/matron/Messages'       // <-- MPYA
-import MatronReports from '../pages/matron/Reports'
-import MatronProfile from '../pages/matron/Profile'         // <-- MPYA
 import { MatronLayout } from '../components/layouts/MatronLayout'
-
-import Profile from '../pages/Profile'
 import { getHomePath } from '../utils/constants'
 import { PrivateRoute } from './PrivateRoute'
+
+const AdminCategories = lazy(() => import('../pages/admin/Categories'))
+const AdminCategoryDashboard = lazy(() => import('../pages/admin/Categories').then((module) => ({ default: module.AdminCategoryDashboard })))
+const Students = lazy(() => import('../pages/Students'))
+const Subjects = lazy(() => import('../pages/Subjects'))
+const Teachers = lazy(() => import('../pages/Teachers'))
+const Timetables = lazy(() => import('../pages/Timetables'))
+const Login = lazy(() => import('../pages/auth/Login'))
+const NotFound = lazy(() => import('../pages/NotFound'))
+const Parents = lazy(() => import('../pages/admin/Parents'))
+const Accountants = lazy(() => import('../pages/admin/Accountants'))
+const FeeStructure = lazy(() => import('../pages/admin/FeeStructure'))
+const Users = lazy(() => import('../pages/admin/Users'))
+const Finance = lazy(() => import('../pages/admin/Finance'))
+const Inventory = lazy(() => import('../pages/admin/Inventory'))
+const AdminReports = lazy(() => import('../pages/admin/Reports'))
+const Settings = lazy(() => import('../pages/admin/Settings'))
+
+// Accountant Pages
+const AccountantDashboard = lazy(() => import('../pages/accountant/Dashboard'))
+const AccountantStudents = lazy(() => import('../pages/accountant/Students'))
+const AccountantPayments = lazy(() => import('../pages/accountant/Payments'))
+const Invoices = lazy(() => import('../pages/accountant/Invoices'))
+const Expenses = lazy(() => import('../pages/accountant/Expenses'))
+const Debts = lazy(() => import('../pages/accountant/Debts'))
+const Transactions = lazy(() => import('../pages/accountant/Transactions'))
+const Reports = lazy(() => import('../pages/accountant/Reports'))
+const ControlNumbers = lazy(() => import('../pages/accountant/ControlNumbers'))
+const AccountantReconciliation = lazy(() => import('../pages/accountant/Reconciliation'))  // <-- MPYA
+const AccountantProfile = lazy(() => import('../pages/accountant/Profile'))                // <-- MPYA
+
+// Student Pages
+const StudentDashboard = lazy(() => import('../pages/student/Dashboard'))
+const StudentResults = lazy(() => import('../pages/student/Results'))
+const StudentAttendance = lazy(() => import('../pages/student/Attendance'))
+const StudentNotes = lazy(() => import('../pages/student/Notes'))
+const StudentTimetable = lazy(() => import('../pages/student/Timetable'))
+const StudentProfile = lazy(() => import('../pages/student/Profile'))
+const StudentAssignments = lazy(() => import('../pages/student/Assignments'))
+const StudentReportCard = lazy(() => import('../pages/student/ReportCard'))
+const StudentCertificates = lazy(() => import('../pages/student/Certificates'))
+const StudentAnnouncements = lazy(() => import('../pages/student/Announcements'))
+
+// Teacher Pages
+const TeacherDashboard = lazy(() => import('../pages/teacher/Dashboard'))
+const TeacherAttendance = lazy(() => import('../pages/teacher/Attendance'))
+const TeacherMarks = lazy(() => import('../pages/teacher/Marks'))
+const TeacherNotes = lazy(() => import('../pages/teacher/Notes'))
+const TeacherBehavior = lazy(() => import('../pages/teacher/Behavior'))
+const TeacherStudents = lazy(() => import('../pages/teacher/Students'))
+const TeacherSubjects = lazy(() => import('../pages/teacher/Subjects'))
+const TeacherTimetable = lazy(() => import('../pages/teacher/Timetable'))
+const TeacherMessages = lazy(() => import('../pages/teacher/Messages'))
+const TeacherProfile = lazy(() => import('../pages/teacher/Profile'))
+
+// Parent Pages
+const ParentDashboard = lazy(() => import('../pages/parent/Dashboard'))
+const Children = lazy(() => import('../pages/parent/Children'))
+const ChildDetail = lazy(() => import('../pages/parent/ChildDetail'))
+const Payments = lazy(() => import('../pages/parent/Payments'))
+const History = lazy(() => import('../pages/parent/History'))
+const Balance = lazy(() => import('../pages/parent/Balance'))
+const ParentStatement = lazy(() => import('../pages/parent/Statement'))
+const ParentAnnouncements = lazy(() => import('../pages/parent/Announcements'))
+const ParentMessages = lazy(() => import('../pages/parent/Messages'))
+const ParentGallery = lazy(() => import('../pages/parent/Gallery'))
+const ParentDocuments = lazy(() => import('../pages/parent/Documents'))
+const ParentReportCard = lazy(() => import('../pages/parent/ReportCard'))
+const ParentProfile = lazy(() => import('../pages/parent/Profile'))
+
+// Academic Pages (MPYA)
+const AcademicDashboard = lazy(() => import('../pages/academic/Dashboard'))
+const AcademicExams = lazy(() => import('../pages/academic/Exams'))
+const AcademicResults = lazy(() => import('../pages/academic/Results'))
+const AcademicSyllabus = lazy(() => import('../pages/academic/Syllabus'))
+const AcademicTeachers = lazy(() => import('../pages/academic/Teachers'))
+const AcademicStudents = lazy(() => import('../pages/academic/Students'))
+const AcademicTimetable = lazy(() => import('../pages/academic/Timetable'))
+const AcademicAnnouncements = lazy(() => import('../pages/academic/Announcements'))
+const AcademicProfile = lazy(() => import('../pages/academic/Profile'))
+const AcademicAllocation = lazy(() => import('../pages/academic/Allocation')) // <-- MPYA
+
+// Store Keeper Pages
+const StoreKeeperDashboard = lazy(() => import('../pages/storekeeper/Dashboard'))
+const StoreKeeperAssets = lazy(() => import('../pages/storekeeper/Assets'))
+const StoreKeeperInventory = lazy(() => import('../pages/storekeeper/Inventory'))
+const StoreKeeperStock = lazy(() => import('../pages/storekeeper/Stock'))
+const StoreKeeperMaintenance = lazy(() => import('../pages/storekeeper/Maintenance'))
+const StoreKeeperSettings = lazy(() => import('../pages/storekeeper/Settings'))
+const StoreKeeperAlerts = lazy(() => import('../pages/storekeeper/Alerts'))      // <-- MPYA
+const StoreKeeperReports = lazy(() => import('../pages/storekeeper/Reports'))    // <-- MPYA
+const StoreKeeperProfile = lazy(() => import('../pages/storekeeper/Profile'))    // <-- MPYA
+
+// System Admin Pages
+const SystemAdminDashboard = lazy(() => import('../pages/system/Dashboard'))
+const SystemAdminSettings = lazy(() => import('../pages/system/Settings'))
+const SystemAdminBackup = lazy(() => import('../pages/system/Backup'))
+const SystemAdminLogs = lazy(() => import('../pages/system/Logs'))
+const SystemAdminSessions = lazy(() => import('../pages/system/Sessions'))
+const SystemAdminCache = lazy(() => import('../pages/system/Cache'))
+const SystemAdminErrors = lazy(() => import('../pages/system/Errors'))
+const SystemAdminQueue = lazy(() => import('../pages/system/Queue'))
+const SystemAdminApiKeys = lazy(() => import('../pages/system/ApiKeys'))
+const SystemAdminProfile = lazy(() => import('../pages/system/Profile'))         // <-- MPYA
+const SystemPlaceholder = lazy(() => import('../pages/system/Placeholder'))
+
+// Matron Pages
+const MatronDashboard = lazy(() => import('../pages/matron/Dashboard'))
+const MatronDormitories = lazy(() => import('../pages/matron/Dormitories'))
+const MatronBeds = lazy(() => import('../pages/matron/Beds'))
+const MatronRollCall = lazy(() => import('../pages/matron/RollCall'))
+const MatronLeaves = lazy(() => import('../pages/matron/Leaves'))           // <-- MPYA
+const MatronSickBay = lazy(() => import('../pages/matron/SickBay'))
+const MatronIncidents = lazy(() => import('../pages/matron/Incidents'))
+const MatronInspections = lazy(() => import('../pages/matron/Inspections')) // <-- MPYA
+const MatronMessages = lazy(() => import('../pages/matron/Messages'))       // <-- MPYA
+const MatronReports = lazy(() => import('../pages/matron/Reports'))
+const MatronProfile = lazy(() => import('../pages/matron/Profile'))         // <-- MPYA
+
+const Profile = lazy(() => import('../pages/Profile'))
 
 const ROLE_ROUTES = [
   { path: '/admin', role: 'super_admin' },
@@ -365,11 +368,16 @@ export default function AppRoutes() {
           path={path}
           element={
             <PrivateRoute roles={[role]}>
-              <Dashboard />
+              <AdminCategories />
             </PrivateRoute>
           }
         />
       ))}
+
+      <Route
+        path="/admin/dashboard"
+        element={<PrivateRoute roles={['super_admin']}><AdminCategoryDashboard /></PrivateRoute>}
+      />
 
       {STUDENT_ROUTES.map(({ path, role }) => (
         <Route

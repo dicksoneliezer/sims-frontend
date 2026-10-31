@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 // src/pages/academic/Results.jsx
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -35,6 +37,7 @@ const emptyForm = {
 }
 
 export default function AcademicResults() {
+  useLanguage()
   const [searchParams] = useSearchParams()
   const [tab, setTab] = useState('results')
 
@@ -90,7 +93,7 @@ export default function AcademicResults() {
         setProgressStudents(studentResponse.data ?? [])
       })
       .catch(() => {
-        if (active) toast.error('Unable to load filters.')
+        if (active) toast.error(t("Unable to load filters."))
       })
 
     return () => { active = false }
@@ -111,7 +114,7 @@ export default function AcademicResults() {
           setMeta(response.meta ?? { current_page: 1, total: 0, last_page: 1 })
         })
         .catch(() => {
-          if (active) toast.error('Unable to load results.')
+          if (active) toast.error(t("Unable to load results."))
         })
         .finally(() => {
           if (active) setLoading(false)
@@ -139,7 +142,7 @@ export default function AcademicResults() {
           if (active) setAnalysis(response.data)
         })
         .catch(() => {
-          if (active) toast.error('Unable to load results analysis.')
+          if (active) toast.error(t("Unable to load results analysis."))
         })
         .finally(() => {
           if (active) setAnalysisLoading(false)
@@ -169,7 +172,7 @@ export default function AcademicResults() {
         if (active) setFormStudents(response.data ?? [])
       })
       .catch(() => {
-        if (active) toast.error('Unable to load students.')
+        if (active) toast.error(t("Unable to load students."))
       })
 
     return () => {
@@ -213,41 +216,41 @@ export default function AcademicResults() {
     try {
       if (form.id) {
         await updateResult(form.id, payload)
-        toast.success('Result updated')
+        toast.success(t("Result updated"))
       } else {
         await createResult(payload)
-        toast.success('Result saved')
+        toast.success(t("Result saved"))
       }
 
       setForm(null)
       setRefreshKey((key) => key + 1)
     } catch (error) {
       const errors = error.response?.data?.errors
-      toast.error(errors ? Object.values(errors).flat()[0] : error.response?.data?.message ?? 'Unable to save result.')
+      toast.error(errors ? Object.values(errors).flat()[0] : error.response?.data?.message ?? t("Unable to save result."))
     } finally {
       setSaving(false)
     }
   }
 
   const handleDelete = async (result) => {
-    if (!window.confirm(`Delete the ${result.subject?.name} result for ${result.student?.full_name}?`)) return
+    if (!window.confirm(t("Delete the {0} result for {1}?", [result.subject?.name, result.student?.full_name]))) return
 
     try {
       await deleteResult(result.id)
-      toast.success('Result deleted')
+      toast.success(t("Result deleted"))
       setRefreshKey((key) => key + 1)
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to delete result.')
+      toast.error(error.response?.data?.message ?? t("Unable to delete result."))
     }
   }
 
   const handleApprove = async (result) => {
     try {
       await api.post(`/academic/results/${result.id}/approve`)
-      toast.success(`Result approved for ${result.student?.full_name}`)
+      toast.success(t("Result approved for {0}", [result.student?.full_name]))
       setRefreshKey((key) => key + 1)
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to approve result.')
+      toast.error(error.response?.data?.message ?? t("Unable to approve result."))
     }
   }
 
@@ -258,7 +261,7 @@ export default function AcademicResults() {
     try {
       setProgress(await getStudentProgress(progressStudentId))
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to load student progress.')
+      toast.error(error.response?.data?.message ?? t("Unable to load student progress."))
     } finally {
       setProgressLoading(false)
     }
@@ -274,19 +277,17 @@ export default function AcademicResults() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiBarChart2 className="h-5 w-5 text-primary" /> Results and analysis
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">Review marks, correct entries and analyse performance.</p>
+            <FiBarChart2 className="h-5 w-5 text-primary" />{t(" Results and analysis")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Review marks, correct entries and analyse performance.")}</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex gap-1 rounded-lg bg-muted p-1">
             {[['results', 'Results'], ['analysis', 'Analysis'], ['progress', 'Student progress']].map(([value, label]) => (
-              <button key={value} type="button" onClick={() => setTab(value)} className={`rounded-md px-3 py-1.5 text-sm font-medium ${tab === value ? 'bg-surface text-foreground shadow-sm' : 'text-muted-foreground'}`}>{label}</button>
+              <button key={value} type="button" onClick={() => setTab(value)} className={`rounded-md px-3 py-1.5 text-sm font-medium ${tab === value ? 'bg-surface text-foreground shadow-sm' : 'text-muted-foreground'}`}>{t(label)}</button>
             ))}
           </div>
           <button type="button" onClick={() => setRefreshKey((key) => key + 1)} className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted">
-            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-          </button>
+            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
         </div>
       </section>
 
@@ -294,50 +295,49 @@ export default function AcademicResults() {
         <section className="rounded-xl border border-border bg-surface shadow-sm">
           <div className="grid gap-3 border-b border-border p-4 md:grid-cols-4">
             <select value={query.exam_id} onChange={(event) => updateFilter('exam_id', event.target.value)} className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary">
-              <option value="">All exams</option>
-              {exams.map((exam) => <option key={exam.id} value={exam.id}>{exam.name} ({exam.term ?? 'No term'})</option>)}
+              <option value="">{t("All exams")}</option>
+              {exams.map((exam) => <option key={exam.id} value={exam.id}>{exam.name} ({exam.term ?? t("No term")})</option>)}
             </select>
             <select value={query.class_id} onChange={(event) => updateFilter('class_id', event.target.value)} className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary">
-              <option value="">All classes</option>
+              <option value="">{t("All classes")}</option>
               {classes.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
             <select value={query.subject_id} onChange={(event) => updateFilter('subject_id', event.target.value)} className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary">
-              <option value="">All subjects</option>
+              <option value="">{t("All subjects")}</option>
               {subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name} ({subject.code})</option>)}
             </select>
             <button type="button" onClick={openCreate} className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover">
-              <FiPlus className="h-4 w-4" /> Add result
-            </button>
+              <FiPlus className="h-4 w-4" />{t(" Add result")}</button>
           </div>
           {selectedExam && (
             <p className="border-b border-border bg-primary-soft/60 px-4 py-2 text-xs text-primary">
-              {selectedExam.name} · {selectedExam.type === 'ca' ? 'Continuous assessment' : 'Exam'} · {selectedExam.term ?? 'No term'} {selectedExam.academic_year ?? ''}
+              {selectedExam.name} · {selectedExam.type === 'ca' ? t("Continuous assessment") : t("Exam")} · {selectedExam.term ?? t("No term")} {selectedExam.academic_year ?? ''}
             </p>
           )}
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-3">Student</th>
-                  <th className="px-4 py-3">Subject</th>
-                  <th className="px-4 py-3">Exam</th>
-                  <th className="px-4 py-3 text-right">Marks</th>
-                  <th className="px-4 py-3">Grade</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Entered by</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="px-4 py-3">{t("Student")}</th>
+                  <th className="px-4 py-3">{t("Subject")}</th>
+                  <th className="px-4 py-3">{t("Exam")}</th>
+                  <th className="px-4 py-3 text-right">{t("Marks")}</th>
+                  <th className="px-4 py-3">{t("Grade")}</th>
+                  <th className="px-4 py-3">{t("Status")}</th>
+                  <th className="px-4 py-3">{t("Entered by")}</th>
+                  <th className="px-4 py-3 text-right">{t("Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
-                  <tr><td colSpan={8} className="px-4 py-14 text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></td></tr>
+                  <tr><td colSpan={8} className="px-4 py-14 text-center"><div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></td></tr>
                 ) : results.length === 0 ? (
-                  <tr><td colSpan={8} className="px-4 py-14 text-center text-muted-foreground">No results match your filters.</td></tr>
+                  <tr><td colSpan={8} className="px-4 py-14 text-center text-muted-foreground">{t("No results match your filters.")}</td></tr>
                 ) : results.map((result) => (
                   <tr key={result.id} className="hover:bg-muted/70">
                     <td className="px-4 py-3">
                       <p className="font-medium text-foreground">{result.student?.full_name}</p>
-                      <p className="text-xs text-muted-foreground">{result.student?.student_number} · {result.student?.school_class?.name ?? result.student?.class ?? 'No class'}</p>
+                      <p className="text-xs text-muted-foreground">{result.student?.student_number} · {result.student?.school_class?.name ?? result.student?.class ?? t("No class")}</p>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{result.subject?.name} <span className="text-xs text-muted-foreground">({result.subject?.code})</span></td>
                     <td className="px-4 py-3 text-muted-foreground">{result.exam?.name ?? result.exam_name ?? '—'}</td>
@@ -346,7 +346,7 @@ export default function AcademicResults() {
                     <td className="px-4 py-3">
                       <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${
                         result.status === 'approved' ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning'
-                      }`}>{result.status ?? 'pending'}</span>
+                      }`}>{result.status ?? t("pending")}</span>
                     </td>
                     <td className="px-4 py-3 text-xs text-muted-foreground">{result.entered_by_name ?? '—'}</td>
                     <td className="px-4 py-3">
@@ -356,12 +356,10 @@ export default function AcademicResults() {
                             type="button"
                             onClick={() => handleApprove(result)}
                             className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-success-soft px-3 py-1.5 text-xs font-semibold text-success hover:bg-emerald-100"
-                          >
-                            Approve
-                          </button>
+                          >{t("Approve")}</button>
                         )}
-                        <button type="button" onClick={() => openEdit(result)} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-primary" aria-label="Edit result"><FiEdit2 className="h-4 w-4" /></button>
-                        <button type="button" onClick={() => handleDelete(result)} className="rounded-lg p-1.5 text-muted-foreground hover:bg-danger-soft hover:text-danger" aria-label="Delete result"><FiTrash2 className="h-4 w-4" /></button>
+                        <button type="button" onClick={() => openEdit(result)} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-primary" aria-label={t("Edit result")}><FiEdit2 className="h-4 w-4" /></button>
+                        <button type="button" onClick={() => handleDelete(result)} className="rounded-lg p-1.5 text-muted-foreground hover:bg-danger-soft hover:text-danger" aria-label={t("Delete result")}><FiTrash2 className="h-4 w-4" /></button>
                       </div>
                     </td>
                   </tr>
@@ -370,11 +368,11 @@ export default function AcademicResults() {
             </table>
           </div>
           <div className="flex items-center justify-between gap-3 border-t border-border p-4 text-sm">
-            <p className="text-muted-foreground">{meta.total ?? 0} result(s)</p>
+            <p className="text-muted-foreground">{meta.total ?? 0}{t(" result(s)")}</p>
             <div className="flex items-center gap-2">
-              <button type="button" disabled={page <= 1} onClick={() => setPage((current) => current - 1)} className="rounded-lg border border-border px-3 py-1.5 font-medium text-foreground disabled:opacity-40">Previous</button>
-              <span className="text-muted-foreground">Page {meta.current_page ?? 1} of {meta.last_page ?? 1}</span>
-              <button type="button" disabled={page >= (meta.last_page ?? 1)} onClick={() => setPage((current) => current + 1)} className="rounded-lg border border-border px-3 py-1.5 font-medium text-foreground disabled:opacity-40">Next</button>
+              <button type="button" disabled={page <= 1} onClick={() => setPage((current) => current - 1)} className="rounded-lg border border-border px-3 py-1.5 font-medium text-foreground disabled:opacity-40">{t("Previous")}</button>
+              <span className="text-muted-foreground">{t("Page ")}{meta.current_page ?? 1}{t(" of ")}{meta.last_page ?? 1}</span>
+              <button type="button" disabled={page >= (meta.last_page ?? 1)} onClick={() => setPage((current) => current + 1)} className="rounded-lg border border-border px-3 py-1.5 font-medium text-foreground disabled:opacity-40">{t("Next")}</button>
             </div>
           </div>
         </section>
@@ -384,25 +382,25 @@ export default function AcademicResults() {
         <section className="space-y-5">
           <div className="grid gap-3 rounded-xl border border-border bg-surface p-4 shadow-sm md:grid-cols-5">
             <select value={analysisFilters.exam_id} onChange={(event) => setAnalysisFilters({ ...analysisFilters, exam_id: event.target.value })} className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary">
-              <option value="">All exams</option>
+              <option value="">{t("All exams")}</option>
               {exams.map((exam) => <option key={exam.id} value={exam.id}>{exam.name}</option>)}
             </select>
             <select value={analysisFilters.class_id} onChange={(event) => setAnalysisFilters({ ...analysisFilters, class_id: event.target.value })} className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary">
-              <option value="">All classes</option>
+              <option value="">{t("All classes")}</option>
               {classes.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
             <select value={analysisFilters.subject_id} onChange={(event) => setAnalysisFilters({ ...analysisFilters, subject_id: event.target.value })} className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary">
-              <option value="">All subjects</option>
+              <option value="">{t("All subjects")}</option>
               {subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}
             </select>
-            <input value={analysisFilters.term} onChange={(event) => setAnalysisFilters({ ...analysisFilters, term: event.target.value })} placeholder="Term" className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary" />
-            <input value={analysisFilters.academic_year} onChange={(event) => setAnalysisFilters({ ...analysisFilters, academic_year: event.target.value })} placeholder="Academic year" className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary" />
+            <input value={analysisFilters.term} onChange={(event) => setAnalysisFilters({ ...analysisFilters, term: event.target.value })} placeholder={t("Term")} className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary" />
+            <input value={analysisFilters.academic_year} onChange={(event) => setAnalysisFilters({ ...analysisFilters, academic_year: event.target.value })} placeholder={t("Academic year")} className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary" />
           </div>
 
           {analysisLoading ? (
-            <div className="rounded-xl border border-border bg-surface py-14 text-center shadow-sm"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></div>
+            <div className="rounded-xl border border-border bg-surface py-14 text-center shadow-sm"><div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></div>
           ) : !analysis ? (
-            <p className="rounded-xl border border-border bg-surface p-14 text-center text-muted-foreground shadow-sm">No analysis available.</p>
+            <p className="rounded-xl border border-border bg-surface p-14 text-center text-muted-foreground shadow-sm">{t("No analysis available.")}</p>
           ) : (
             <>
               <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-6">
@@ -415,7 +413,7 @@ export default function AcademicResults() {
                   ['Pass rate', analysis.summary?.pass_rate != null ? `${analysis.summary.pass_rate}%` : '—'],
                 ].map(([label, value]) => (
                   <div key={label} className="rounded-xl border border-border bg-surface p-4 shadow-sm">
-                    <p className="text-xs text-muted-foreground">{label}</p>
+                    <p className="text-xs text-muted-foreground">{t(label)}</p>
                     <p className="mt-1 text-xl font-semibold text-foreground">{value ?? '—'}</p>
                   </div>
                 ))}
@@ -423,11 +421,11 @@ export default function AcademicResults() {
 
               <div className="grid gap-5 xl:grid-cols-2">
                 <div className="rounded-xl border border-border bg-surface shadow-sm">
-                  <h3 className="border-b border-border px-4 py-3 font-semibold text-foreground">Subject performance</h3>
+                  <h3 className="border-b border-border px-4 py-3 font-semibold text-foreground">{t("Subject performance")}</h3>
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-slate-100 text-sm">
                       <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
-                        <tr><th className="px-4 py-3">Subject</th><th className="px-4 py-3 text-right">Average</th><th className="px-4 py-3 text-right">Highest</th><th className="px-4 py-3 text-right">Lowest</th></tr>
+                        <tr><th className="px-4 py-3">{t("Subject")}</th><th className="px-4 py-3 text-right">{t("Average")}</th><th className="px-4 py-3 text-right">{t("Highest")}</th><th className="px-4 py-3 text-right">{t("Lowest")}</th></tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
                         {(analysis.subject_performance ?? []).map((row) => (
@@ -444,11 +442,11 @@ export default function AcademicResults() {
                 </div>
 
                 <div className="rounded-xl border border-border bg-surface shadow-sm">
-                  <h3 className="border-b border-border px-4 py-3 font-semibold text-foreground">Class performance</h3>
+                  <h3 className="border-b border-border px-4 py-3 font-semibold text-foreground">{t("Class performance")}</h3>
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-slate-100 text-sm">
                       <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
-                        <tr><th className="px-4 py-3">Class</th><th className="px-4 py-3 text-right">Students</th><th className="px-4 py-3 text-right">Average</th><th className="px-4 py-3 text-right">Results</th></tr>
+                        <tr><th className="px-4 py-3">{t("Class")}</th><th className="px-4 py-3 text-right">{t("Students")}</th><th className="px-4 py-3 text-right">{t("Average")}</th><th className="px-4 py-3 text-right">{t("Results")}</th></tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
                         {(analysis.class_performance ?? []).map((row) => (
@@ -465,13 +463,13 @@ export default function AcademicResults() {
                 </div>
 
                 <div className="rounded-xl border border-border bg-surface shadow-sm">
-                  <h3 className="border-b border-border px-4 py-3 font-semibold text-foreground">Top students</h3>
+                  <h3 className="border-b border-border px-4 py-3 font-semibold text-foreground">{t("Top students")}</h3>
                   <div className="divide-y divide-slate-100">
                     {(analysis.top_students ?? []).map((row, index) => (
                       <div key={row.student_id} className="flex items-center justify-between px-4 py-3 text-sm">
                         <div className="flex items-center gap-3">
                           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-soft text-xs font-semibold text-primary">{index + 1}</span>
-                          <div><p className="font-medium text-foreground">{row.full_name}</p><p className="text-xs text-muted-foreground">{row.class} · {row.results_count} result(s)</p></div>
+                          <div><p className="font-medium text-foreground">{row.full_name}</p><p className="text-xs text-muted-foreground">{row.class} · {row.results_count}{t(" result(s)")}</p></div>
                         </div>
                         <span className="font-semibold text-foreground">{row.average}</span>
                       </div>
@@ -480,12 +478,12 @@ export default function AcademicResults() {
                 </div>
 
                 <div className="rounded-xl border border-border bg-surface shadow-sm">
-                  <h3 className="border-b border-border px-4 py-3 font-semibold text-foreground">Grade distribution</h3>
+                  <h3 className="border-b border-border px-4 py-3 font-semibold text-foreground">{t("Grade distribution")}</h3>
                   <div className="flex flex-wrap gap-2 p-4">
                     {(analysis.grade_distribution ?? []).map((row) => (
                       <div key={row.grade} className="rounded-lg border border-border px-4 py-3">
                         <p className="text-lg font-semibold text-foreground">{row.grade}</p>
-                        <p className="text-xs text-muted-foreground">{row.count} result(s)</p>
+                        <p className="text-xs text-muted-foreground">{row.count}{t(" result(s)")}</p>
                       </div>
                     ))}
                   </div>
@@ -500,21 +498,21 @@ export default function AcademicResults() {
         <section className="space-y-5">
           <div className="flex flex-wrap items-end gap-3 rounded-xl border border-border bg-surface p-4 shadow-sm">
             <label className="text-sm">
-              <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-muted-foreground">Student</span>
+              <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("Student")}</span>
               <select value={progressStudentId} onChange={(event) => setProgressStudentId(event.target.value)} className="min-w-64 rounded-lg border border-border px-3 py-2 outline-none focus:border-primary">
-                <option value="">Select a student</option>
+                <option value="">{t("Select a student")}</option>
                 {progressStudents.map((student) => <option key={student.id} value={student.id}>{student.full_name} ({student.student_number})</option>)}
               </select>
             </label>
             <button type="button" onClick={loadProgress} disabled={!progressStudentId || progressLoading} className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50">
-              <FiTrendingUp className="h-4 w-4" /> {progressLoading ? 'Loading...' : 'View progress'}
+              <FiTrendingUp className="h-4 w-4" /> {progressLoading ? t("Loading...") : t("View progress")}
             </button>
           </div>
 
           {progressLoading ? (
-            <div className="rounded-xl border border-border bg-surface py-14 text-center shadow-sm"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></div>
+            <div className="rounded-xl border border-border bg-surface py-14 text-center shadow-sm"><div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></div>
           ) : !progress ? (
-            <p className="rounded-xl border border-border bg-surface p-14 text-center text-muted-foreground shadow-sm">Select a student to view their academic progress.</p>
+            <p className="rounded-xl border border-border bg-surface p-14 text-center text-muted-foreground shadow-sm">{t("Select a student to view their academic progress.")}</p>
           ) : (
             <>
               <div className="rounded-xl border border-border bg-surface p-4 shadow-sm">
@@ -528,13 +526,13 @@ export default function AcademicResults() {
                     ['Behavior', progress.summary.behavior_records],
                     ['Notes', progress.summary.notes],
                   ].map(([label, value]) => (
-                    <div key={label} className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">{label}</p><p className="mt-1 text-lg font-semibold text-foreground">{value}</p></div>
+                    <div key={label} className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">{t(label)}</p><p className="mt-1 text-lg font-semibold text-foreground">{value}</p></div>
                   ))}
                 </div>
               </div>
               <div className="grid gap-5 xl:grid-cols-2">
                 <div className="rounded-xl border border-border bg-surface shadow-sm">
-                  <h3 className="border-b border-border px-4 py-3 font-semibold text-foreground">Term performance</h3>
+                  <h3 className="border-b border-border px-4 py-3 font-semibold text-foreground">{t("Term performance")}</h3>
                   <div className="divide-y divide-slate-100">
                     {(progress.terms ?? []).map((term) => (
                       <div key={`${term.academic_year}-${term.term}`} className="flex items-center justify-between px-4 py-3 text-sm">
@@ -545,7 +543,7 @@ export default function AcademicResults() {
                   </div>
                 </div>
                 <div className="rounded-xl border border-border bg-surface shadow-sm">
-                  <h3 className="border-b border-border px-4 py-3 font-semibold text-foreground">Subject performance</h3>
+                  <h3 className="border-b border-border px-4 py-3 font-semibold text-foreground">{t("Subject performance")}</h3>
                   <div className="divide-y divide-slate-100">
                     {(progress.subjects ?? []).map((subject) => (
                       <div key={subject.subject_id} className="flex items-center justify-between px-4 py-3 text-sm">
@@ -562,50 +560,50 @@ export default function AcademicResults() {
       )}
 
       {form && (
-        <Modal title={form.id ? 'Edit result' : 'Add result'} onClose={() => setForm(null)}>
+        <Modal title={form.id ? t("Edit result") : t("Add result")} onClose={() => setForm(null)}>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block text-sm">
-                <span className="mb-1 block font-medium text-foreground">Exam</span>
+                <span className="mb-1 block font-medium text-foreground">{t("Exam")}</span>
                 <select required disabled={Boolean(form.id)} value={form.exam_id} onChange={(event) => setForm({ ...form, exam_id: event.target.value })} className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary disabled:bg-muted disabled:text-muted-foreground">
-                  <option value="">Select an exam</option>
-                  {exams.map((exam) => <option key={exam.id} value={exam.id}>{exam.name} ({exam.term ?? 'No term'})</option>)}
+                  <option value="">{t("Select an exam")}</option>
+                  {exams.map((exam) => <option key={exam.id} value={exam.id}>{exam.name} ({exam.term ?? t("No term")})</option>)}
                 </select>
               </label>
               <label className="block text-sm">
-                <span className="mb-1 block font-medium text-foreground">Class</span>
+                <span className="mb-1 block font-medium text-foreground">{t("Class")}</span>
                 <select disabled={Boolean(form.id)} value={form.class_id} onChange={(event) => setForm({ ...form, class_id: event.target.value, student_id: '' })} className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary disabled:bg-muted disabled:text-muted-foreground">
-                  <option value="">All classes</option>
+                  <option value="">{t("All classes")}</option>
                   {classes.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
                 </select>
               </label>
               <label className="block text-sm">
-                <span className="mb-1 block font-medium text-foreground">Student</span>
+                <span className="mb-1 block font-medium text-foreground">{t("Student")}</span>
                 <select required disabled={Boolean(form.id)} value={form.student_id} onChange={(event) => setForm({ ...form, student_id: event.target.value })} className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary disabled:bg-muted disabled:text-muted-foreground">
-                  <option value="">Select a student</option>
+                  <option value="">{t("Select a student")}</option>
                   {formStudents.map((student) => <option key={student.id} value={student.id}>{student.full_name} ({student.student_number})</option>)}
                 </select>
               </label>
               <label className="block text-sm">
-                <span className="mb-1 block font-medium text-foreground">Subject</span>
+                <span className="mb-1 block font-medium text-foreground">{t("Subject")}</span>
                 <select required disabled={Boolean(form.id)} value={form.subject_id} onChange={(event) => setForm({ ...form, subject_id: event.target.value })} className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary disabled:bg-muted disabled:text-muted-foreground">
-                  <option value="">Select a subject</option>
+                  <option value="">{t("Select a subject")}</option>
                   {subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name} ({subject.code})</option>)}
                 </select>
               </label>
               <label className="block text-sm">
-                <span className="mb-1 block font-medium text-foreground">Marks</span>
+                <span className="mb-1 block font-medium text-foreground">{t("Marks")}</span>
                 <input type="number" required min="0" max="100" step="0.5" value={form.marks} onChange={(event) => setForm({ ...form, marks: event.target.value })} className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary" />
               </label>
               <label className="block text-sm">
-                <span className="mb-1 block font-medium text-foreground">Remarks (optional)</span>
+                <span className="mb-1 block font-medium text-foreground">{t("Remarks (optional)")}</span>
                 <input value={form.remarks} onChange={(event) => setForm({ ...form, remarks: event.target.value })} className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary" />
               </label>
             </div>
-            {form.id && <p className="rounded-lg bg-warning-soft px-3 py-2 text-xs text-warning">Only marks and remarks can be edited on an existing result.</p>}
+            {form.id && <p className="rounded-lg bg-warning-soft px-3 py-2 text-xs text-warning">{t("Only marks and remarks can be edited on an existing result.")}</p>}
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setForm(null)} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">Cancel</button>
-              <button type="submit" disabled={saving} className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50">{saving ? 'Saving...' : 'Save result'}</button>
+              <button type="button" onClick={() => setForm(null)} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">{t("Cancel")}</button>
+              <button type="submit" disabled={saving} className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50">{saving ? t("Saving...") : t("Save result")}</button>
             </div>
           </form>
         </Modal>

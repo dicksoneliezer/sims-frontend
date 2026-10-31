@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
@@ -18,6 +20,7 @@ const METHODS = [
 ]
 
 export function ControlNumberForm({ onClose, onSaved }) {
+  useLanguage()
   const [students, setStudents] = useState([])
   const [invoices, setInvoices] = useState([])
   const [generated, setGenerated] = useState(null)
@@ -43,7 +46,7 @@ export function ControlNumberForm({ onClose, onSaved }) {
         if (active) setStudents(response.data)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load students.')
+        if (active) toast.error(t("Unable to load students."))
       })
 
     return () => {
@@ -65,7 +68,7 @@ export function ControlNumberForm({ onClose, onSaved }) {
         if (requestRef.current === requestId) setInvoices(response.data.filter((invoice) => invoice.balance > 0))
       })
       .catch(() => {
-        if (requestRef.current === requestId) toast.error('Unable to load student invoices.')
+        if (requestRef.current === requestId) toast.error(t("Unable to load student invoices."))
       })
   }, [studentId])
 
@@ -95,7 +98,7 @@ export function ControlNumberForm({ onClose, onSaved }) {
         setError(field, { type: 'server', message: messages[0] })
       })
 
-      toast.error(data?.message ?? 'Unable to generate control number.')
+      toast.error(data?.message ?? t("Unable to generate control number."))
     }
   }
 
@@ -103,20 +106,20 @@ export function ControlNumberForm({ onClose, onSaved }) {
     return (
       <div className="space-y-4">
         <div className="rounded-xl border border-emerald-200 bg-success-soft p-4 text-center">
-          <p className="text-sm text-success">Control number generated</p>
+          <p className="text-sm text-success">{t("Control number generated")}</p>
           <p className="mt-1 text-2xl font-bold tracking-wide text-emerald-900">{generated.control_number}</p>
-          <p className="mt-1 text-sm text-success">{formatMoney(generated.amount)} · {generated.payment_method}</p>
-          {generated.expires_at && <p className="mt-1 text-xs text-success">Expires {new Date(generated.expires_at).toLocaleString()}</p>}
+          <p className="mt-1 text-sm text-success">{formatMoney(generated.amount)} · {t(generated.payment_method)}</p>
+          {generated.expires_at && <p className="mt-1 text-xs text-success">{t("Expires ")}{new Date(generated.expires_at).toLocaleString()}</p>}
         </div>
         {generated.payment_instructions && (
           <div className="rounded-lg border border-border bg-muted p-3 text-sm text-foreground">
-            <p className="font-medium text-foreground">Payment instructions</p>
+            <p className="font-medium text-foreground">{t("Payment instructions")}</p>
             <p className="mt-1 whitespace-pre-wrap text-xs text-muted-foreground">{generated.payment_instructions[generated.payment_method] ?? JSON.stringify(generated.payment_instructions)}</p>
           </div>
         )}
         <div className="flex justify-end gap-3 border-t border-border pt-4">
-          <button type="button" onClick={() => setGenerated(null)} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">Generate another</button>
-          <button type="button" onClick={onClose} className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover">Done</button>
+          <button type="button" onClick={() => setGenerated(null)} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">{t("Generate another")}</button>
+          <button type="button" onClick={onClose} className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover">{t("Done")}</button>
         </div>
       </div>
     )
@@ -126,49 +129,49 @@ export function ControlNumberForm({ onClose, onSaved }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <label htmlFor="student_id" className={labelClass}>Student <span className="text-red-500">*</span></label>
-          <select id="student_id" className={`${inputClass} mt-1.5`} {...register('student_id', { required: 'Student is required.' })}>
-            <option value="">Select student</option>
+          <label htmlFor="student_id" className={labelClass}>{t("Student ")}<span className="text-red-500">*</span></label>
+          <select id="student_id" className={`${inputClass} mt-1.5`} {...register('student_id', { required: t("Student is required.") })}>
+            <option value="">{t("Select student")}</option>
             {students.map((student) => <option key={student.id} value={student.id}>{student.full_name} · {student.student_number}</option>)}
           </select>
           {errors.student_id && <p className={errorClass}>{errors.student_id.message}</p>}
         </div>
 
         <div className="sm:col-span-2">
-          <label htmlFor="invoice_id" className={labelClass}>Invoice <span className="text-red-500">*</span></label>
-          <select id="invoice_id" disabled={!studentId} className={`${inputClass} mt-1.5 disabled:bg-muted`} {...register('invoice_id', { required: 'Invoice is required.' })}>
-            <option value="">{studentId ? 'Select invoice' : 'Select a student first'}</option>
+          <label htmlFor="invoice_id" className={labelClass}>{t("Invoice ")}<span className="text-red-500">*</span></label>
+          <select id="invoice_id" disabled={!studentId} className={`${inputClass} mt-1.5 disabled:bg-muted`} {...register('invoice_id', { required: t("Invoice is required.") })}>
+            <option value="">{studentId ? t("Select invoice") : t("Select a student first")}</option>
             {invoices.map((invoice) => (
-              <option key={invoice.id} value={invoice.id}>{invoice.invoice_number} · balance {formatMoney(invoice.balance)}</option>
+              <option key={invoice.id} value={invoice.id}>{invoice.invoice_number}{t(" · balance ")}{formatMoney(invoice.balance)}</option>
             ))}
           </select>
-          {studentId && invoices.length === 0 && <p className="mt-1 text-xs text-warning">This student has no invoices with a balance.</p>}
+          {studentId && invoices.length === 0 && <p className="mt-1 text-xs text-warning">{t("This student has no invoices with a balance.")}</p>}
           {errors.invoice_id && <p className={errorClass}>{errors.invoice_id.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="amount" className={labelClass}>Amount (TZS) <span className="text-red-500">*</span></label>
-          <input id="amount" type="number" min="0.01" step="0.01" className={`${inputClass} mt-1.5`} {...register('amount', { required: 'Amount is required.', min: { value: 0.01, message: 'Must be greater than zero.' } })} />
+          <label htmlFor="amount" className={labelClass}>{t("Amount (TZS) ")}<span className="text-red-500">*</span></label>
+          <input id="amount" type="number" min="0.01" step="0.01" className={`${inputClass} mt-1.5`} {...register('amount', { required: t("Amount is required."), min: { value: 0.01, message: t("Must be greater than zero.") } })} />
           {errors.amount && <p className={errorClass}>{errors.amount.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="payment_method" className={labelClass}>Payment method</label>
+          <label htmlFor="payment_method" className={labelClass}>{t("Payment method")}</label>
           <select id="payment_method" className={`${inputClass} mt-1.5`} {...register('payment_method')}>
-            {METHODS.map((method) => <option key={method.value} value={method.value}>{method.label}</option>)}
+            {METHODS.map((method) => <option key={method.value} value={method.value}>{t(method.label)}</option>)}
           </select>
         </div>
 
         <div className="sm:col-span-2">
-          <label htmlFor="description" className={labelClass}>Description</label>
+          <label htmlFor="description" className={labelClass}>{t("Description")}</label>
           <input id="description" className={`${inputClass} mt-1.5`} {...register('description')} />
         </div>
       </div>
 
       <div className="flex justify-end gap-3 border-t border-border pt-4">
-        <button type="button" onClick={onClose} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">Cancel</button>
+        <button type="button" onClick={onClose} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">{t("Cancel")}</button>
         <button type="submit" disabled={isSubmitting} className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-60">
-          {isSubmitting ? 'Generating...' : 'Generate control number'}
+          {isSubmitting ? t("Generating...") : t("Generate control number")}
         </button>
       </div>
     </form>

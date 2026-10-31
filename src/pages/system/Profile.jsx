@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 // src/pages/system/Profile.jsx
 import { useEffect, useState } from 'react'
 import { FiUser, FiMail, FiPhone, FiSave, FiLock } from 'react-icons/fi'
@@ -6,6 +8,7 @@ import api from '../../api/axios'
 import { useAuth } from '../../hooks/useAuth'
 
 export default function SystemAdminProfile() {
+  useLanguage()
   const { user } = useAuth()
   const [form, setForm] = useState({
     full_name: '',
@@ -36,9 +39,9 @@ export default function SystemAdminProfile() {
 
     try {
       await api.put('/profile', form)
-      toast.success('Profile updated successfully')
+      toast.success(t("Profile updated successfully"))
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to update profile.')
+      toast.error(error.response?.data?.message ?? t("Unable to update profile."))
     } finally {
       setSaving(false)
     }
@@ -48,7 +51,7 @@ export default function SystemAdminProfile() {
     e.preventDefault()
 
     if (passwordForm.password !== passwordForm.password_confirmation) {
-      toast.error('New passwords do not match.')
+      toast.error(t("New passwords do not match."))
       return
     }
 
@@ -60,7 +63,7 @@ export default function SystemAdminProfile() {
         password: passwordForm.password,
         password_confirmation: passwordForm.password_confirmation,
       })
-      toast.success('Password changed successfully')
+      toast.success(t("Password changed successfully"))
       setPasswordForm({
         current_password: '',
         password: '',
@@ -71,7 +74,7 @@ export default function SystemAdminProfile() {
       toast.error(
         errors
           ? Object.values(errors).flat()[0]
-          : error.response?.data?.message ?? 'Unable to change password.',
+          : error.response?.data?.message ?? t("Unable to change password."),
       )
     } finally {
       setSavingPassword(false)
@@ -82,19 +85,16 @@ export default function SystemAdminProfile() {
     <div className="space-y-6">
       <section>
         <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-          <FiUser className="h-5 w-5 text-primary" /> My Profile
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Update your personal details and change your password.
-        </p>
+          <FiUser className="h-5 w-5 text-primary" />{t(" My Profile")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("Update your personal details and change your password.")}</p>
       </section>
 
       {/* Personal details */}
       <form onSubmit={handleSave} className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-        <h3 className="font-semibold text-foreground">Personal details</h3>
+        <h3 className="font-semibold text-foreground">{t("Personal details")}</h3>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block text-sm sm:col-span-2">
-            <span className="mb-1 block font-medium text-foreground">Full name</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Full name")}</span>
             <input
               required
               value={form.full_name}
@@ -103,7 +103,7 @@ export default function SystemAdminProfile() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">Email</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Email")}</span>
             <div className="relative">
               <FiMail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
@@ -115,7 +115,7 @@ export default function SystemAdminProfile() {
             </div>
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">Phone</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Phone")}</span>
             <div className="relative">
               <FiPhone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
@@ -132,7 +132,7 @@ export default function SystemAdminProfile() {
             disabled={saving}
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
           >
-            <FiSave className="h-4 w-4" /> {saving ? 'Saving...' : 'Save changes'}
+            <FiSave className="h-4 w-4" /> {saving ? t("Saving...") : t("Save changes")}
           </button>
         </div>
       </form>
@@ -140,11 +140,10 @@ export default function SystemAdminProfile() {
       {/* Change password */}
       <form onSubmit={handleChangePassword} className="rounded-xl border border-border bg-surface p-6 shadow-sm">
         <h3 className="flex items-center gap-2 font-semibold text-foreground">
-          <FiLock className="h-4 w-4 text-primary" /> Change password
-        </h3>
+          <FiLock className="h-4 w-4 text-primary" />{t(" Change password")}</h3>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block text-sm sm:col-span-2">
-            <span className="mb-1 block font-medium text-foreground">Current password</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Current password")}</span>
             <input
               type="password"
               required
@@ -154,7 +153,7 @@ export default function SystemAdminProfile() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">New password</span>
+            <span className="mb-1 block font-medium text-foreground">{t("New password")}</span>
             <input
               type="password"
               required
@@ -165,7 +164,7 @@ export default function SystemAdminProfile() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">Confirm new password</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Confirm new password")}</span>
             <input
               type="password"
               required
@@ -182,7 +181,7 @@ export default function SystemAdminProfile() {
             disabled={savingPassword}
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
           >
-            <FiLock className="h-4 w-4" /> {savingPassword ? 'Changing...' : 'Change password'}
+            <FiLock className="h-4 w-4" /> {savingPassword ? t("Changing...") : t("Change password")}
           </button>
         </div>
       </form>

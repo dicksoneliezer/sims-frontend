@@ -1,9 +1,12 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiUser, FiMail, FiPhone, FiBookOpen, FiHash, FiUsers, FiLock, FiSave } from 'react-icons/fi'
 import { toast } from 'react-toastify'
 import api from '../../api/axios'
 
 export default function StudentProfile() {
+  useLanguage()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [passwordForm, setPasswordForm] = useState({
@@ -22,7 +25,7 @@ export default function StudentProfile() {
         if (active) setProfile(res.data.data || res.data)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load profile.')
+        if (active) toast.error(t("Unable to load profile."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -35,7 +38,7 @@ export default function StudentProfile() {
     e.preventDefault()
 
     if (passwordForm.password !== passwordForm.password_confirmation) {
-      toast.error('New passwords do not match.')
+      toast.error(t("New passwords do not match."))
       return
     }
 
@@ -47,7 +50,7 @@ export default function StudentProfile() {
         password: passwordForm.password,
         password_confirmation: passwordForm.password_confirmation,
       })
-      toast.success('Password changed successfully')
+      toast.success(t("Password changed successfully"))
       setPasswordForm({
         current_password: '',
         password: '',
@@ -58,7 +61,7 @@ export default function StudentProfile() {
       toast.error(
         errors
           ? Object.values(errors).flat()[0]
-          : error.response?.data?.message ?? 'Unable to change password.',
+          : error.response?.data?.message ?? t("Unable to change password."),
       )
     } finally {
       setSavingPassword(false)
@@ -76,7 +79,7 @@ export default function StudentProfile() {
   if (!profile) {
     return (
       <div className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-        <p className="text-sm text-muted-foreground">Unable to load your profile. Please try again later.</p>
+        <p className="text-sm text-muted-foreground">{t("Unable to load your profile. Please try again later.")}</p>
       </div>
     )
   }
@@ -84,8 +87,7 @@ export default function StudentProfile() {
   return (
     <div className="space-y-6">
       <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-        <FiUser className="h-5 w-5 text-primary" /> My Profile
-      </h2>
+        <FiUser className="h-5 w-5 text-primary" />{t(" My Profile")}</h2>
 
       {/* Profile details */}
       <div className="rounded-xl border border-border bg-surface p-6 shadow-sm">
@@ -101,35 +103,35 @@ export default function StudentProfile() {
 
         <dl className="grid gap-4 sm:grid-cols-2">
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Full Name</dt>
+            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("Full Name")}</dt>
             <dd className="mt-1 text-sm font-medium text-foreground">{profile.full_name || '—'}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Student Number</dt>
+            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("Student Number")}</dt>
             <dd className="mt-1 text-sm font-medium text-foreground">{profile.student_number || '—'}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Class</dt>
+            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("Class")}</dt>
             <dd className="mt-1 text-sm font-medium text-foreground">{profile.class || profile.school_class?.name || '—'}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Gender</dt>
+            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("Gender")}</dt>
             <dd className="mt-1 text-sm font-medium text-foreground capitalize">{profile.gender || '—'}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Parent Phone</dt>
+            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("Parent Phone")}</dt>
             <dd className="mt-1 text-sm font-medium text-foreground">{profile.parent_phone || '—'}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Email</dt>
+            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("Email")}</dt>
             <dd className="mt-1 text-sm font-medium text-foreground">{profile.email || '—'}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Residence</dt>
+            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("Residence")}</dt>
             <dd className="mt-1 text-sm font-medium text-foreground">{profile.residence || '—'}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Date of Birth</dt>
+            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("Date of Birth")}</dt>
             <dd className="mt-1 text-sm font-medium text-foreground">{profile.date_of_birth || '—'}</dd>
           </div>
         </dl>
@@ -138,11 +140,10 @@ export default function StudentProfile() {
       {/* Change password */}
       <form onSubmit={handleChangePassword} className="rounded-xl border border-border bg-surface p-6 shadow-sm">
         <h3 className="flex items-center gap-2 font-semibold text-foreground">
-          <FiLock className="h-4 w-4 text-primary" /> Change password
-        </h3>
+          <FiLock className="h-4 w-4 text-primary" />{t(" Change password")}</h3>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block text-sm sm:col-span-2">
-            <span className="mb-1 block font-medium text-foreground">Current password</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Current password")}</span>
             <input
               type="password"
               required
@@ -152,7 +153,7 @@ export default function StudentProfile() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">New password</span>
+            <span className="mb-1 block font-medium text-foreground">{t("New password")}</span>
             <input
               type="password"
               required
@@ -163,7 +164,7 @@ export default function StudentProfile() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">Confirm new password</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Confirm new password")}</span>
             <input
               type="password"
               required
@@ -180,7 +181,7 @@ export default function StudentProfile() {
             disabled={savingPassword}
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
           >
-            <FiLock className="h-4 w-4" /> {savingPassword ? 'Changing...' : 'Change password'}
+            <FiLock className="h-4 w-4" /> {savingPassword ? t("Changing...") : t("Change password")}
           </button>
         </div>
       </form>

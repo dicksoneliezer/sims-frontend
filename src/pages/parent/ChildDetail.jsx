@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiArrowLeft, FiAward, FiBookOpen, FiCheckCircle, FiFileText, FiUser, FiCreditCard } from 'react-icons/fi'
 import { Link, useParams } from 'react-router-dom'
@@ -9,6 +11,7 @@ import { getStudentAttendance, getStudentResults } from '../../api/students'
 import { formatDate, formatMoney, statusClass } from '../../utils/format'
 
 export default function ChildDetail() {
+  useLanguage()
   const { id } = useParams()
   const [child, setChild] = useState(null)
   const [invoices, setInvoices] = useState([])
@@ -34,7 +37,7 @@ export default function ChildDetail() {
         setPayments(paymentResponse.data)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load child details.')
+        if (active) toast.error(t("Unable to load child details."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -65,7 +68,7 @@ export default function ChildDetail() {
         if (tab === 'notes') setNotes(response ?? [])
       })
       .catch(() => {
-        if (active) toast.error(`Unable to load child ${tab}.`)
+        if (active) toast.error(t("Unable to load child {0}.", [tab]))
       })
       .finally(() => {
         if (active) setTabLoading(false)
@@ -80,11 +83,10 @@ export default function ChildDetail() {
     // Hapa tunaondoa AppLayout na MODULES_BY_ROLE kabisa. Tunabaki na div ya maudhui pekee.
     <div className="space-y-5">
       <Link to="/parent/children" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
-        <FiArrowLeft className="h-4 w-4" /> Back to children
-      </Link>
+        <FiArrowLeft className="h-4 w-4" />{t(" Back to children")}</Link>
 
       {loading ? (
-        <div className="rounded-xl border border-border bg-surface p-14 text-center shadow-sm"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></div>
+        <div className="rounded-xl border border-border bg-surface p-14 text-center shadow-sm"><div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></div>
       ) : !child ? null : (
         <>
           <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
@@ -96,22 +98,22 @@ export default function ChildDetail() {
               )}
               <div className="min-w-0 flex-1">
                 <h2 className="text-lg font-semibold text-foreground">{child.full_name}</h2>
-                <p className="text-sm text-muted-foreground">{child.student_number} · {child.school_class?.name ?? child.class ?? 'No class'}</p>
+                <p className="text-sm text-muted-foreground">{child.student_number} · {child.school_class?.name ?? child.class ?? t("No class")}</p>
                 <p className="text-xs text-muted-foreground">{[child.gender, child.residence, child.parent_phone].filter(Boolean).join(' · ')}</p>
               </div>
             </div>
 
             <dl className="mt-5 grid gap-3 border-t border-border pt-4 sm:grid-cols-3">
               <div className="rounded-lg bg-muted p-3">
-                <dt className="text-xs text-muted-foreground">Total invoiced</dt>
+                <dt className="text-xs text-muted-foreground">{t("Total invoiced")}</dt>
                 <dd className="mt-1 font-semibold text-foreground">{formatMoney(summary.total_invoiced)}</dd>
               </div>
               <div className="rounded-lg bg-success-soft p-3">
-                <dt className="text-xs text-success">Total paid</dt>
+                <dt className="text-xs text-success">{t("Total paid")}</dt>
                 <dd className="mt-1 font-semibold text-success">{formatMoney(summary.total_paid)}</dd>
               </div>
               <div className="rounded-lg bg-danger-soft p-3">
-                <dt className="text-xs text-danger">Outstanding</dt>
+                <dt className="text-xs text-danger">{t("Outstanding")}</dt>
                 <dd className="mt-1 font-semibold text-danger">{formatMoney(summary.total_outstanding)}</dd>
               </div>
             </dl>
@@ -120,33 +122,31 @@ export default function ChildDetail() {
           <section className="rounded-xl border border-border bg-surface shadow-sm">
             <div className="flex gap-1 border-b border-border px-4 pt-3">
               <button type="button" onClick={() => setTab('invoices')} className={`flex items-center gap-2 rounded-t-lg px-4 py-2 text-sm font-medium ${tab === 'invoices' ? 'border-b-2 border-blue-600 text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
-                <FiFileText className="h-4 w-4" /> Invoices ({invoices.length})
+                <FiFileText className="h-4 w-4" />{t(" Invoices (")}{invoices.length})
               </button>
               <button type="button" onClick={() => setTab('payments')} className={`flex items-center gap-2 rounded-t-lg px-4 py-2 text-sm font-medium ${tab === 'payments' ? 'border-b-2 border-blue-600 text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
-                <FiCreditCard className="h-4 w-4" /> Payments ({payments.length})
+                <FiCreditCard className="h-4 w-4" />{t(" Payments (")}{payments.length})
               </button>
               <button type="button" onClick={() => setTab('results')} className={`flex items-center gap-2 rounded-t-lg px-4 py-2 text-sm font-medium ${tab === 'results' ? 'border-b-2 border-blue-600 text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
-                <FiAward className="h-4 w-4" /> Results
-              </button>
+                <FiAward className="h-4 w-4" />{t(" Results")}</button>
               <button type="button" onClick={() => setTab('attendance')} className={`flex items-center gap-2 rounded-t-lg px-4 py-2 text-sm font-medium ${tab === 'attendance' ? 'border-b-2 border-blue-600 text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
-                <FiCheckCircle className="h-4 w-4" /> Attendance
-              </button>
+                <FiCheckCircle className="h-4 w-4" />{t(" Attendance")}</button>
               <button type="button" onClick={() => setTab('notes')} className={`flex items-center gap-2 rounded-t-lg px-4 py-2 text-sm font-medium ${tab === 'notes' ? 'border-b-2 border-blue-600 text-primary' : 'text-muted-foreground hover:text-foreground'}`}>
-                <FiBookOpen className="h-4 w-4" /> Notes ({notes.length})
+                <FiBookOpen className="h-4 w-4" />{t(" Notes (")}{notes.length})
               </button>
             </div>
 
             {tabLoading ? (
-              <div className="py-14 text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></div>
+              <div className="py-14 text-center"><div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></div>
             ) : tab === 'results' ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-slate-200 text-sm">
                   <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
-                    <tr><th className="px-4 py-3">Exam</th><th className="px-4 py-3">Subject</th><th className="px-4 py-3">Term</th><th className="px-4 py-3 text-right">Marks</th><th className="px-4 py-3">Grade</th></tr>
+                    <tr><th className="px-4 py-3">{t("Exam")}</th><th className="px-4 py-3">{t("Subject")}</th><th className="px-4 py-3">{t("Term")}</th><th className="px-4 py-3 text-right">{t("Marks")}</th><th className="px-4 py-3">{t("Grade")}</th></tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {(results?.results ?? []).length === 0 ? (
-                      <tr><td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">No results published yet.</td></tr>
+                      <tr><td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">{t("No results published yet.")}</td></tr>
                     ) : results.results.map((result) => (
                       <tr key={result.id} className="hover:bg-muted/70">
                         <td className="px-4 py-3 font-medium text-foreground">{result.exam?.name ?? result.exam_name}</td>
@@ -163,21 +163,21 @@ export default function ChildDetail() {
               <div>
                 <div className="grid gap-3 border-b border-border p-4 sm:grid-cols-5">
                   {[['Total', attendance?.summary?.total], ['Present', attendance?.summary?.present], ['Absent', attendance?.summary?.absent], ['Late', attendance?.summary?.late], ['Excused', attendance?.summary?.excused]].map(([label, value]) => (
-                    <div key={label} className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">{label}</p><p className="mt-1 text-lg font-semibold text-foreground">{value ?? 0}</p></div>
+                    <div key={label} className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">{t(label)}</p><p className="mt-1 text-lg font-semibold text-foreground">{value ?? 0}</p></div>
                   ))}
                 </div>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-slate-200 text-sm">
                     <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
-                      <tr><th className="px-4 py-3">Date</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Remarks</th></tr>
+                      <tr><th className="px-4 py-3">{t("Date")}</th><th className="px-4 py-3">{t("Status")}</th><th className="px-4 py-3">{t("Remarks")}</th></tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {(attendance?.records ?? []).length === 0 ? (
-                        <tr><td colSpan={3} className="px-4 py-10 text-center text-muted-foreground">No attendance records yet.</td></tr>
+                        <tr><td colSpan={3} className="px-4 py-10 text-center text-muted-foreground">{t("No attendance records yet.")}</td></tr>
                       ) : attendance.records.map((record) => (
                         <tr key={record.id} className="hover:bg-muted/70">
                           <td className="px-4 py-3 font-medium text-foreground">{formatDate(record.date)}</td>
-                          <td className="px-4 py-3"><span className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold capitalize text-foreground">{record.status}</span></td>
+                          <td className="px-4 py-3"><span className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold capitalize text-foreground">{t(record.status)}</span></td>
                           <td className="px-4 py-3 text-muted-foreground">{record.remarks ?? '—'}</td>
                         </tr>
                       ))}
@@ -188,13 +188,13 @@ export default function ChildDetail() {
             ) : tab === 'notes' ? (
               <div className="divide-y divide-slate-100">
                 {notes.length === 0 ? (
-                  <p className="px-4 py-10 text-center text-muted-foreground">No teacher notes for this child.</p>
+                  <p className="px-4 py-10 text-center text-muted-foreground">{t("No teacher notes for this child.")}</p>
                 ) : notes.map((note) => (
                   <article key={note.id} className="p-4">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div>
                         <h3 className="font-semibold text-foreground">{note.title}</h3>
-                        <p className="text-xs text-muted-foreground">{note.teacher_name ?? 'Teacher'} · {formatDate(note.created_at)}</p>
+                        <p className="text-xs text-muted-foreground">{note.teacher_name ?? t("Teacher")} · {formatDate(note.created_at)}</p>
                       </div>
                       <span className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-semibold capitalize text-primary">{note.type}</span>
                     </div>
@@ -208,17 +208,17 @@ export default function ChildDetail() {
                   <table className="min-w-full divide-y divide-slate-200 text-sm">
                     <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
                       <tr>
-                        <th className="px-4 py-3">Invoice</th>
-                        <th className="px-4 py-3">Due date</th>
-                        <th className="px-4 py-3 text-right">Amount</th>
-                        <th className="px-4 py-3 text-right">Paid</th>
-                        <th className="px-4 py-3 text-right">Balance</th>
-                        <th className="px-4 py-3">Status</th>
+                        <th className="px-4 py-3">{t("Invoice")}</th>
+                        <th className="px-4 py-3">{t("Due date")}</th>
+                        <th className="px-4 py-3 text-right">{t("Amount")}</th>
+                        <th className="px-4 py-3 text-right">{t("Paid")}</th>
+                        <th className="px-4 py-3 text-right">{t("Balance")}</th>
+                        <th className="px-4 py-3">{t("Status")}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {invoices.length === 0 ? (
-                        <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">No invoices yet.</td></tr>
+                        <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">{t("No invoices yet.")}</td></tr>
                       ) : invoices.map((invoice) => (
                         <tr key={invoice.id} className="hover:bg-muted/70">
                           <td className="px-4 py-3">
@@ -227,12 +227,12 @@ export default function ChildDetail() {
                           </td>
                           <td className="px-4 py-3 text-muted-foreground">
                             <p>{formatDate(invoice.due_date)}</p>
-                            {invoice.is_overdue && <p className="text-xs font-medium text-danger">{invoice.days_overdue} day(s) overdue</p>}
+                            {invoice.is_overdue && <p className="text-xs font-medium text-danger">{invoice.days_overdue}{t(" day(s) overdue")}</p>}
                           </td>
                           <td className="px-4 py-3 text-right text-foreground">{formatMoney(invoice.amount)}</td>
                           <td className="px-4 py-3 text-right text-success">{formatMoney(invoice.amount_paid)}</td>
                           <td className="px-4 py-3 text-right font-semibold text-foreground">{formatMoney(invoice.balance)}</td>
-                          <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusClass(invoice.status)}`}>{invoice.status}</span></td>
+                          <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusClass(invoice.status)}`}>{t(invoice.status)}</span></td>
                         </tr>
                       ))}
                     </tbody>
@@ -241,17 +241,17 @@ export default function ChildDetail() {
                   <table className="min-w-full divide-y divide-slate-200 text-sm">
                     <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
                       <tr>
-                        <th className="px-4 py-3">Control number</th>
-                        <th className="px-4 py-3">Invoice</th>
-                        <th className="px-4 py-3 text-right">Amount</th>
-                        <th className="px-4 py-3">Method</th>
-                        <th className="px-4 py-3">Date</th>
-                        <th className="px-4 py-3">Status</th>
+                        <th className="px-4 py-3">{t("Control number")}</th>
+                        <th className="px-4 py-3">{t("Invoice")}</th>
+                        <th className="px-4 py-3 text-right">{t("Amount")}</th>
+                        <th className="px-4 py-3">{t("Method")}</th>
+                        <th className="px-4 py-3">{t("Date")}</th>
+                        <th className="px-4 py-3">{t("Status")}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {payments.length === 0 ? (
-                        <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">No payments yet.</td></tr>
+                        <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">{t("No payments yet.")}</td></tr>
                       ) : payments.map((payment) => (
                         <tr key={payment.id} className="hover:bg-muted/70">
                           <td className="px-4 py-3 font-medium text-foreground">{payment.control_number}</td>
@@ -259,7 +259,7 @@ export default function ChildDetail() {
                           <td className="px-4 py-3 text-right font-semibold text-foreground">{formatMoney(payment.amount)}</td>
                           <td className="px-4 py-3 capitalize text-muted-foreground">{payment.payment_method ?? '—'}</td>
                           <td className="px-4 py-3 text-muted-foreground">{formatDate(payment.completed_at ?? payment.created_at)}</td>
-                          <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusClass(payment.status)}`}>{payment.status}</span></td>
+                          <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusClass(payment.status)}`}>{t(payment.status)}</span></td>
                         </tr>
                       ))}
                     </tbody>

@@ -1,3 +1,5 @@
+import { t as translateUI } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiCalendar, FiClock, FiRefreshCw } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -6,6 +8,7 @@ import api from '../../api/axios'
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
 export default function AcademicTimetable() {
+  useLanguage()
   const [timetable, setTimetable] = useState([])
   const [loading, setLoading] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
@@ -21,7 +24,7 @@ export default function AcademicTimetable() {
         }
       })
       .catch(() => {
-        if (active) toast.error('Unable to load timetable.')
+        if (active) toast.error(translateUI("Unable to load timetable."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -40,13 +43,11 @@ export default function AcademicTimetable() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiCalendar className="h-5 w-5 text-primary" /> Master Timetable
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">View the school-wide timetable for all classes.</p>
+            <FiCalendar className="h-5 w-5 text-primary" />{translateUI(" Master Timetable")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{translateUI("View the school-wide timetable for all classes.")}</p>
         </div>
         <button type="button" onClick={() => setRefreshKey((key) => key + 1)} className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted">
-          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-        </button>
+          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{translateUI(" Refresh")}</button>
       </section>
 
       {loading ? (
@@ -58,23 +59,23 @@ export default function AcademicTimetable() {
           {DAYS.map((day) => (
             <div key={day} className="rounded-xl border border-border bg-surface shadow-sm">
               <div className="border-b border-border bg-muted px-4 py-2">
-                <h3 className="font-semibold text-foreground">{day}</h3>
+                <h3 className="font-semibold text-foreground">{translateUI(day)}</h3>
               </div>
               <div className="space-y-3 p-4">
                 {grouped[day].length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No classes.</p>
+                  <p className="text-sm text-muted-foreground">{translateUI("No classes.")}</p>
                 ) : grouped[day].map((item) => (
                   <div key={item.id} className="flex items-start gap-3 rounded-lg border border-border p-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-soft text-primary">
                       <FiClock className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-foreground">{item.subject?.name ?? 'Subject'}</p>
+                      <p className="font-medium text-foreground">{item.subject?.name ?? translateUI("Subject")}</p>
                       <p className="text-xs text-muted-foreground">
-                        {item.start_time} - {item.end_time} · {item.room ?? 'Room'}
+                        {item.start_time} - {item.end_time} · {item.room ?? translateUI("Room")}
                       </p>
-                      <p className="text-xs text-muted-foreground">Class: {item.school_class?.name ?? item.class?.name ?? '—'}</p>
-                      <p className="text-xs text-muted-foreground">Teacher: {item.teacher?.full_name ?? '—'}</p>
+                      <p className="text-xs text-muted-foreground">{translateUI("Class: ")}{item.school_class?.name ?? item.class?.name ?? '—'}</p>
+                      <p className="text-xs text-muted-foreground">{translateUI("Teacher: ")}{item.teacher?.full_name ?? '—'}</p>
                     </div>
                   </div>
                 ))}

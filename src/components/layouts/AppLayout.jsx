@@ -1,31 +1,32 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 // src/components/layouts/AppLayout.jsx
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   FiArchive,
   FiBarChart2,
   FiBell,
   FiBookOpen,
   FiCalendar,
-  FiChevronDown,
-  FiChevronRight,
-  FiClipboard,
+  FiArrowLeft,
   FiDollarSign,
-  FiFileText,
   FiGrid,
-  FiImage,
-  FiLayers,
-  FiLogOut,
   FiMenu,
   FiSettings,
-  FiTool,
   FiUser,
   FiUserCheck,
-  FiUserPlus,
   FiUsers,
   FiX,
 } from 'react-icons/fi'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
+import { ProfileMenu } from '../common/ProfileMenu'
+import { SidebarLogout } from '../common/SidebarLogout'
+import { LanguageSwitch } from '../common/LanguageSwitch'
+import { ThemeToggle } from '../common/ThemeToggle'
+import { PageBoundary } from '../common/PageBoundary'
+import { useDialogFocus } from '../../hooks/useDialogFocus'
 import { useAuth } from '../../hooks/useAuth'
+import { getAdminDashboardPath, getAdminSection, isAdminItemActive } from '../../utils/adminNavigation'
 import { getHomePath, getModulePath, ROLE_LABELS } from '../../utils/constants'
 
 function initials(name = '') {
@@ -39,78 +40,10 @@ function initials(name = '') {
 }
 
 /**
- * Sidebar modules zilizopangwa kwa makundi bila kurudia.
- * Kila section ina `id`, `label`, na `items`.
- * Kila item ina `label` (jina la module), `icon`, na `path` (hiari).
- */
-const SIDEBAR_SECTIONS = [
-  {
-    id: 'user-management',
-    label: 'User Management',
-    items: [
-      { label: 'Manage Users', icon: FiUsers, path: '/admin/users' },
-    ],
-  },
-  {
-    id: 'user-lists',
-    label: 'User Lists',
-    items: [
-      { label: 'Add Parent', icon: FiUserPlus, path: '/admin/parents' },
-      { label: 'Students List', icon: FiUsers, path: '/admin/students' },
-      { label: 'Teachers List', icon: FiUserCheck, path: '/admin/teachers' },
-      { label: 'Parents List', icon: FiUser, path: '/admin/parents' },
-      { label: 'Accountants List', icon: FiUser, path: '/admin/accountants' },
-      { label: 'Store Keepers List', icon: FiArchive, path: '/admin/users' },
-    ],
-  },
-  {
-    id: 'attendance',
-    label: 'Attendance',
-    items: [
-      { label: 'Teacher Attendance', icon: FiUserCheck, path: '/admin/users' },
-      { label: 'Attendance Stats', icon: FiBarChart2, path: '/admin/reports' },
-    ],
-  },
-  {
-    id: 'academic-setup',
-    label: 'Academic Setup',
-    items: [
-      { label: 'Manage Classes', icon: FiLayers, path: '/admin/subjects' },
-      { label: 'Manage Subjects', icon: FiBookOpen, path: '/admin/subjects' },
-      { label: 'Assign Subjects', icon: FiClipboard, path: '/admin/teachers' },
-    ],
-  },
-  {
-    id: 'timetables',
-    label: 'Timetables',
-    items: [{ label: 'Manage Timetables', icon: FiCalendar, path: '/admin/timetables' }],
-  },
-  {
-    id: 'school-setup',
-    label: 'School Setup',
-    items: [
-      { label: 'School Settings', icon: FiSettings, path: '/admin/settings' },
-      { label: 'Grading System', icon: FiFileText, path: '/admin/settings' },
-      { label: 'Fee Structure', icon: FiDollarSign, path: '/admin/fee-structure' },
-      { label: 'School Calendar', icon: FiCalendar, path: '/admin/settings' },
-    ],
-  },
-  {
-    id: 'maintenance',
-    label: 'Maintenance',
-    items: [{ label: 'Fix Accounts', icon: FiTool, path: '/admin/users' }],
-  },
-  {
-    id: 'content',
-    label: 'Content',
-    items: [{ label: 'Gallery', icon: FiImage, path: '/admin/settings' }],
-  },
-]
-
-/**
  * Icon resolver kwa module yoyote.
  */
 function ModuleIcon({ module, className = 'h-4 w-4' }) {
+  useLanguage()
   if (module === 'Students') return <FiUsers className={className} />
   if (module === 'Teachers') return <FiUserCheck className={className} />
   if (module === 'Subjects') return <FiBookOpen className={className} />
@@ -127,85 +60,50 @@ function ModuleIcon({ module, className = 'h-4 w-4' }) {
 }
 
 export function AppLayout({ modules = [], title = 'Dashboard', children }) {
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
+  useLanguage()
+  const { user } = useAuth()
+  const location = useLocation()
   const [open, setOpen] = useState(false)
+  const menuRef = useRef(null)
+  useDialogFocus(menuRef, () => setOpen(false), open)
 
-  // Fungua makundi yote kwa default.
-  const [openSections, setOpenSections] = useState(() =>
-    SIDEBAR_SECTIONS.reduce((acc, section) => {
-      acc[section.id] = true
-      return acc
-    }, {}),
+  const isAdmin = user?.role === 'super_admin'
+  const selectedSection = isAdmin ? getAdminSection(location) : null
+  const homePath = selectedSection ? getAdminDashboardPath(selectedSection) : getHomePath(user?.role)
+  const profilePath = selectedSection ? `/profile?category=${selectedSection.id}` : '/profile'
+
+  const renderItem = (label, Icon, path, active) => (
+    <NavLink
+      key={path}
+      to={path}
+      onClick={() => setOpen(false)}
+      aria-current={active === false ? 'false' : active ? 'page' : undefined}
+      className={({ isActive }) =>
+        `flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${
+          (active ?? isActive)
+            ? 'bg-sidebar-hover font-medium text-sidebar-foreground'
+            : 'text-sidebar-muted hover:bg-sidebar-hover hover:text-brand-foreground'
+        }`
+      }
+    >
+      <Icon className="h-4 w-4 shrink-0" />
+      <span>{t(label)}</span>
+    </NavLink>
   )
 
-  const homePath = getHomePath(user?.role)
-
-  const handleLogout = async () => {
-    await logout()
-    navigate('/login', { replace: true })
-  }
-
-  const toggleSection = (sectionId) => {
-    setOpenSections((prev) => ({ ...prev, [sectionId]: !prev[sectionId] }))
-  }
-
-  /**
-   * Render item — kila kitu ni clickable.
-   * Kama item ina `path` (kutoka SIDEBAR_SECTIONS au getModulePath), tumia NavLink.
-   * Kama haina, onyesha kama button isiyo clickable (HAKUNA kurudi dashboard).
-   */
-  const renderItem = (label, Icon, explicitPath) => {
-    const path = explicitPath || getModulePath(user?.role, label)
-
-    // Kama path ipo — tumia NavLink
-    if (path) {
-      return (
-        <NavLink
-          key={label}
-          to={path}
-          onClick={() => setOpen(false)}
-          className={({ isActive }) =>
-            `flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${
-              isActive
-                ? 'bg-sidebar-hover font-medium text-primary-foreground'
-                : 'text-muted-foreground hover:bg-sidebar-hover hover:text-brand-foreground'
-            }`
-          }
-        >
-          <Icon className="h-4 w-4" />
-          {label}
-        </NavLink>
-      )
-    }
-
-    // Kama path haipo — onyesha kama button (HAKUNA kurudi dashboard)
-    return (
-      <button
-        key={label}
-        type="button"
-        onClick={() => setOpen(false)}
-        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition hover:bg-sidebar-hover hover:text-brand-foreground"
-      >
-        <Icon className="h-4 w-4" />
-        {label}
-      </button>
-    )
-  }
-
-  const sidebar = (
-    <div className="flex h-full flex-col bg-sidebar text-sidebar-muted">
+  const sidebar = () => (
+    <div className="app-sidebar flex h-full flex-col bg-sidebar text-sidebar-muted">
       <div className="flex items-center gap-3 px-6 py-6">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary font-bold text-primary-foreground">
           S
         </div>
         <div>
-          <p className="text-sm font-semibold tracking-wide text-primary-foreground">SIMS</p>
-          <p className="text-xs text-muted-foreground">Student Information</p>
+          <p className="text-sm font-semibold tracking-wide text-sidebar-foreground">{t("SIMS")}</p>
+          <p className="text-xs text-sidebar-muted">{t("Student Information")}</p>
         </div>
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-2">
+      <nav aria-label={t("Main navigation")} className="flex-1 space-y-1 overflow-y-auto px-3 py-2">
         {/* Dashboard */}
         <NavLink
           to={homePath}
@@ -215,88 +113,58 @@ export function AppLayout({ modules = [], title = 'Dashboard', children }) {
             `flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
               isActive
                 ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-sidebar-hover hover:text-brand-foreground'
+                : 'text-sidebar-muted hover:bg-sidebar-hover hover:text-brand-foreground'
             }`
           }
         >
-          <FiGrid className="h-4 w-4" />
-          Dashboard
-        </NavLink>
+          <FiGrid className="h-4 w-4" />{t("Dashboard")}</NavLink>
 
-        {/* Modules zilizoainishwa na parent — kila kitu ni clickable */}
-        {modules.map((module) => {
+        {!isAdmin && modules.map((module) => {
           const path = getModulePath(user?.role, module)
-
-          return (
-            <NavLink
-              key={module}
-              to={path || homePath}
-              onClick={() => setOpen(false)}
-              className={({ isActive }) =>
-                `flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
-                  isActive
-                    ? 'bg-sidebar-hover font-medium text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-sidebar-hover hover:text-brand-foreground'
-                }`
-              }
-            >
-              <ModuleIcon module={module} />
-              {module}
-            </NavLink>
-          )
+          if (!path) return null
+          return renderItem(module, () => <ModuleIcon module={module} />, path)
         })}
 
+        {isAdmin && (
+          <>
+            <NavLink
+              to="/admin"
+              end
+              onClick={() => setOpen(false)}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-sidebar-muted transition hover:bg-sidebar-hover hover:text-brand-foreground"
+            >
+              <FiArrowLeft className="h-4 w-4 shrink-0" />{t("All categories")}</NavLink>
+            {selectedSection && (
+              <div className="pt-3">
+                <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-sidebar-muted">{t(selectedSection.label)}</p>
+                <div className="space-y-0.5">
+                  {selectedSection.items.map((item) =>
+                    renderItem(item.label, item.icon, item.path, isAdminItemActive(item.path, location)),
+                  )}
+                </div>
+              </div>
+            )}
+          </>
+        )}
         {/* My Profile — link ya moja kwa moja */}
         <NavLink
-          to="/profile"
+          to={profilePath}
           onClick={() => setOpen(false)}
           className={({ isActive }) =>
             `flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
               isActive
-                ? 'bg-sidebar-hover font-medium text-primary-foreground'
-                : 'text-muted-foreground hover:bg-sidebar-hover hover:text-brand-foreground'
+                ? 'bg-sidebar-hover font-medium text-sidebar-foreground'
+                : 'text-sidebar-muted hover:bg-sidebar-hover hover:text-brand-foreground'
             }`
           }
         >
-          <FiUser className="h-4 w-4" />
-          My Profile
-        </NavLink>
+          <FiUser className="h-4 w-4" />{t("My Profile")}</NavLink>
 
-        {/* Makundi ya sidebar yenye kufunguka/kufunga */}
-        {SIDEBAR_SECTIONS.map((section) => {
-          const isOpen = !!openSections[section.id]
-
-          return (
-            <div key={section.id} className="pt-1">
-              <button
-                type="button"
-                onClick={() => toggleSection(section.id)}
-                aria-expanded={isOpen}
-                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground transition hover:bg-sidebar-hover hover:text-brand-foreground"
-              >
-                <span>{section.label}</span>
-                {isOpen ? (
-                  <FiChevronDown className="h-4 w-4" />
-                ) : (
-                  <FiChevronRight className="h-4 w-4" />
-                )}
-              </button>
-
-              {isOpen && (
-                <div className="mt-1 space-y-0.5 pl-2">
-                  {section.items.map((item) =>
-                    renderItem(item.label, item.icon, item.path)
-                  )}
-                </div>
-              )}
-            </div>
-          )
-        })}
       </nav>
 
       <div className="border-t border-sidebar-border p-4">
         <NavLink
-          to="/profile"
+          to={profilePath}
           onClick={() => setOpen(false)}
           className={({ isActive }) =>
             `flex items-center gap-3 rounded-lg p-3 transition ${
@@ -308,82 +176,79 @@ export function AppLayout({ modules = [], title = 'Dashboard', children }) {
             {initials(user?.full_name)}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-primary-foreground">{user?.full_name}</p>
-            <p className="truncate text-xs text-muted-foreground">{ROLE_LABELS[user?.role] ?? user?.role}</p>
+            <p className="truncate text-sm font-medium text-sidebar-foreground">{user?.full_name}</p>
+            <p className="truncate text-xs text-sidebar-muted">{t(ROLE_LABELS[user?.role] ?? user?.role)}</p>
           </div>
-          <FiUser className="h-4 w-4 text-muted-foreground" />
+          <FiUser className="h-4 w-4 text-sidebar-muted" />
         </NavLink>
+        <SidebarLogout />
       </div>
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-muted">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 lg:block">{sidebar}</aside>
+    <div className="min-h-screen bg-background">
+      <a href="#main-content" className="skip-link">{t("Skip to content")}</a>
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 lg:block">{sidebar()}</aside>
 
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <button
             type="button"
-            aria-label="Close menu"
+            aria-label={t("Close menu")}
             className="absolute inset-0 bg-overlay"
             onClick={() => setOpen(false)}
           />
-          <aside className="relative h-full w-64">
+          <aside ref={menuRef} role="dialog" aria-modal="true" aria-label={t("Navigation menu")} tabIndex={-1} className="relative h-full w-64">
             <button
               type="button"
-              aria-label="Close menu"
+              aria-label={t("Close menu")}
               className="absolute right-3 top-3 z-10 rounded-md p-1 text-muted-foreground hover:text-brand-foreground"
               onClick={() => setOpen(false)}
             >
               <FiX className="h-5 w-5" />
             </button>
-            {sidebar}
+            {sidebar()}
           </aside>
         </div>
       )}
 
       <div className="lg:pl-64">
         <header className="sticky top-0 z-30 border-b border-border bg-surface/90 backdrop-blur">
-          <div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:flex-nowrap sm:px-6">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 className="rounded-md p-2 text-muted-foreground hover:bg-muted lg:hidden"
                 onClick={() => setOpen(true)}
-                aria-label="Open menu"
+                aria-label={t("Open menu")}
               >
                 <FiMenu className="h-5 w-5" />
               </button>
               <div>
                 <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  {ROLE_LABELS[user?.role] ?? 'Dashboard'}
+                  {t(ROLE_LABELS[user?.role] ?? 'Dashboard')}
                 </p>
-                <h1 className="text-lg font-semibold text-foreground">{title}</h1>
+                <h1 className="text-lg font-semibold text-foreground">{t(title)}</h1>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
+              <LanguageSwitch />
+              <ThemeToggle />
               <button
                 type="button"
                 className="hidden rounded-lg p-2 text-muted-foreground hover:bg-muted sm:block"
-                aria-label="Notifications"
+                aria-label={t("Notifications")}
               >
                 <FiBell className="h-5 w-5" />
               </button>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
-              >
-                <FiLogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">Sign out</span>
-              </button>
+              <ProfileMenu profilePath={profilePath} />
             </div>
           </div>
         </header>
 
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-8">{children}</main>
+        <main id="main-content" tabIndex={-1} className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-8"><PageBoundary key={location.pathname}>{children}</PageBoundary></main>
       </div>
     </div>
   )

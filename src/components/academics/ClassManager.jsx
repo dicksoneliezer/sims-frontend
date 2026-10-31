@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiEdit2, FiPlus, FiRefreshCw, FiSearch, FiTrash2 } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -9,6 +11,7 @@ import { SCHOOL_LEVELS } from '../../utils/constants'
 const PAGE_SIZE = 10
 
 export function ClassManager({ teachers, onChanged }) {
+  useLanguage()
   const [classes, setClasses] = useState([])
   const [meta, setMeta] = useState({ current_page: 1, per_page: PAGE_SIZE, total: 0, last_page: 1 })
   const [search, setSearch] = useState('')
@@ -37,7 +40,7 @@ export function ClassManager({ teachers, onChanged }) {
         setMeta(response.meta)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load classes.')
+        if (active) toast.error(t("Unable to load classes."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -59,14 +62,14 @@ export function ClassManager({ teachers, onChanged }) {
   }
 
   const handleDelete = async (schoolClass) => {
-    if (!window.confirm(`Delete ${schoolClass.name}?`)) return
+    if (!window.confirm(t("Delete {0}?", [schoolClass.name]))) return
 
     try {
       await deleteClass(schoolClass.id)
-      toast.success('Class deleted')
+      toast.success(t("Class deleted"))
       refresh()
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to delete class.')
+      toast.error(error.response?.data?.message ?? t("Unable to delete class."))
     }
   }
 
@@ -80,7 +83,7 @@ export function ClassManager({ teachers, onChanged }) {
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search class or section"
+              placeholder={t("Search class or section")}
               className="w-full rounded-lg border border-border py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </div>
@@ -89,10 +92,10 @@ export function ClassManager({ teachers, onChanged }) {
             onChange={(event) => updateFilter('level', event.target.value)}
             className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           >
-            <option value="">All levels</option>
+            <option value="">{t("All levels")}</option>
             {Object.entries(SCHOOL_LEVELS).map(([value, label]) => (
               <option key={value} value={value}>
-                {label}
+                {t(label)}
               </option>
             ))}
           </select>
@@ -101,9 +104,9 @@ export function ClassManager({ teachers, onChanged }) {
             onChange={(event) => updateFilter('is_active', event.target.value)}
             className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           >
-            <option value="">All statuses</option>
-            <option value="1">Active</option>
-            <option value="0">Inactive</option>
+            <option value="">{t("All statuses")}</option>
+            <option value="1">{t("Active")}</option>
+            <option value="0">{t("Inactive")}</option>
           </select>
         </div>
         <div className="flex items-center gap-2">
@@ -114,7 +117,7 @@ export function ClassManager({ teachers, onChanged }) {
               setRefreshKey((key) => key + 1)
             }}
             className="rounded-lg border border-border p-2 text-muted-foreground hover:bg-muted"
-            aria-label="Refresh classes"
+            aria-label={t("Refresh classes")}
           >
             <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -123,8 +126,7 @@ export function ClassManager({ teachers, onChanged }) {
             onClick={() => setForm({ schoolClass: null })}
             className="flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
           >
-            <FiPlus className="h-4 w-4" /> Add class
-          </button>
+            <FiPlus className="h-4 w-4" />{t(" Add class")}</button>
         </div>
       </div>
 
@@ -132,13 +134,13 @@ export function ClassManager({ teachers, onChanged }) {
         <table className="min-w-full divide-y divide-slate-200 text-sm">
           <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
             <tr>
-              <th className="px-4 py-3">Class</th>
-              <th className="px-4 py-3">Level</th>
-              <th className="px-4 py-3">Section</th>
-              <th className="px-4 py-3">Class teacher</th>
-              <th className="px-4 py-3 text-right">Students</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3 text-right">Actions</th>
+              <th className="px-4 py-3">{t("Class")}</th>
+              <th className="px-4 py-3">{t("Level")}</th>
+              <th className="px-4 py-3">{t("Section")}</th>
+              <th className="px-4 py-3">{t("Class teacher")}</th>
+              <th className="px-4 py-3 text-right">{t("Students")}</th>
+              <th className="px-4 py-3">{t("Status")}</th>
+              <th className="px-4 py-3 text-right">{t("Actions")}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -150,9 +152,7 @@ export function ClassManager({ teachers, onChanged }) {
               </tr>
             ) : classes.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">
-                  No classes match the current filters.
-                </td>
+                <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">{t("No classes match the current filters.")}</td>
               </tr>
             ) : (
               classes.map((schoolClass) => (
@@ -163,7 +163,7 @@ export function ClassManager({ teachers, onChanged }) {
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">{schoolClass.section ?? '-'}</td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {schoolClass.class_teacher?.full_name ?? 'Not assigned'}
+                    {schoolClass.class_teacher?.full_name ?? t("Not assigned")}
                   </td>
                   <td className="px-4 py-3 text-right text-foreground">{schoolClass.students_count ?? 0}</td>
                   <td className="px-4 py-3">
@@ -174,7 +174,7 @@ export function ClassManager({ teachers, onChanged }) {
                           : 'bg-muted text-muted-foreground'
                       }`}
                     >
-                      {schoolClass.is_active ? 'Active' : 'Inactive'}
+                      {schoolClass.is_active ? t("Active") : t("Inactive")}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -183,7 +183,7 @@ export function ClassManager({ teachers, onChanged }) {
                         type="button"
                         onClick={() => setForm({ schoolClass })}
                         className="rounded-lg p-2 text-muted-foreground hover:bg-warning-soft hover:text-warning"
-                        aria-label={`Edit ${schoolClass.name}`}
+                        aria-label={t("Edit {0}", [schoolClass.name])}
                       >
                         <FiEdit2 className="h-4 w-4" />
                       </button>
@@ -191,7 +191,7 @@ export function ClassManager({ teachers, onChanged }) {
                         type="button"
                         onClick={() => handleDelete(schoolClass)}
                         className="rounded-lg p-2 text-muted-foreground hover:bg-danger-soft hover:text-danger"
-                        aria-label={`Delete ${schoolClass.name}`}
+                        aria-label={t("Delete {0}", [schoolClass.name])}
                       >
                         <FiTrash2 className="h-4 w-4" />
                       </button>
@@ -206,7 +206,7 @@ export function ClassManager({ teachers, onChanged }) {
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-sm text-muted-foreground">
         <p>
-          {meta.total} classes - page {meta.current_page} of {Math.max(meta.last_page, 1)}
+          {meta.total}{t(" classes - page ")}{meta.current_page}{t(" of ")}{Math.max(meta.last_page, 1)}
         </p>
         <div className="flex items-center gap-2">
           <button
@@ -214,24 +214,20 @@ export function ClassManager({ teachers, onChanged }) {
             onClick={() => setPage((current) => Math.max(1, current - 1))}
             disabled={meta.current_page <= 1 || loading}
             className="rounded-lg border border-border px-3 py-1.5 font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Previous
-          </button>
+          >{t("Previous")}</button>
           <button
             type="button"
             onClick={() => setPage((current) => Math.min(meta.last_page, current + 1))}
             disabled={meta.current_page >= meta.last_page || loading}
             className="rounded-lg border border-border px-3 py-1.5 font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Next
-          </button>
+          >{t("Next")}</button>
         </div>
       </div>
 
       {form && (
         <Modal
-          title={form.schoolClass ? 'Edit class' : 'Add class'}
-          description="Class names are used on student records and timetables."
+          title={form.schoolClass ? t("Edit class") : t("Add class")}
+          description={t("Class names are used on student records and timetables.")}
           onClose={() => setForm(null)}
         >
           <ClassForm

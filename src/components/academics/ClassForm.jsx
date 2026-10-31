@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { createClass, updateClass } from '../../api/academics'
@@ -9,6 +11,7 @@ const labelClass = 'text-sm font-medium text-foreground'
 const errorClass = 'mt-1 text-xs text-danger'
 
 export function ClassForm({ schoolClass, teachers, onClose, onSaved }) {
+  useLanguage()
   const isEdit = Boolean(schoolClass)
   const {
     register,
@@ -38,10 +41,10 @@ export function ClassForm({ schoolClass, teachers, onClose, onSaved }) {
     try {
       if (isEdit) {
         await updateClass(schoolClass.id, payload)
-        toast.success('Class updated')
+        toast.success(t("Class updated"))
       } else {
         await createClass(payload)
-        toast.success('Class created')
+        toast.success(t("Class created"))
       }
 
       onSaved()
@@ -51,7 +54,7 @@ export function ClassForm({ schoolClass, teachers, onClose, onSaved }) {
       Object.entries(data?.errors ?? {}).forEach(([field, messages]) => {
         setError(field, { type: 'server', message: messages[0] })
       })
-      toast.error(data?.message ?? 'Unable to save class.')
+      toast.error(data?.message ?? t("Unable to save class."))
     }
   }
 
@@ -59,57 +62,49 @@ export function ClassForm({ schoolClass, teachers, onClose, onSaved }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="name" className={labelClass}>
-            Class name <span className="text-red-500">*</span>
+          <label htmlFor="name" className={labelClass}>{t("Class name")}<span className="text-red-500">*</span>
           </label>
           <input
             id="name"
             className={`${inputClass} mt-1.5`}
-            placeholder="e.g. Form 1A"
-            {...register('name', { required: 'Class name is required.' })}
+            placeholder={t("e.g. Form 1A")}
+            {...register('name', { required: t("Class name is required.") })}
           />
           {errors.name && <p className={errorClass}>{errors.name.message}</p>}
         </div>
         <div>
-          <label htmlFor="level" className={labelClass}>
-            Level <span className="text-red-500">*</span>
+          <label htmlFor="level" className={labelClass}>{t("Level")}<span className="text-red-500">*</span>
           </label>
           <select id="level" className={`${inputClass} mt-1.5`} {...register('level')}>
             {Object.entries(SCHOOL_LEVELS).map(([value, label]) => (
               <option key={value} value={value}>
-                {label}
+                {t(label)}
               </option>
             ))}
           </select>
           {errors.level && <p className={errorClass}>{errors.level.message}</p>}
         </div>
         <div>
-          <label htmlFor="section" className={labelClass}>
-            Section
-          </label>
+          <label htmlFor="section" className={labelClass}>{t("Section")}</label>
           <input id="section" className={`${inputClass} mt-1.5`} placeholder="e.g. A" {...register('section')} />
           {errors.section && <p className={errorClass}>{errors.section.message}</p>}
         </div>
         <div>
-          <label htmlFor="capacity" className={labelClass}>
-            Capacity
-          </label>
+          <label htmlFor="capacity" className={labelClass}>{t("Capacity")}</label>
           <input
             id="capacity"
             type="number"
             min="0"
             max="500"
             className={`${inputClass} mt-1.5`}
-            {...register('capacity', { min: { value: 0, message: 'Capacity cannot be negative.' } })}
+            {...register('capacity', { min: { value: 0, message: t("Capacity cannot be negative.") } })}
           />
           {errors.capacity && <p className={errorClass}>{errors.capacity.message}</p>}
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor="class_teacher_id" className={labelClass}>
-            Class teacher
-          </label>
+          <label htmlFor="class_teacher_id" className={labelClass}>{t("Class teacher")}</label>
           <select id="class_teacher_id" className={`${inputClass} mt-1.5`} {...register('class_teacher_id')}>
-            <option value="">Not assigned</option>
+            <option value="">{t("Not assigned")}</option>
             {teachers.map((teacher) => (
               <option key={teacher.id} value={teacher.id}>
                 {teacher.full_name}
@@ -120,9 +115,7 @@ export function ClassForm({ schoolClass, teachers, onClose, onSaved }) {
         </div>
         <div className="flex items-end pb-2 sm:col-span-2">
           <label className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <input type="checkbox" className="h-4 w-4 rounded border-border" {...register('is_active')} />
-            Active class
-          </label>
+            <input type="checkbox" className="h-4 w-4 rounded border-border" {...register('is_active')} />{t("Active class")}</label>
         </div>
       </div>
 
@@ -131,15 +124,13 @@ export function ClassForm({ schoolClass, teachers, onClose, onSaved }) {
           type="button"
           onClick={onClose}
           className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
-        >
-          Cancel
-        </button>
+        >{t("Cancel")}</button>
         <button
           type="submit"
           disabled={isSubmitting}
           className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-60"
         >
-          {isSubmitting ? 'Saving...' : isEdit ? 'Save changes' : 'Create class'}
+          {isSubmitting ? t("Saving...") : isEdit ? t("Save changes") : t("Create class")}
         </button>
       </div>
     </form>

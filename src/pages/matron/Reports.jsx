@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 // src/pages/matron/Reports.jsx
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -22,6 +24,7 @@ const SESSION_LABELS = {
 }
 
 export default function MatronReports() {
+  useLanguage()
   const today = new Date()
   const thirtyDaysAgo = new Date()
   thirtyDaysAgo.setDate(today.getDate() - 30)
@@ -50,7 +53,7 @@ export default function MatronReports() {
         setReport(data)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load reports.')
+        if (active) toast.error(t("Unable to load reports."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -130,29 +133,24 @@ export default function MatronReports() {
       <section className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiFileText className="h-5 w-5 text-primary" /> Boarding Reports
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            View attendance, health, incidents, and leave reports.
-          </p>
+            <FiFileText className="h-5 w-5 text-primary" />{t(" Boarding Reports")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("View attendance, health, incidents, and leave reports.")}</p>
         </div>
         <button
           type="button"
           onClick={() => setFilters((p) => ({ ...p }))}
           className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
         >
-          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-        </button>
+          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
       </section>
 
       {/* Filters */}
       <section className="rounded-xl border border-border bg-surface p-4 shadow-sm">
         <div className="flex flex-wrap items-end gap-3">
           <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <FiCalendar className="h-4 w-4" /> Period
-          </div>
+            <FiCalendar className="h-4 w-4" />{t(" Period")}</div>
           <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            <span>From</span>
+            <span>{t("From")}</span>
             <input
               type="date"
               name="from"
@@ -162,7 +160,7 @@ export default function MatronReports() {
             />
           </label>
           <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            <span>To</span>
+            <span>{t("To")}</span>
             <input
               type="date"
               name="to"
@@ -176,23 +174,17 @@ export default function MatronReports() {
               type="button"
               onClick={() => quickRange(7)}
               className="rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted"
-            >
-              Last 7 days
-            </button>
+            >{t("Last 7 days")}</button>
             <button
               type="button"
               onClick={() => quickRange(30)}
               className="rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted"
-            >
-              Last 30 days
-            </button>
+            >{t("Last 30 days")}</button>
             <button
               type="button"
               onClick={() => quickRange(90)}
               className="rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted"
-            >
-              Last 90 days
-            </button>
+            >{t("Last 90 days")}</button>
           </div>
         </div>
       </section>
@@ -200,7 +192,7 @@ export default function MatronReports() {
       {/* Summary Cards */}
       {loading ? (
         <div className="flex items-center justify-center py-14">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+          <div role="status" aria-label={t("Loading data")} className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
         </div>
       ) : (
         <>
@@ -214,27 +206,23 @@ export default function MatronReports() {
                   <card.icon className="h-5 w-5" />
                 </div>
                 <p className="mt-4 text-2xl font-semibold text-foreground">{card.value}</p>
-                <p className="text-sm text-muted-foreground">{card.label}</p>
+                <p className="text-sm text-muted-foreground">{t(card.label)}</p>
               </article>
             ))}
           </section>
 
           {/* Attendance Breakdown */}
           <section className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-            <h3 className="font-semibold text-foreground">Attendance breakdown</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Roll call totals grouped by session for the selected period.
-            </p>
+            <h3 className="font-semibold text-foreground">{t("Attendance breakdown")}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">{t("Roll call totals grouped by session for the selected period.")}</p>
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {/* Sessions */}
               <div className="rounded-lg bg-muted p-4">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  By session
-                </p>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("By session")}</p>
                 <ul className="mt-3 space-y-2">
                   {(report?.attendance ?? []).length === 0 ? (
-                    <li className="text-sm text-muted-foreground">No roll calls in this period.</li>
+                    <li className="text-sm text-muted-foreground">{t("No roll calls in this period.")}</li>
                   ) : (
                     report.attendance.map((row) => (
                       <li
@@ -257,24 +245,20 @@ export default function MatronReports() {
 
               {/* Totals */}
               <div className="rounded-lg bg-muted p-4">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Overall
-                </p>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("Overall")}</p>
                 <div className="mt-3 space-y-2 text-sm">
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-2 text-muted-foreground">
-                      <FiUsers className="h-4 w-4 text-success" /> Present
-                    </span>
+                      <FiUsers className="h-4 w-4 text-success" />{t(" Present")}</span>
                     <span className="font-semibold text-foreground">{attendanceTotals.present}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-2 text-muted-foreground">
-                      <FiUserX className="h-4 w-4 text-danger" /> Absent
-                    </span>
+                      <FiUserX className="h-4 w-4 text-danger" />{t(" Absent")}</span>
                     <span className="font-semibold text-foreground">{attendanceTotals.absent}</span>
                   </div>
                   <div className="flex items-center justify-between border-t border-border pt-2">
-                    <span className="text-muted-foreground">Attendance rate</span>
+                    <span className="text-muted-foreground">{t("Attendance rate")}</span>
                     <span className={`font-semibold ${attendanceRate >= 90 ? 'text-success' : attendanceRate >= 75 ? 'text-warning' : 'text-danger'}`}>
                       {attendanceRate}%
                     </span>
@@ -285,12 +269,10 @@ export default function MatronReports() {
           </section>
 
           {/* Period Info */}
-          <section className="rounded-xl border border-border bg-surface p-4 text-sm text-muted-foreground shadow-sm">
-            Showing data from{' '}
+          <section className="rounded-xl border border-border bg-surface p-4 text-sm text-muted-foreground shadow-sm">{t("Showing data from")}{' '}
             <span className="font-medium text-foreground">
               {report?.period?.from ? formatDate(report.period.from) : '—'}
-            </span>{' '}
-            to{' '}
+            </span>{' '}{t("to")}{' '}
             <span className="font-medium text-foreground">
               {report?.period?.to ? formatDate(report.period.to) : '—'}
             </span>

@@ -1,4 +1,8 @@
+import { t } from '../utils/i18n'
+import { useLanguage } from '../hooks/useLanguage'
 import dayjs from 'dayjs'
+import 'dayjs/locale/sw.js'
+import { getLanguage } from '../utils/i18n'
 import { useEffect, useState } from 'react'
 import {
   FiActivity,
@@ -12,11 +16,12 @@ import {
   FiUserCheck,
   FiUsers,
 } from 'react-icons/fi'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import api from '../api/axios'
 import { AppLayout } from '../components/layouts/AppLayout'
 import { useAuth } from '../hooks/useAuth'
+import { getAdminSection } from '../utils/adminNavigation'
 import { getModulePath, ROLE_LABELS, ROLE_PREFIX } from '../utils/constants'
 import { formatMoney } from '../utils/format'
 
@@ -51,7 +56,10 @@ const STAT_META = {
 }
 
 export default function Dashboard() {
+  useLanguage()
   const { user } = useAuth()
+  const location = useLocation()
+  const selectedSection = user.role === 'super_admin' ? getAdminSection(location) : null
   const [dashboard, setDashboard] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -64,7 +72,7 @@ export default function Dashboard() {
         if (active) setDashboard(data.data)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load dashboard data.')
+        if (active) toast.error(t("Unable to load dashboard data."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -75,29 +83,24 @@ export default function Dashboard() {
     }
   }, [user.role])
 
-  const modules = dashboard?.modules ?? []
+  const modules = selectedSection ? selectedSection.items.map((item) => item.label) : dashboard?.modules ?? []
   const stats = dashboard?.stats
   const statMeta = STAT_META[user.role] ?? []
   const roleCount = stats?.by_role ? Object.keys(stats.by_role).length : null
 
   return (
-    <AppLayout modules={modules}>
+    <AppLayout modules={modules} title={selectedSection ? t("{0} Dashboard", [t(selectedSection.label)]) : t("Dashboard")}>
       <div className="space-y-6">
-        <section className="overflow-hidden rounded-2xl bg-gradient-to-r from-brand to-primary px-6 py-7 text-primary-foreground sm:px-8">
+        <section className="overflow-hidden rounded-2xl bg-gradient-to-r from-brand to-primary px-6 py-7 text-brand-foreground sm:px-8">
           <p className="text-xs font-medium uppercase tracking-widest text-brand-muted">
-            {ROLE_LABELS[user.role] ?? user.role} workspace
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">
-            Welcome back, {user.full_name?.split(' ')[0]}
+            {t(ROLE_LABELS[user.role] ?? user.role)}{t(" workspace")}</p>
+          <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">{t("Welcome back,")}{user.full_name?.split(' ')[0]}
           </h2>
-          <p className="mt-2 max-w-2xl text-sm text-brand-muted">
-            Your account is active and secure. The dashboard below is the starting point for the
-            modules being built in this milestone.
-          </p>
+          <p className="mt-2 max-w-2xl text-sm text-brand-muted">{t("Your account is active and secure. The dashboard below is the starting point for the modules being built in this milestone.")}</p>
           <div className="mt-5 flex flex-wrap gap-4 text-sm text-brand-muted">
             <span className="flex items-center gap-2">
               <FiClock className="h-4 w-4" />
-              {dayjs().format('dddd, D MMMM YYYY')}
+              {dayjs().locale(getLanguage()).format('dddd, D MMMM YYYY')}
             </span>
             <span className="flex items-center gap-2">
               <FiUser className="h-4 w-4" />
@@ -119,7 +122,7 @@ export default function Dashboard() {
                 <p className="mt-4 text-2xl font-semibold text-foreground">
                   {meta.money ? formatMoney(stats[meta.key] ?? 0) : (stats[meta.key] ?? 0)}
                 </p>
-                <p className="text-sm text-muted-foreground">{meta.label}</p>
+                <p className="text-sm text-muted-foreground">{t(meta.label)}</p>
               </article>
             ))}
             {roleCount !== null && (
@@ -128,7 +131,7 @@ export default function Dashboard() {
                   <FiLayers className="h-5 w-5" />
                 </div>
                 <p className="mt-4 text-2xl font-semibold text-foreground">{roleCount}</p>
-                <p className="text-sm text-muted-foreground">User roles</p>
+                <p className="text-sm text-muted-foreground">{t("User roles")}</p>
               </article>
             )}
           </section>
@@ -137,28 +140,27 @@ export default function Dashboard() {
         <section className="rounded-xl border border-border bg-surface shadow-sm">
           <div className="flex items-center justify-between border-b border-border px-6 py-4">
             <div>
-              <h3 className="font-semibold text-foreground">Your modules</h3>
+              <h3 className="font-semibold text-foreground">{selectedSection ? t("{0} modules", [t(selectedSection.label)]) : t("Your modules")}</h3>
               <p className="text-sm text-muted-foreground">
-                Modules assigned to the {ROLE_LABELS[user.role] ?? user.role} role.
+                {selectedSection ? t("Open a module in this category.") : t("Modules assigned to the {0} role.", [t(ROLE_LABELS[user.role] ?? user.role)])}
               </p>
             </div>
             <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-              {modules.length} modules
-            </span>
+              {modules.length}{t(" modules")}</span>
           </div>
 
           {loading ? (
             <div className="flex items-center justify-center py-14">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+              <div role="status" aria-label={t("Loading data")} className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
             </div>
           ) : modules.length === 0 ? (
-            <p className="px-6 py-10 text-center text-sm text-muted-foreground">
-              No modules have been assigned to this role yet.
-            </p>
+            <p className="px-6 py-10 text-center text-sm text-muted-foreground">{t("No modules have been assigned to this role yet.")}</p>
           ) : (
             <div className="grid gap-3 p-6 sm:grid-cols-2 lg:grid-cols-3">
               {modules.map((module) => {
-                const path = getModulePath(user.role, module)
+                const path = selectedSection
+                  ? selectedSection.items.find((item) => item.label === module)?.path
+                  : getModulePath(user.role, module)
 
                 if (path) {
                   return (
@@ -167,10 +169,8 @@ export default function Dashboard() {
                       to={path}
                       className="flex items-center justify-between rounded-lg border border-border px-4 py-3 transition hover:border-primary/40 hover:bg-primary-soft/50"
                     >
-                      <span className="text-sm font-medium text-foreground">{module}</span>
-                      <span className="rounded bg-success-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-success">
-                        Open
-                      </span>
+                      <span className="text-sm font-medium text-foreground">{t(module)}</span>
+                      <span className="rounded bg-success-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-success">{t("Open")}</span>
                     </Link>
                   )
                 }
@@ -180,10 +180,8 @@ export default function Dashboard() {
                     key={module}
                     className="flex items-center justify-between rounded-lg border border-border px-4 py-3"
                   >
-                    <span className="text-sm font-medium text-foreground">{module}</span>
-                    <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-warning">
-                      Soon
-                    </span>
+                    <span className="text-sm font-medium text-foreground">{t(module)}</span>
+                    <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-warning">{t("Soon")}</span>
                   </div>
                 )
               })}
@@ -193,38 +191,35 @@ export default function Dashboard() {
 
         <section className="grid gap-4 lg:grid-cols-3">
           <article className="rounded-xl border border-border bg-surface p-5 shadow-sm lg:col-span-2">
-            <h3 className="font-semibold text-foreground">Account details</h3>
+            <h3 className="font-semibold text-foreground">{t("Account details")}</h3>
             <dl className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
-                <dt className="text-xs uppercase tracking-wider text-muted-foreground">Full name</dt>
+                <dt className="text-xs uppercase tracking-wider text-muted-foreground">{t("Full name")}</dt>
                 <dd className="mt-1 text-sm font-medium text-foreground">{user.full_name}</dd>
               </div>
               <div>
-                <dt className="text-xs uppercase tracking-wider text-muted-foreground">Username</dt>
+                <dt className="text-xs uppercase tracking-wider text-muted-foreground">{t("Username")}</dt>
                 <dd className="mt-1 text-sm font-medium text-foreground">@{user.username}</dd>
               </div>
               <div>
-                <dt className="text-xs uppercase tracking-wider text-muted-foreground">Email</dt>
+                <dt className="text-xs uppercase tracking-wider text-muted-foreground">{t("Email")}</dt>
                 <dd className="mt-1 text-sm font-medium text-foreground">{user.email ?? '—'}</dd>
               </div>
               <div>
-                <dt className="text-xs uppercase tracking-wider text-muted-foreground">Phone</dt>
+                <dt className="text-xs uppercase tracking-wider text-muted-foreground">{t("Phone")}</dt>
                 <dd className="mt-1 text-sm font-medium text-foreground">{user.phone ?? '—'}</dd>
               </div>
             </dl>
           </article>
 
           <article className="rounded-xl border border-border bg-surface p-5 shadow-sm">
-            <h3 className="font-semibold text-foreground">Milestone 6</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Teaching and academic workflows are now live, with attendance, marks, results,
-              behavior, syllabus tracking and a shared profile page.
-            </p>
+            <h3 className="font-semibold text-foreground">{t("Milestone 6")}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{t("Teaching and academic workflows are now live, with attendance, marks, results, behavior, syllabus tracking and a shared profile page.")}</p>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-              <li>Teacher attendance, marks, notes and behavior records</li>
-              <li>Academic exams, results analysis and syllabus progress</li>
-              <li>Student and parent read-only academic views</li>
-              <li>Profile management with photo and password updates</li>
+              <li>{t("Teacher attendance, marks, notes and behavior records")}</li>
+              <li>{t("Academic exams, results analysis and syllabus progress")}</li>
+              <li>{t("Student and parent read-only academic views")}</li>
+              <li>{t("Profile management with photo and password updates")}</li>
             </ul>
           </article>
         </section>

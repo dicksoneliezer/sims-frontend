@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiClipboard, FiPlus, FiRefreshCw, FiSearch, FiHash } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -9,6 +11,7 @@ import { formatDate, formatMoney, statusClass } from '../../utils/format'
 const PAGE_SIZE = 10
 
 export default function ControlNumbers() {
+  useLanguage()
   const [payments, setPayments] = useState([])
   const [meta, setMeta] = useState({ current_page: 1, per_page: PAGE_SIZE, total: 0, last_page: 1 })
   const [search, setSearch] = useState('')
@@ -20,7 +23,7 @@ export default function ControlNumbers() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setQuery((current) => ({ ...current, search }))
+      setQuery((current) => current.search === search ? current : { ...current, search })
       setPage(1)
     }, 350)
 
@@ -38,7 +41,7 @@ export default function ControlNumbers() {
         setMeta(response.meta)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load control numbers.')
+        if (active) toast.error(t("Unable to load control numbers."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -52,9 +55,9 @@ export default function ControlNumbers() {
   const copy = async (controlNumber) => {
     try {
       await navigator.clipboard.writeText(controlNumber)
-      toast.success('Control number copied')
+      toast.success(t("Control number copied"))
     } catch {
-      toast.error('Unable to copy control number.')
+      toast.error(t("Unable to copy control number."))
     }
   }
 
@@ -64,17 +67,14 @@ export default function ControlNumbers() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiHash className="h-5 w-5 text-primary" /> Control numbers
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">Generate payment control numbers for students.</p>
+            <FiHash className="h-5 w-5 text-primary" />{t(" Control numbers")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Generate payment control numbers for students.")}</p>
         </div>
         <div className="flex items-center gap-2">
           <button type="button" onClick={() => setRefreshKey((key) => key + 1)} className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted">
-            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-          </button>
+            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
           <button type="button" onClick={() => setFormOpen(true)} className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover">
-            <FiPlus className="h-4 w-4" /> Generate
-          </button>
+            <FiPlus className="h-4 w-4" />{t(" Generate")}</button>
         </div>
       </section>
 
@@ -86,7 +86,7 @@ export default function ControlNumbers() {
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search control number, reference or student"
+              placeholder={t("Search control number, reference or student")}
               className="w-full rounded-lg border border-border py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </div>
@@ -95,10 +95,10 @@ export default function ControlNumbers() {
             onChange={(event) => { setQuery((current) => ({ ...current, status: event.target.value })); setPage(1) }}
             className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           >
-            <option value="">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="">{t("All statuses")}</option>
+            <option value="pending">{t("Pending")}</option>
+            <option value="completed">{t("Completed")}</option>
+            <option value="cancelled">{t("Cancelled")}</option>
           </select>
         </div>
 
@@ -106,20 +106,20 @@ export default function ControlNumbers() {
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-4 py-3">Control number</th>
-                <th className="px-4 py-3">Student</th>
-                <th className="px-4 py-3">Invoice</th>
-                <th className="px-4 py-3 text-right">Amount</th>
-                <th className="px-4 py-3">Method</th>
-                <th className="px-4 py-3">Created</th>
-                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">{t("Control number")}</th>
+                <th className="px-4 py-3">{t("Student")}</th>
+                <th className="px-4 py-3">{t("Invoice")}</th>
+                <th className="px-4 py-3 text-right">{t("Amount")}</th>
+                <th className="px-4 py-3">{t("Method")}</th>
+                <th className="px-4 py-3">{t("Created")}</th>
+                <th className="px-4 py-3">{t("Status")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading ? (
-                <tr><td colSpan={7} className="px-4 py-14 text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></td></tr>
+                <tr><td colSpan={7} className="px-4 py-14 text-center"><div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></td></tr>
               ) : payments.length === 0 ? (
-                <tr><td colSpan={7} className="px-4 py-14 text-center text-muted-foreground">No control numbers found.</td></tr>
+                <tr><td colSpan={7} className="px-4 py-14 text-center text-muted-foreground">{t("No control numbers found.")}</td></tr>
               ) : payments.map((payment) => (
                 <tr key={payment.id} className="hover:bg-muted/70">
                   <td className="px-4 py-3">
@@ -137,11 +137,11 @@ export default function ControlNumbers() {
                   <td className="px-4 py-3 capitalize text-muted-foreground">{payment.payment_method ?? '—'}</td>
                   <td className="px-4 py-3 text-muted-foreground">
                     <p>{formatDate(payment.created_at)}</p>
-                    {payment.expires_at && <p className="text-xs text-muted-foreground">Expires {formatDate(payment.expires_at)}</p>}
+                    {payment.expires_at && <p className="text-xs text-muted-foreground">{t("Expires ")}{formatDate(payment.expires_at)}</p>}
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusClass(payment.status)}`}>{payment.status}</span>
-                    {payment.is_expired && <p className="mt-0.5 text-xs text-warning">Expired</p>}
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusClass(payment.status)}`}>{t(payment.status)}</span>
+                    {payment.is_expired && <p className="mt-0.5 text-xs text-warning">{t("Expired")}</p>}
                   </td>
                 </tr>
               ))}
@@ -150,17 +150,17 @@ export default function ControlNumbers() {
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-sm text-muted-foreground">
-          <p>Showing <span className="font-medium text-foreground">{meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1}</span>–<span className="font-medium text-foreground">{Math.min(meta.current_page * meta.per_page, meta.total)}</span> of <span className="font-medium text-foreground">{meta.total}</span></p>
+          <p>{t("Showing ")}<span className="font-medium text-foreground">{meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1}</span>–<span className="font-medium text-foreground">{Math.min(meta.current_page * meta.per_page, meta.total)}</span>{t(" of ")}<span className="font-medium text-foreground">{meta.total}</span></p>
           <div className="flex items-center gap-2">
-            <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={meta.current_page <= 1 || loading} className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50">Previous</button>
-            <span>Page {meta.current_page} of {Math.max(meta.last_page, 1)}</span>
-            <button type="button" onClick={() => setPage((current) => Math.min(meta.last_page, current + 1))} disabled={meta.current_page >= meta.last_page || loading} className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50">Next</button>
+            <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={meta.current_page <= 1 || loading} className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50">{t("Previous")}</button>
+            <span>{t("Page ")}{meta.current_page}{t(" of ")}{Math.max(meta.last_page, 1)}</span>
+            <button type="button" onClick={() => setPage((current) => Math.min(meta.last_page, current + 1))} disabled={meta.current_page >= meta.last_page || loading} className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50">{t("Next")}</button>
           </div>
         </div>
       </section>
 
       {formOpen && (
-        <Modal title="Generate control number" description="Create a payment control number for a student invoice." onClose={() => setFormOpen(false)}>
+        <Modal title={t("Generate control number")} description={t("Create a payment control number for a student invoice.")} onClose={() => setFormOpen(false)}>
           <ControlNumberForm onClose={() => setFormOpen(false)} onSaved={() => setRefreshKey((key) => key + 1)} />
         </Modal>
       )}

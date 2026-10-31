@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiClipboard, FiRefreshCw, FiUpload, FiCheckCircle, FiClock } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -61,6 +63,7 @@ const STATUS_ICON = {
 }
 
 export default function StudentAssignments() {
+  useLanguage()
   const [assignments, setAssignments] = useState([])
   const [loading, setLoading] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
@@ -99,12 +102,12 @@ export default function StudentAssignments() {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
 
-      toast.success('Assignment submitted successfully')
+      toast.success(t("Assignment submitted successfully"))
       setUploading(null)
       setFile(null)
       setRefreshKey((key) => key + 1)
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to submit assignment.')
+      toast.error(error.response?.data?.message ?? t("Unable to submit assignment."))
     }
   }
 
@@ -113,27 +116,23 @@ export default function StudentAssignments() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiClipboard className="h-5 w-5 text-primary" /> Assignments
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">View and submit your homework and assignments.</p>
+            <FiClipboard className="h-5 w-5 text-primary" />{t(" Assignments")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("View and submit your homework and assignments.")}</p>
         </div>
         <button
           type="button"
           onClick={() => setRefreshKey((key) => key + 1)}
           className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
         >
-          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-        </button>
+          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
       </section>
 
       {loading ? (
         <div className="rounded-xl border border-border bg-surface p-14 text-center shadow-sm">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+          <div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
         </div>
       ) : assignments.length === 0 ? (
-        <div className="rounded-xl border border-border bg-surface p-14 text-center text-muted-foreground shadow-sm">
-          No assignments yet.
-        </div>
+        <div className="rounded-xl border border-border bg-surface p-14 text-center text-muted-foreground shadow-sm">{t("No assignments yet.")}</div>
       ) : (
         <div className="space-y-3">
           {assignments.map((item) => {
@@ -144,18 +143,18 @@ export default function StudentAssignments() {
                   <div>
                     <h3 className="font-semibold text-foreground">{item.title}</h3>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {item.subject} · Due {formatDate(item.due_date)}
+                      {item.subject}{t(" · Due ")}{formatDate(item.due_date)}
                     </p>
                   </div>
                   <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${STATUS_TONE[item.status]}`}>
                     <StatusIcon className="h-3 w-3" />
-                    {item.status}
+                    {t(item.status)}
                   </span>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">{item.description}</p>
 
                 {item.grade && (
-                  <p className="mt-2 text-sm font-semibold text-success">Grade: {item.grade}</p>
+                  <p className="mt-2 text-sm font-semibold text-success">{t("Grade: ")}{item.grade}</p>
                 )}
 
                 {item.status === 'pending' && (
@@ -165,8 +164,7 @@ export default function StudentAssignments() {
                       onClick={() => { setUploading(item); setFile(null) }}
                       className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary-hover"
                     >
-                      <FiUpload className="h-3.5 w-3.5" /> Submit
-                    </button>
+                      <FiUpload className="h-3.5 w-3.5" />{t(" Submit")}</button>
                   </div>
                 )}
               </article>
@@ -176,11 +174,11 @@ export default function StudentAssignments() {
       )}
 
       {uploading && (
-        <Modal title="Submit assignment" description={uploading.title} onClose={() => { setUploading(null); setFile(null) }}>
+        <Modal title={t("Submit assignment")} description={uploading.title} onClose={() => { setUploading(null); setFile(null) }}>
           <div className="space-y-4">
             <div>
               <label className="block text-sm">
-                <span className="mb-1 block font-medium text-foreground">Upload file</span>
+                <span className="mb-1 block font-medium text-foreground">{t("Upload file")}</span>
                 <input
                   type="file"
                   onChange={(e) => setFile(e.target.files?.[0] ?? null)}
@@ -193,17 +191,13 @@ export default function StudentAssignments() {
                 type="button"
                 onClick={() => { setUploading(null); setFile(null) }}
                 className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
-              >
-                Cancel
-              </button>
+              >{t("Cancel")}</button>
               <button
                 type="button"
                 onClick={handleSubmit}
                 disabled={!file}
                 className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
-              >
-                Submit assignment
-              </button>
+              >{t("Submit assignment")}</button>
             </div>
           </div>
         </Modal>

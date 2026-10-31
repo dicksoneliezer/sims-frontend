@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 // src/pages/storekeeper/Reports.jsx
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -16,6 +18,7 @@ import api from '../../api/axios'
 import { formatMoney } from '../../utils/format'
 
 export default function StoreKeeperReports() {
+  useLanguage()
   const today = new Date()
   const thirtyDaysAgo = new Date()
   thirtyDaysAgo.setDate(today.getDate() - 30)
@@ -42,7 +45,7 @@ export default function StoreKeeperReports() {
         setAssetReport(assetRes.data?.data ?? assetRes.data ?? null)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load reports.')
+        if (active) toast.error(t("Unable to load reports."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -81,29 +84,24 @@ export default function StoreKeeperReports() {
       <section className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiFileText className="h-5 w-5 text-primary" /> Store Reports
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Reports on assets, stock, maintenance, and missing items.
-          </p>
+            <FiFileText className="h-5 w-5 text-primary" />{t(" Store Reports")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Reports on assets, stock, maintenance, and missing items.")}</p>
         </div>
         <button
           type="button"
           onClick={() => setFilters((p) => ({ ...p }))}
           className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
         >
-          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-        </button>
+          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
       </section>
 
       {/* Period */}
       <section className="rounded-xl border border-border bg-surface p-4 shadow-sm">
         <div className="flex flex-wrap items-end gap-3">
           <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <FiCalendar className="h-4 w-4" /> Period
-          </div>
+            <FiCalendar className="h-4 w-4" />{t(" Period")}</div>
           <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            <span>From</span>
+            <span>{t("From")}</span>
             <input
               type="date"
               value={filters.from}
@@ -112,7 +110,7 @@ export default function StoreKeeperReports() {
             />
           </label>
           <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            <span>To</span>
+            <span>{t("To")}</span>
             <input
               type="date"
               value={filters.to}
@@ -130,7 +128,7 @@ export default function StoreKeeperReports() {
 
       {loading ? (
         <div className="flex items-center justify-center py-14">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+          <div role="status" aria-label={t("Loading data")} className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
         </div>
       ) : (
         <>
@@ -141,28 +139,28 @@ export default function StoreKeeperReports() {
                 <FiArchive className="h-5 w-5" />
               </div>
               <p className="mt-4 text-2xl font-semibold text-foreground">{totals.assetsTotal}</p>
-              <p className="text-sm text-muted-foreground">Total assets</p>
+              <p className="text-sm text-muted-foreground">{t("Total assets")}</p>
             </article>
             <article className="rounded-xl border border-border bg-surface p-5 shadow-sm">
               <div className="inline-flex rounded-lg bg-info-soft p-2.5 text-info">
                 <FiDollarSign className="h-5 w-5" />
               </div>
               <p className="mt-4 text-2xl font-semibold text-foreground">{formatMoney(totals.assetsValue)}</p>
-              <p className="text-sm text-muted-foreground">Asset current value</p>
+              <p className="text-sm text-muted-foreground">{t("Asset current value")}</p>
             </article>
             <article className="rounded-xl border border-border bg-surface p-5 shadow-sm">
               <div className="inline-flex rounded-lg bg-success-soft p-2.5 text-success">
                 <FiBox className="h-5 w-5" />
               </div>
               <p className="mt-4 text-2xl font-semibold text-foreground">{totals.inventoryItems}</p>
-              <p className="text-sm text-muted-foreground">Inventory items</p>
+              <p className="text-sm text-muted-foreground">{t("Inventory items")}</p>
             </article>
             <article className="rounded-xl border border-border bg-surface p-5 shadow-sm">
               <div className="inline-flex rounded-lg bg-warning-soft p-2.5 text-warning">
                 <FiAlertCircleIcon />
               </div>
               <p className="mt-4 text-2xl font-semibold text-foreground">{totals.lowStock}</p>
-              <p className="text-sm text-muted-foreground">Low stock items</p>
+              <p className="text-sm text-muted-foreground">{t("Low stock items")}</p>
             </article>
           </section>
 
@@ -170,21 +168,17 @@ export default function StoreKeeperReports() {
           <section className="grid gap-4 lg:grid-cols-2">
             {/* Stock movements */}
             <article className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-              <h3 className="font-semibold text-foreground">Stock movements</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Items in and out of the store during this period.
-              </p>
+              <h3 className="font-semibold text-foreground">{t("Stock movements")}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{t("Items in and out of the store during this period.")}</p>
               <dl className="mt-4 space-y-3">
                 <div className="flex items-center justify-between rounded-lg bg-muted p-3">
                   <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <FiTrendingUp className="h-4 w-4 text-success" /> Stock in
-                  </span>
+                    <FiTrendingUp className="h-4 w-4 text-success" />{t(" Stock in")}</span>
                   <span className="font-semibold text-foreground">{totals.stockIn}</span>
                 </div>
                 <div className="flex items-center justify-between rounded-lg bg-muted p-3">
                   <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <FiTrendingDown className="h-4 w-4 text-danger" /> Stock out
-                  </span>
+                    <FiTrendingDown className="h-4 w-4 text-danger" />{t(" Stock out")}</span>
                   <span className="font-semibold text-foreground">{totals.stockOut}</span>
                 </div>
               </dl>
@@ -192,21 +186,17 @@ export default function StoreKeeperReports() {
 
             {/* Maintenance */}
             <article className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-              <h3 className="font-semibold text-foreground">Maintenance</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Costs and pending repairs during this period.
-              </p>
+              <h3 className="font-semibold text-foreground">{t("Maintenance")}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{t("Costs and pending repairs during this period.")}</p>
               <dl className="mt-4 space-y-3">
                 <div className="flex items-center justify-between rounded-lg bg-muted p-3">
                   <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <FiTool className="h-4 w-4 text-primary" /> Total cost
-                  </span>
+                    <FiTool className="h-4 w-4 text-primary" />{t(" Total cost")}</span>
                   <span className="font-semibold text-foreground">{formatMoney(totals.maintenanceCost)}</span>
                 </div>
                 <div className="flex items-center justify-between rounded-lg bg-muted p-3">
                   <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <FiAlertCircleIcon className="text-warning" /> Pending
-                  </span>
+                    <FiAlertCircleIcon className="text-warning" />{t(" Pending")}</span>
                   <span className="font-semibold text-foreground">{totals.maintenancePending}</span>
                 </div>
               </dl>
@@ -216,29 +206,27 @@ export default function StoreKeeperReports() {
           {/* Asset breakdown */}
           {assetReport && (
             <section className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-              <h3 className="font-semibold text-foreground">Asset value &amp; depreciation</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Breakdown of assets by category and status.
-              </p>
+              <h3 className="font-semibold text-foreground">{t("Asset value &amp; depreciation")}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{t("Breakdown of assets by category and status.")}</p>
 
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 {/* Totals */}
                 <div className="rounded-lg bg-muted p-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Overall</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("Overall")}</p>
                   <dl className="mt-3 space-y-2 text-sm">
-                    <div className="flex justify-between"><dt className="text-muted-foreground">Purchase cost</dt><dd className="font-semibold text-foreground">{formatMoney(assetReport.totals?.purchase_cost ?? 0)}</dd></div>
-                    <div className="flex justify-between"><dt className="text-muted-foreground">Current value</dt><dd className="font-semibold text-foreground">{formatMoney(assetReport.totals?.current_value ?? 0)}</dd></div>
-                    <div className="flex justify-between"><dt className="text-muted-foreground">Depreciation</dt><dd className="font-semibold text-danger">{formatMoney(assetReport.totals?.depreciation ?? 0)}</dd></div>
-                    <div className="flex justify-between border-t border-border pt-2"><dt className="text-muted-foreground">Depreciation rate</dt><dd className="font-semibold text-foreground">{assetReport.totals?.depreciation_rate ?? 0}%</dd></div>
+                    <div className="flex justify-between"><dt className="text-muted-foreground">{t("Purchase cost")}</dt><dd className="font-semibold text-foreground">{formatMoney(assetReport.totals?.purchase_cost ?? 0)}</dd></div>
+                    <div className="flex justify-between"><dt className="text-muted-foreground">{t("Current value")}</dt><dd className="font-semibold text-foreground">{formatMoney(assetReport.totals?.current_value ?? 0)}</dd></div>
+                    <div className="flex justify-between"><dt className="text-muted-foreground">{t("Depreciation")}</dt><dd className="font-semibold text-danger">{formatMoney(assetReport.totals?.depreciation ?? 0)}</dd></div>
+                    <div className="flex justify-between border-t border-border pt-2"><dt className="text-muted-foreground">{t("Depreciation rate")}</dt><dd className="font-semibold text-foreground">{assetReport.totals?.depreciation_rate ?? 0}%</dd></div>
                   </dl>
                 </div>
 
                 {/* By category */}
                 <div className="rounded-lg bg-muted p-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">By category</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("By category")}</p>
                   <ul className="mt-3 space-y-2 text-sm">
                     {(assetReport.by_category ?? []).length === 0 ? (
-                      <li className="text-muted-foreground">No data.</li>
+                      <li className="text-muted-foreground">{t("No data.")}</li>
                     ) : (
                       assetReport.by_category.map((row) => (
                         <li key={row.category} className="flex justify-between">
@@ -254,8 +242,7 @@ export default function StoreKeeperReports() {
           )}
 
           {/* Period info */}
-          <section className="rounded-xl border border-border bg-surface p-4 text-sm text-muted-foreground shadow-sm">
-            Showing data from <span className="font-medium text-foreground">{report?.period?.from ?? '—'}</span> to <span className="font-medium text-foreground">{report?.period?.to ?? '—'}</span>.
+          <section className="rounded-xl border border-border bg-surface p-4 text-sm text-muted-foreground shadow-sm">{t("Showing data from")}<span className="font-medium text-foreground">{report?.period?.from ?? '—'}</span>{t(" to ")}<span className="font-medium text-foreground">{report?.period?.to ?? '—'}</span>.
           </section>
         </>
       )}
@@ -265,6 +252,7 @@ export default function StoreKeeperReports() {
 
 // Small icon helper to avoid re-importing
 function FiAlertCircleIcon({ className = 'h-5 w-5' }) {
+  useLanguage()
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10" />

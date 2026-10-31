@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { FiCheckCircle, FiClipboard, FiRefreshCw, FiSave } from 'react-icons/fi'
@@ -17,6 +19,7 @@ function statusTone(status) {
 }
 
 export default function TeacherAttendance() {
+  useLanguage()
   const [tab, setTab] = useState('register')
   const [classes, setClasses] = useState([])
   const [classId, setClassId] = useState('')
@@ -49,7 +52,7 @@ export default function TeacherAttendance() {
         }
       })
       .catch(() => {
-        if (active) toast.error('Unable to load attendance register.')
+        if (active) toast.error(t("Unable to load attendance register."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -71,7 +74,7 @@ export default function TeacherAttendance() {
         if (active) setReport(response)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load attendance report.')
+        if (active) toast.error(t("Unable to load attendance report."))
       })
       .finally(() => {
         if (active) setReportLoading(false)
@@ -103,10 +106,10 @@ export default function TeacherAttendance() {
           remarks: row.remarks || null,
         })),
       })
-      toast.success('Attendance saved')
+      toast.success(t("Attendance saved"))
       setRefreshKey((key) => key + 1)
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to save attendance.')
+      toast.error(error.response?.data?.message ?? t("Unable to save attendance."))
     } finally {
       setSaving(false)
     }
@@ -123,38 +126,34 @@ export default function TeacherAttendance() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiClipboard className="h-5 w-5 text-primary" /> Class attendance
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Mark the daily register and review attendance history for your classes.
-          </p>
+            <FiClipboard className="h-5 w-5 text-primary" />{t(" Class attendance")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Mark the daily register and review attendance history for your classes.")}</p>
         </div>
         <button
           type="button"
           onClick={() => setRefreshKey((key) => key + 1)}
           className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
         >
-          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-        </button>
+          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
       </section>
 
       <section className="rounded-xl border border-border bg-surface shadow-sm">
         <div className="flex flex-wrap items-end gap-3 border-b border-border p-4">
           <label className="text-sm">
-            <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-muted-foreground">Class</span>
+            <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("Class")}</span>
             <select
               value={classId}
               onChange={(event) => setClassId(event.target.value)}
               className="min-w-48 rounded-lg border border-border px-3 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             >
-              <option value="">All assigned classes</option>
+              <option value="">{t("All assigned classes")}</option>
               {classes.map((item) => (
                 <option key={item.id} value={item.id}>{item.name}</option>
               ))}
             </select>
           </label>
           <label className="text-sm">
-            <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-muted-foreground">Date</span>
+            <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("Date")}</span>
             <input
               type="date"
               value={date}
@@ -182,7 +181,7 @@ export default function TeacherAttendance() {
             <div className="grid gap-3 border-b border-border p-4 sm:grid-cols-4">
               {STATUSES.map((status) => (
                 <div key={status} className="rounded-lg bg-muted px-3 py-2">
-                  <p className="text-xs capitalize text-muted-foreground">{status}</p>
+                  <p className="text-xs capitalize text-muted-foreground">{t(status)}</p>
                   <p className="text-lg font-semibold text-foreground">{counts[status] ?? 0}</p>
                 </div>
               ))}
@@ -192,17 +191,17 @@ export default function TeacherAttendance() {
               <table className="min-w-full divide-y divide-slate-200 text-sm">
                 <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
                   <tr>
-                    <th className="px-4 py-3">Student</th>
-                    <th className="px-4 py-3">Class</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3">Remarks</th>
+                    <th className="px-4 py-3">{t("Student")}</th>
+                    <th className="px-4 py-3">{t("Class")}</th>
+                    <th className="px-4 py-3">{t("Status")}</th>
+                    <th className="px-4 py-3">{t("Remarks")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {loading ? (
-                    <tr><td colSpan={4} className="px-4 py-14 text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></td></tr>
+                    <tr><td colSpan={4} className="px-4 py-14 text-center"><div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></td></tr>
                   ) : roster.length === 0 ? (
-                    <tr><td colSpan={4} className="px-4 py-14 text-center text-muted-foreground">No students found for this class.</td></tr>
+                    <tr><td colSpan={4} className="px-4 py-14 text-center text-muted-foreground">{t("No students found for this class.")}</td></tr>
                   ) : roster.map((row) => (
                     <tr key={row.student_id} className="hover:bg-muted/70">
                       <td className="px-4 py-3">
@@ -216,14 +215,14 @@ export default function TeacherAttendance() {
                           onChange={(event) => updateRow(row.student_id, 'status', event.target.value)}
                           className={`rounded-full border-0 px-3 py-1 text-xs font-semibold capitalize outline-none ${statusTone(row.status)}`}
                         >
-                          {STATUSES.map((status) => <option key={status} value={status}>{status}</option>)}
+                          {STATUSES.map((status) => <option key={status} value={status}>{t(status)}</option>)}
                         </select>
                       </td>
                       <td className="px-4 py-3">
                         <input
                           value={row.remarks}
                           onChange={(event) => updateRow(row.student_id, 'remarks', event.target.value)}
-                          placeholder="Optional remark"
+                          placeholder={t("Optional remark")}
                           className="w-full min-w-48 rounded-lg border border-border px-3 py-1.5 text-sm outline-none focus:border-primary"
                         />
                       </td>
@@ -234,23 +233,23 @@ export default function TeacherAttendance() {
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border p-4">
-              <p className="text-sm text-muted-foreground">{roster.length} student(s) on the register for {formatDate(date)}.</p>
+              <p className="text-sm text-muted-foreground">{roster.length}{t(" student(s) on the register for ")}{formatDate(date)}.</p>
               <button
                 type="button"
                 onClick={handleSave}
                 disabled={saving || roster.length === 0 || !classId}
                 className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
               >
-                <FiSave className="h-4 w-4" /> {saving ? 'Saving...' : 'Save attendance'}
+                <FiSave className="h-4 w-4" /> {saving ? t("Saving...") : t("Save attendance")}
               </button>
             </div>
           </>
         ) : (
           <div className="p-4">
             {reportLoading ? (
-              <div className="py-14 text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></div>
+              <div className="py-14 text-center"><div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></div>
             ) : !report ? (
-              <p className="py-10 text-center text-sm text-muted-foreground">Select a class to view its attendance report.</p>
+              <p className="py-10 text-center text-sm text-muted-foreground">{t("Select a class to view its attendance report.")}</p>
             ) : (
               <div className="space-y-5">
                 <div className="grid gap-3 sm:grid-cols-5">
@@ -262,7 +261,7 @@ export default function TeacherAttendance() {
                     ['excused', report.summary?.excused ?? 0],
                   ].map(([label, value]) => (
                     <div key={label} className="rounded-lg border border-border p-3">
-                      <p className="text-xs capitalize text-muted-foreground">{label}</p>
+                      <p className="text-xs capitalize text-muted-foreground">{t(label)}</p>
                       <p className="mt-1 text-xl font-semibold text-foreground">{value}</p>
                     </div>
                   ))}
@@ -271,12 +270,12 @@ export default function TeacherAttendance() {
                   <table className="min-w-full divide-y divide-slate-200 text-sm">
                     <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
                       <tr>
-                        <th className="px-4 py-3">Student</th>
-                        <th className="px-4 py-3 text-right">Present</th>
-                        <th className="px-4 py-3 text-right">Absent</th>
-                        <th className="px-4 py-3 text-right">Late</th>
-                        <th className="px-4 py-3 text-right">Excused</th>
-                        <th className="px-4 py-3 text-right">Total</th>
+                        <th className="px-4 py-3">{t("Student")}</th>
+                        <th className="px-4 py-3 text-right">{t("Present")}</th>
+                        <th className="px-4 py-3 text-right">{t("Absent")}</th>
+                        <th className="px-4 py-3 text-right">{t("Late")}</th>
+                        <th className="px-4 py-3 text-right">{t("Excused")}</th>
+                        <th className="px-4 py-3 text-right">{t("Total")}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -302,8 +301,7 @@ export default function TeacherAttendance() {
         )}
       </section>
       <p className="flex items-center gap-2 text-xs text-muted-foreground">
-        <FiCheckCircle className="h-4 w-4 text-success" /> Attendance is saved per student and date, so re-saving updates the existing entry.
-      </p>
+        <FiCheckCircle className="h-4 w-4 text-success" />{t(" Attendance is saved per student and date, so re-saving updates the existing entry.")}</p>
     </div>
   )
 }

@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useMemo, useState } from 'react'
 import { FiFileText, FiRefreshCw, FiTrash2, FiSearch } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -32,6 +34,7 @@ const LEVEL_TONE = {
 }
 
 export default function SystemAdminLogs() {
+  useLanguage()
   const [logs, setLogs] = useState([])
   const [level, setLevel] = useState('')
   const [search, setSearch] = useState('')
@@ -51,16 +54,16 @@ export default function SystemAdminLogs() {
   }, [logs, level, search])
 
   const handleClear = () => {
-    if (!window.confirm('Clear all system logs?')) return
+    if (!window.confirm(t("Clear all system logs?"))) return
     setLogs([])
     saveLogs([])
-    toast.success('System logs cleared')
+    toast.success(t("System logs cleared"))
   }
 
   const handleRefresh = () => {
     const refreshed = loadLogs()
     setLogs(refreshed)
-    toast.success('Logs refreshed')
+    toast.success(t("Logs refreshed"))
   }
 
   const formatDate = (dateStr) => {
@@ -73,9 +76,8 @@ export default function SystemAdminLogs() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiFileText className="h-5 w-5 text-primary" /> System Logs
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">View system activity and audit logs.</p>
+            <FiFileText className="h-5 w-5 text-primary" />{t(" System Logs")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("View system activity and audit logs.")}</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -83,15 +85,13 @@ export default function SystemAdminLogs() {
             onClick={handleRefresh}
             className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
           >
-            <FiRefreshCw className="h-4 w-4" /> Refresh
-          </button>
+            <FiRefreshCw className="h-4 w-4" />{t(" Refresh")}</button>
           <button
             type="button"
             onClick={handleClear}
             className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-danger hover:bg-danger-soft"
           >
-            <FiTrash2 className="h-4 w-4" /> Clear Logs
-          </button>
+            <FiTrash2 className="h-4 w-4" />{t(" Clear Logs")}</button>
         </div>
       </section>
 
@@ -103,7 +103,7 @@ export default function SystemAdminLogs() {
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search logs by message or module"
+              placeholder={t("Search logs by message or module")}
               className="w-full rounded-lg border border-border py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </div>
@@ -112,10 +112,10 @@ export default function SystemAdminLogs() {
             onChange={(e) => setLevel(e.target.value)}
             className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary"
           >
-            <option value="">All levels</option>
-            <option value="info">Info</option>
-            <option value="warning">Warning</option>
-            <option value="error">Error</option>
+            <option value="">{t("All levels")}</option>
+            <option value="info">{t("Info")}</option>
+            <option value="warning">{t("Warning")}</option>
+            <option value="error">{t("Error")}</option>
           </select>
         </div>
 
@@ -123,18 +123,16 @@ export default function SystemAdminLogs() {
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-4 py-3">Level</th>
-                <th className="px-4 py-3">Module</th>
-                <th className="px-4 py-3">Message</th>
-                <th className="px-4 py-3">Date</th>
+                <th className="px-4 py-3">{t("Level")}</th>
+                <th className="px-4 py-3">{t("Module")}</th>
+                <th className="px-4 py-3">{t("Message")}</th>
+                <th className="px-4 py-3">{t("Date")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-14 text-center text-muted-foreground">
-                    No logs found.
-                  </td>
+                  <td colSpan={4} className="px-4 py-14 text-center text-muted-foreground">{t("No logs found.")}</td>
                 </tr>
               ) : (
                 filtered.map((log) => (

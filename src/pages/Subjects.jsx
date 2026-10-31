@@ -1,3 +1,5 @@
+import { t } from '../utils/i18n'
+import { useLanguage } from '../hooks/useLanguage'
 import { useEffect, useMemo, useState } from 'react'
 import { FiBookOpen, FiEdit2, FiPlus, FiRefreshCw, FiSearch, FiTrash2 } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -11,6 +13,7 @@ import { MODULES_BY_ROLE, ROLE_LABELS, SCHOOL_LEVELS } from '../utils/constants'
 const PAGE_SIZE = 10
 
 export default function Subjects() {
+  useLanguage()
   const { user } = useAuth()
   const prefix = user.role === 'academic_teacher' ? 'academic' : 'admin'
   const canManage = ['super_admin', 'academic_teacher'].includes(user.role)
@@ -48,7 +51,7 @@ export default function Subjects() {
         setMeta(response.meta)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load subjects.')
+        if (active) toast.error(t("Unable to load subjects."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -65,14 +68,14 @@ export default function Subjects() {
   }
 
   const handleDelete = async (subject) => {
-    if (!window.confirm(`Delete ${subject.name}?`)) return
+    if (!window.confirm(t("Delete {0}?", [subject.name]))) return
 
     try {
       await deleteSubject(subject.id, prefix)
-      toast.success('Subject deleted')
+      toast.success(t("Subject deleted"))
       setRefreshKey((key) => key + 1)
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to delete subject.')
+      toast.error(error.response?.data?.message ?? t("Unable to delete subject."))
     }
   }
 
@@ -80,16 +83,14 @@ export default function Subjects() {
   const to = Math.min(meta.current_page * meta.per_page, meta.total)
 
   return (
-    <AppLayout modules={modules} title="Subjects">
+    <AppLayout modules={modules} title={t("Subjects")}>
       <div className="space-y-5">
         <section className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-              <FiBookOpen className="h-5 w-5 text-primary" /> Subjects
-            </h2>
+              <FiBookOpen className="h-5 w-5 text-primary" />{t(" Subjects")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {ROLE_LABELS[user.role]} - manage the subject catalogue used for results and timetables.
-            </p>
+              {t(ROLE_LABELS[user.role])}{t(" - manage the subject catalogue used for results and timetables.")}</p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -100,16 +101,14 @@ export default function Subjects() {
               }}
               className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
             >
-              <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-            </button>
+              <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
             {canManage && (
               <button
                 type="button"
                 onClick={() => setForm({ subject: null })}
                 className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
               >
-                <FiPlus className="h-4 w-4" /> Add subject
-              </button>
+                <FiPlus className="h-4 w-4" />{t(" Add subject")}</button>
             )}
           </div>
         </section>
@@ -122,7 +121,7 @@ export default function Subjects() {
                 type="search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search code or name"
+                placeholder={t("Search code or name")}
                 className="w-full rounded-lg border border-border py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
@@ -131,10 +130,10 @@ export default function Subjects() {
               onChange={(event) => updateFilter('level', event.target.value)}
               className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             >
-              <option value="">All levels</option>
+              <option value="">{t("All levels")}</option>
               {Object.entries(SCHOOL_LEVELS).map(([value, label]) => (
                 <option key={value} value={value}>
-                  {label}
+                  {t(label)}
                 </option>
               ))}
             </select>
@@ -143,9 +142,9 @@ export default function Subjects() {
               onChange={(event) => updateFilter('is_active', event.target.value)}
               className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             >
-              <option value="">All statuses</option>
-              <option value="1">Active</option>
-              <option value="0">Inactive</option>
+              <option value="">{t("All statuses")}</option>
+              <option value="1">{t("Active")}</option>
+              <option value="0">{t("Inactive")}</option>
             </select>
           </div>
 
@@ -153,26 +152,24 @@ export default function Subjects() {
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-3">Code</th>
-                  <th className="px-4 py-3">Subject</th>
-                  <th className="px-4 py-3">Level</th>
-                  <th className="px-4 py-3 text-right">Results</th>
-                  <th className="px-4 py-3">Status</th>
-                  {canManage && <th className="px-4 py-3 text-right">Actions</th>}
+                  <th className="px-4 py-3">{t("Code")}</th>
+                  <th className="px-4 py-3">{t("Subject")}</th>
+                  <th className="px-4 py-3">{t("Level")}</th>
+                  <th className="px-4 py-3 text-right">{t("Results")}</th>
+                  <th className="px-4 py-3">{t("Status")}</th>
+                  {canManage && <th className="px-4 py-3 text-right">{t("Actions")}</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
                     <td colSpan={canManage ? 6 : 5} className="px-4 py-14 text-center">
-                      <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+                      <div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
                     </td>
                   </tr>
                 ) : subjects.length === 0 ? (
                   <tr>
-                    <td colSpan={canManage ? 6 : 5} className="px-4 py-14 text-center text-muted-foreground">
-                      No subjects match the current filters.
-                    </td>
+                    <td colSpan={canManage ? 6 : 5} className="px-4 py-14 text-center text-muted-foreground">{t("No subjects match the current filters.")}</td>
                   </tr>
                 ) : (
                   subjects.map((subject) => (
@@ -185,7 +182,7 @@ export default function Subjects() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
-                        {SCHOOL_LEVELS[subject.level] ?? 'All levels'}
+                        {SCHOOL_LEVELS[subject.level] ?? t("All levels")}
                       </td>
                       <td className="px-4 py-3 text-right text-foreground">{subject.results_count ?? 0}</td>
                       <td className="px-4 py-3">
@@ -196,7 +193,7 @@ export default function Subjects() {
                               : 'bg-muted text-muted-foreground'
                           }`}
                         >
-                          {subject.is_active ? 'Active' : 'Inactive'}
+                          {subject.is_active ? t("Active") : t("Inactive")}
                         </span>
                       </td>
                       {canManage && (
@@ -206,7 +203,7 @@ export default function Subjects() {
                               type="button"
                               onClick={() => setForm({ subject })}
                               className="rounded-lg p-2 text-muted-foreground hover:bg-warning-soft hover:text-warning"
-                              aria-label={`Edit ${subject.name}`}
+                              aria-label={t("Edit {0}", [subject.name])}
                             >
                               <FiEdit2 className="h-4 w-4" />
                             </button>
@@ -214,7 +211,7 @@ export default function Subjects() {
                               type="button"
                               onClick={() => handleDelete(subject)}
                               className="rounded-lg p-2 text-muted-foreground hover:bg-danger-soft hover:text-danger"
-                              aria-label={`Delete ${subject.name}`}
+                              aria-label={t("Delete {0}", [subject.name])}
                             >
                               <FiTrash2 className="h-4 w-4" />
                             </button>
@@ -229,31 +226,24 @@ export default function Subjects() {
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-sm text-muted-foreground">
-            <p>
-              Showing <span className="font-medium text-foreground">{from}</span>-
-              <span className="font-medium text-foreground">{to}</span> of{' '}
-              <span className="font-medium text-foreground">{meta.total}</span> subjects
-            </p>
+            <p>{t("Showing")}<span className="font-medium text-foreground">{from}</span>-
+              <span className="font-medium text-foreground">{to}</span>{t(" of")}{' '}
+              <span className="font-medium text-foreground">{meta.total}</span>{t(" subjects")}</p>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setPage((current) => Math.max(1, current - 1))}
                 disabled={meta.current_page <= 1 || loading}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <span className="px-1">
-                Page {meta.current_page} of {Math.max(meta.last_page, 1)}
+              >{t("Previous")}</button>
+              <span className="px-1">{t("Page")}{meta.current_page}{t(" of ")}{Math.max(meta.last_page, 1)}
               </span>
               <button
                 type="button"
                 onClick={() => setPage((current) => Math.min(meta.last_page, current + 1))}
                 disabled={meta.current_page >= meta.last_page || loading}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Next
-              </button>
+              >{t("Next")}</button>
             </div>
           </div>
         </section>
@@ -261,8 +251,8 @@ export default function Subjects() {
 
       {form && (
         <Modal
-          title={form.subject ? 'Edit subject' : 'Add subject'}
-          description="Subjects are shared across classes, results and timetables."
+          title={form.subject ? t("Edit subject") : t("Add subject")}
+          description={t("Subjects are shared across classes, results and timetables.")}
           onClose={() => setForm(null)}
         >
           <SubjectForm

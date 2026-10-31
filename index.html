@@ -4,11 +4,13 @@
     <meta charset="UTF-8" />
     <script>
       (function () {
+        var theme
         try {
-          var theme = localStorage.getItem('sims_theme')
-          if (theme === 'dark' || theme === 'light') {
-            document.documentElement.setAttribute('data-theme', theme)
-          }
+          theme = localStorage.getItem('sims_theme')
+        } catch (e) {}
+        document.documentElement.setAttribute('data-theme', theme === 'dark' || theme === 'light' ? theme : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        try {
+          document.documentElement.lang = localStorage.getItem('sims_language') === 'sw' ? 'sw' : 'en'
         } catch (e) {}
       })()
     </script>

@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { createSubject, updateSubject } from '../../api/academics'
@@ -9,6 +11,7 @@ const labelClass = 'text-sm font-medium text-foreground'
 const errorClass = 'mt-1 text-xs text-danger'
 
 export function SubjectForm({ subject, prefix, onClose, onSaved }) {
+  useLanguage()
   const isEdit = Boolean(subject)
   const {
     register,
@@ -36,10 +39,10 @@ export function SubjectForm({ subject, prefix, onClose, onSaved }) {
     try {
       if (isEdit) {
         await updateSubject(subject.id, payload, prefix)
-        toast.success('Subject updated')
+        toast.success(t("Subject updated"))
       } else {
         await createSubject(payload, prefix)
-        toast.success('Subject created')
+        toast.success(t("Subject created"))
       }
 
       onSaved()
@@ -49,7 +52,7 @@ export function SubjectForm({ subject, prefix, onClose, onSaved }) {
       Object.entries(data?.errors ?? {}).forEach(([field, messages]) => {
         setError(field, { type: 'server', message: messages[0] })
       })
-      toast.error(data?.message ?? 'Unable to save subject.')
+      toast.error(data?.message ?? t("Unable to save subject."))
     }
   }
 
@@ -57,38 +60,34 @@ export function SubjectForm({ subject, prefix, onClose, onSaved }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="code" className={labelClass}>
-            Code <span className="text-red-500">*</span>
+          <label htmlFor="code" className={labelClass}>{t("Code")}<span className="text-red-500">*</span>
           </label>
           <input
             id="code"
             className={`${inputClass} mt-1.5 uppercase`}
-            placeholder="e.g. MATH"
-            {...register('code', { required: 'Code is required.' })}
+            placeholder={t("e.g. MATH")}
+            {...register('code', { required: t("Code is required.") })}
           />
           {errors.code && <p className={errorClass}>{errors.code.message}</p>}
         </div>
         <div>
-          <label htmlFor="name" className={labelClass}>
-            Name <span className="text-red-500">*</span>
+          <label htmlFor="name" className={labelClass}>{t("Name")}<span className="text-red-500">*</span>
           </label>
           <input
             id="name"
             className={`${inputClass} mt-1.5`}
-            placeholder="e.g. Mathematics"
-            {...register('name', { required: 'Name is required.' })}
+            placeholder={t("e.g. Mathematics")}
+            {...register('name', { required: t("Name is required.") })}
           />
           {errors.name && <p className={errorClass}>{errors.name.message}</p>}
         </div>
         <div>
-          <label htmlFor="level" className={labelClass}>
-            Level
-          </label>
+          <label htmlFor="level" className={labelClass}>{t("Level")}</label>
           <select id="level" className={`${inputClass} mt-1.5`} {...register('level')}>
-            <option value="">All levels</option>
+            <option value="">{t("All levels")}</option>
             {Object.entries(SCHOOL_LEVELS).map(([value, label]) => (
               <option key={value} value={value}>
-                {label}
+                {t(label)}
               </option>
             ))}
           </select>
@@ -96,19 +95,15 @@ export function SubjectForm({ subject, prefix, onClose, onSaved }) {
         </div>
         <div className="flex items-end pb-2">
           <label className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <input type="checkbox" className="h-4 w-4 rounded border-border" {...register('is_active')} />
-            Active subject
-          </label>
+            <input type="checkbox" className="h-4 w-4 rounded border-border" {...register('is_active')} />{t("Active subject")}</label>
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor="description" className={labelClass}>
-            Description
-          </label>
+          <label htmlFor="description" className={labelClass}>{t("Description")}</label>
           <textarea
             id="description"
             rows={3}
             className={`${inputClass} mt-1.5`}
-            placeholder="Optional notes about this subject"
+            placeholder={t("Optional notes about this subject")}
             {...register('description')}
           />
         </div>
@@ -119,15 +114,13 @@ export function SubjectForm({ subject, prefix, onClose, onSaved }) {
           type="button"
           onClick={onClose}
           className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
-        >
-          Cancel
-        </button>
+        >{t("Cancel")}</button>
         <button
           type="submit"
           disabled={isSubmitting}
           className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-60"
         >
-          {isSubmitting ? 'Saving...' : isEdit ? 'Save changes' : 'Create subject'}
+          {isSubmitting ? t("Saving...") : isEdit ? t("Save changes") : t("Create subject")}
         </button>
       </div>
     </form>

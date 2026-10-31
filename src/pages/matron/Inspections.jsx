@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 // src/pages/matron/Inspections.jsx
 import { useEffect, useRef, useState } from 'react'
 import {
@@ -23,6 +25,7 @@ const STATUS_FILTERS = [
 ]
 
 export default function MatronInspections() {
+  useLanguage()
   const [inspections, setInspections] = useState([])
   const [meta, setMeta] = useState({ current_page: 1, per_page: PAGE_SIZE, total: 0, last_page: 1 })
   const [dormitories, setDormitories] = useState([])
@@ -63,7 +66,7 @@ export default function MatronInspections() {
         dormsLoaded.current = true
       })
       .catch(() => {
-        if (active) toast.error('Unable to load dormitories.')
+        if (active) toast.error(t("Unable to load dormitories."))
       })
       .finally(() => {
         if (active) setDormsLoading(false)
@@ -92,7 +95,7 @@ export default function MatronInspections() {
           setMeta(res.data.meta || { current_page: page, per_page: PAGE_SIZE, total: data.length, last_page: 1 })
         })
         .catch(() => {
-          if (active) toast.error('Unable to load inspections.')
+          if (active) toast.error(t("Unable to load inspections."))
         })
         .finally(() => {
           if (active) setLoading(false)
@@ -132,7 +135,7 @@ export default function MatronInspections() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!form.dormitory_id) {
-      toast.error('Please select a dormitory.')
+      toast.error(t("Please select a dormitory."))
       return
     }
 
@@ -146,7 +149,7 @@ export default function MatronInspections() {
         issues_found: form.issues_found || null,
         notes: form.notes || null,
       })
-      toast.success('Inspection recorded.')
+      toast.success(t("Inspection recorded."))
       setShowForm(false)
       setForm({
         dormitory_id: '',
@@ -159,7 +162,7 @@ export default function MatronInspections() {
       setPage(1)
       setRefreshKey((k) => k + 1)
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Unable to save inspection.')
+      toast.error(err?.response?.data?.message || t("Unable to save inspection."))
     } finally {
       setSaving(false)
     }
@@ -180,11 +183,8 @@ export default function MatronInspections() {
       <section className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiClipboard className="h-5 w-5 text-primary" /> Dormitory Inspections
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Record hygiene and cleanliness checks for dormitories.
-          </p>
+            <FiClipboard className="h-5 w-5 text-primary" />{t(" Dormitory Inspections")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Record hygiene and cleanliness checks for dormitories.")}</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -192,15 +192,14 @@ export default function MatronInspections() {
             onClick={() => setRefreshKey((k) => k + 1)}
             className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
           >
-            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-          </button>
+            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
           <button
             type="button"
             onClick={() => setShowForm((v) => !v)}
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover transition"
           >
             {showForm ? <FiX className="h-4 w-4" /> : <FiPlus className="h-4 w-4" />}
-            {showForm ? 'Close' : 'New Inspection'}
+            {showForm ? t("Close") : t("New Inspection")}
           </button>
         </div>
       </section>
@@ -212,21 +211,21 @@ export default function MatronInspections() {
             <FiClipboard className="h-5 w-5" />
           </div>
           <p className="mt-4 text-2xl font-semibold text-foreground">{summary.total}</p>
-          <p className="text-sm text-muted-foreground">Total inspections</p>
+          <p className="text-sm text-muted-foreground">{t("Total inspections")}</p>
         </article>
         <article className="rounded-xl border border-border bg-surface p-5 shadow-sm">
           <div className="inline-flex rounded-lg bg-success-soft p-2.5 text-success">
             <FiCheckCircle className="h-5 w-5" />
           </div>
           <p className="mt-4 text-2xl font-semibold text-foreground">{summary.passed}</p>
-          <p className="text-sm text-muted-foreground">Passed (this page)</p>
+          <p className="text-sm text-muted-foreground">{t("Passed (this page)")}</p>
         </article>
         <article className="rounded-xl border border-border bg-surface p-5 shadow-sm">
           <div className="inline-flex rounded-lg bg-danger-soft p-2.5 text-danger">
             <FiXCircle className="h-5 w-5" />
           </div>
           <p className="mt-4 text-2xl font-semibold text-foreground">{summary.failed}</p>
-          <p className="text-sm text-muted-foreground">Failed (this page)</p>
+          <p className="text-sm text-muted-foreground">{t("Failed (this page)")}</p>
         </article>
         <article className="rounded-xl border border-border bg-surface p-5 shadow-sm">
           <div className="inline-flex rounded-lg bg-warning-soft p-2.5 text-warning">
@@ -235,21 +234,19 @@ export default function MatronInspections() {
           <p className="mt-4 text-2xl font-semibold text-foreground">
             {summary.avgHygiene}% / {summary.avgCleanliness}%
           </p>
-          <p className="text-sm text-muted-foreground">Avg hygiene / cleanliness (this page)</p>
+          <p className="text-sm text-muted-foreground">{t("Avg hygiene / cleanliness (this page)")}</p>
         </article>
       </section>
 
       {/* Form */}
       {showForm && (
         <section className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-          <h3 className="font-semibold text-foreground">Record new inspection</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Status is automatically set based on the average score (≥70 passed, &lt;70 failed).
-          </p>
+          <h3 className="font-semibold text-foreground">{t("Record new inspection")}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Status is automatically set based on the average score (≥70 passed, &lt;70 failed).")}</p>
 
           <form onSubmit={handleSubmit} className="mt-4 grid gap-4 sm:grid-cols-2">
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-muted-foreground">Dormitory</span>
+              <span className="text-muted-foreground">{t("Dormitory")}</span>
               <select
                 name="dormitory_id"
                 value={form.dormitory_id}
@@ -258,7 +255,7 @@ export default function MatronInspections() {
                 disabled={dormsLoading}
                 className="rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-primary disabled:opacity-60"
               >
-                <option value="">{dormsLoading ? 'Loading...' : 'Select dormitory'}</option>
+                <option value="">{dormsLoading ? t("Loading...") : t("Select dormitory")}</option>
                 {dormitories.map((d) => (
                   <option key={d.id} value={d.id}>{d.name}</option>
                 ))}
@@ -266,7 +263,7 @@ export default function MatronInspections() {
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-muted-foreground">Inspection date</span>
+              <span className="text-muted-foreground">{t("Inspection date")}</span>
               <input
                 type="date"
                 name="inspection_date"
@@ -278,7 +275,7 @@ export default function MatronInspections() {
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-muted-foreground">Hygiene score (0–100)</span>
+              <span className="text-muted-foreground">{t("Hygiene score (0–100)")}</span>
               <input
                 type="number"
                 name="hygiene_score"
@@ -292,7 +289,7 @@ export default function MatronInspections() {
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-muted-foreground">Cleanliness score (0–100)</span>
+              <span className="text-muted-foreground">{t("Cleanliness score (0–100)")}</span>
               <input
                 type="number"
                 name="cleanliness_score"
@@ -306,19 +303,19 @@ export default function MatronInspections() {
             </label>
 
             <label className="flex flex-col gap-1 text-sm sm:col-span-2">
-              <span className="text-muted-foreground">Issues found (optional)</span>
+              <span className="text-muted-foreground">{t("Issues found (optional)")}</span>
               <textarea
                 name="issues_found"
                 rows={2}
                 value={form.issues_found}
                 onChange={handleChange}
                 className="rounded-lg border border-border bg-surface px-3 py-2 text-foreground outline-none focus:border-primary"
-                placeholder="e.g. Broken window, dirty floor..."
+                placeholder={t("e.g. Broken window, dirty floor...")}
               />
             </label>
 
             <label className="flex flex-col gap-1 text-sm sm:col-span-2">
-              <span className="text-muted-foreground">Notes (optional)</span>
+              <span className="text-muted-foreground">{t("Notes (optional)")}</span>
               <textarea
                 name="notes"
                 rows={2}
@@ -334,15 +331,13 @@ export default function MatronInspections() {
                 disabled={saving}
                 className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover transition disabled:opacity-60"
               >
-                <FiCheckCircle className="h-4 w-4" /> {saving ? 'Saving...' : 'Save inspection'}
+                <FiCheckCircle className="h-4 w-4" /> {saving ? t("Saving...") : t("Save inspection")}
               </button>
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
                 className="rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
-              >
-                Cancel
-              </button>
+              >{t("Cancel")}</button>
             </div>
           </form>
         </section>
@@ -352,30 +347,29 @@ export default function MatronInspections() {
       <section className="rounded-xl border border-border bg-surface p-4 shadow-sm">
         <div className="flex flex-wrap items-end gap-3">
           <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <FiFilter className="h-4 w-4" /> Filters
-          </div>
+            <FiFilter className="h-4 w-4" />{t(" Filters")}</div>
           <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            <span>Dormitory</span>
+            <span>{t("Dormitory")}</span>
             <select
               value={filterDormitory}
               onChange={(e) => { setFilterDormitory(e.target.value); setPage(1) }}
               className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-foreground outline-none focus:border-primary"
             >
-              <option value="">All dormitories</option>
+              <option value="">{t("All dormitories")}</option>
               {dormitories.map((d) => (
                 <option key={d.id} value={d.id}>{d.name}</option>
               ))}
             </select>
           </label>
           <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            <span>Status</span>
+            <span>{t("Status")}</span>
             <select
               value={filterStatus}
               onChange={(e) => { setFilterStatus(e.target.value); setPage(1) }}
               className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-foreground outline-none focus:border-primary"
             >
               {STATUS_FILTERS.map((f) => (
-                <option key={f.value} value={f.value}>{f.label}</option>
+                <option key={f.value} value={f.value}>{t(f.label)}</option>
               ))}
             </select>
           </label>
@@ -383,9 +377,7 @@ export default function MatronInspections() {
             type="button"
             onClick={() => { setFilterDormitory(''); setFilterStatus(''); setPage(1) }}
             className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted"
-          >
-            Clear
-          </button>
+          >{t("Clear")}</button>
         </div>
       </section>
 
@@ -395,27 +387,25 @@ export default function MatronInspections() {
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">Dormitory</th>
-                <th className="px-4 py-3 text-right">Hygiene</th>
-                <th className="px-4 py-3 text-right">Cleanliness</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Inspector</th>
-                <th className="px-4 py-3">Issues</th>
+                <th className="px-4 py-3">{t("Date")}</th>
+                <th className="px-4 py-3">{t("Dormitory")}</th>
+                <th className="px-4 py-3 text-right">{t("Hygiene")}</th>
+                <th className="px-4 py-3 text-right">{t("Cleanliness")}</th>
+                <th className="px-4 py-3">{t("Status")}</th>
+                <th className="px-4 py-3">{t("Inspector")}</th>
+                <th className="px-4 py-3">{t("Issues")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-14 text-center">
-                    <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+                    <div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
                   </td>
                 </tr>
               ) : inspections.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-14 text-center text-muted-foreground">
-                    No inspections recorded yet.
-                  </td>
+                  <td colSpan={7} className="px-4 py-14 text-center text-muted-foreground">{t("No inspections recorded yet.")}</td>
                 </tr>
               ) : (
                 inspections.map((i) => (
@@ -426,7 +416,7 @@ export default function MatronInspections() {
                     <td className="px-4 py-3 text-right font-semibold text-foreground">{i.cleanliness_score}%</td>
                     <td className="px-4 py-3">
                       <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusBadge(i.status)}`}>
-                        {i.status}
+                        {t(i.status)}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{i.inspector?.full_name ?? '—'}</td>
@@ -443,31 +433,24 @@ export default function MatronInspections() {
         {/* Pagination */}
         {!loading && inspections.length > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-sm text-muted-foreground">
-            <p>
-              Showing <span className="font-medium text-foreground">{from}</span>–
-              <span className="font-medium text-foreground">{to}</span> of{' '}
-              <span className="font-medium text-foreground">{meta.total}</span> inspections
-            </p>
+            <p>{t("Showing")}<span className="font-medium text-foreground">{from}</span>–
+              <span className="font-medium text-foreground">{to}</span>{t(" of")}{' '}
+              <span className="font-medium text-foreground">{meta.total}</span>{t(" inspections")}</p>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={meta.current_page <= 1}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <span className="px-1">
-                Page {meta.current_page} of {Math.max(meta.last_page, 1)}
+              >{t("Previous")}</button>
+              <span className="px-1">{t("Page")}{meta.current_page}{t(" of ")}{Math.max(meta.last_page, 1)}
               </span>
               <button
                 type="button"
                 onClick={() => setPage((p) => Math.min(meta.last_page, p + 1))}
                 disabled={meta.current_page >= meta.last_page}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Next
-              </button>
+              >{t("Next")}</button>
             </div>
           </div>
         )}

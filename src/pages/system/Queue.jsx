@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useMemo, useState } from 'react'
 import { FiActivity, FiRefreshCw, FiRotateCw, FiTrash2, FiCheckCircle, FiClock, FiAlertCircle } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -81,6 +83,7 @@ const STATUS_ICON = {
 }
 
 export default function SystemAdminQueue() {
+  useLanguage()
   const [jobs, setJobs] = useState([])
   const [status, setStatus] = useState('')
 
@@ -109,7 +112,7 @@ export default function SystemAdminQueue() {
   const handleRefresh = () => {
     const refreshed = loadJobs()
     setJobs(refreshed)
-    toast.success('Queue refreshed')
+    toast.success(t("Queue refreshed"))
   }
 
   const handleRetry = (job) => {
@@ -118,24 +121,24 @@ export default function SystemAdminQueue() {
     )
     setJobs(updated)
     saveJobs(updated)
-    toast.success(`Job ${job.id} retried`)
+    toast.success(t("Job {0} retried", [job.id]))
   }
 
   const handleClearFailed = () => {
-    if (!window.confirm('Clear all failed jobs?')) return
+    if (!window.confirm(t("Clear all failed jobs?"))) return
 
     const updated = jobs.filter((j) => j.status !== 'failed')
     setJobs(updated)
     saveJobs(updated)
-    toast.success('Failed jobs cleared')
+    toast.success(t("Failed jobs cleared"))
   }
 
   const handleClearAll = () => {
-    if (!window.confirm('Clear all jobs from the queue?')) return
+    if (!window.confirm(t("Clear all jobs from the queue?"))) return
 
     setJobs([])
     saveJobs([])
-    toast.success('All jobs cleared')
+    toast.success(t("All jobs cleared"))
   }
 
   const formatDate = (dateStr) => {
@@ -148,9 +151,8 @@ export default function SystemAdminQueue() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiActivity className="h-5 w-5 text-primary" /> Queue Monitor
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">Monitor background jobs and queue status.</p>
+            <FiActivity className="h-5 w-5 text-primary" />{t(" Queue Monitor")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Monitor background jobs and queue status.")}</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -158,30 +160,27 @@ export default function SystemAdminQueue() {
             onClick={handleRefresh}
             className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
           >
-            <FiRefreshCw className="h-4 w-4" /> Refresh
-          </button>
+            <FiRefreshCw className="h-4 w-4" />{t(" Refresh")}</button>
           <button
             type="button"
             onClick={handleClearFailed}
             className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-warning hover:bg-warning-soft"
           >
-            <FiAlertCircle className="h-4 w-4" /> Clear Failed
-          </button>
+            <FiAlertCircle className="h-4 w-4" />{t(" Clear Failed")}</button>
           <button
             type="button"
             onClick={handleClearAll}
             className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-danger hover:bg-danger-soft"
           >
-            <FiTrash2 className="h-4 w-4" /> Clear All
-          </button>
+            <FiTrash2 className="h-4 w-4" />{t(" Clear All")}</button>
         </div>
       </section>
 
       <section className="grid gap-4 sm:grid-cols-4">
-        <StatCard label="Pending" value={summary.pending} tone="text-warning" bg="bg-warning-soft" icon={FiClock} />
-        <StatCard label="Processing" value={summary.processing} tone="text-primary" bg="bg-primary-soft" icon={FiActivity} />
-        <StatCard label="Completed" value={summary.completed} tone="text-success" bg="bg-success-soft" icon={FiCheckCircle} />
-        <StatCard label="Failed" value={summary.failed} tone="text-danger" bg="bg-danger-soft" icon={FiAlertCircle} />
+        <StatCard label={t("Pending")} value={summary.pending} tone="text-warning" bg="bg-warning-soft" icon={FiClock} />
+        <StatCard label={t("Processing")} value={summary.processing} tone="text-primary" bg="bg-primary-soft" icon={FiActivity} />
+        <StatCard label={t("Completed")} value={summary.completed} tone="text-success" bg="bg-success-soft" icon={FiCheckCircle} />
+        <StatCard label={t("Failed")} value={summary.failed} tone="text-danger" bg="bg-danger-soft" icon={FiAlertCircle} />
       </section>
 
       <section className="rounded-xl border border-border bg-surface shadow-sm">
@@ -191,11 +190,11 @@ export default function SystemAdminQueue() {
             onChange={(e) => setStatus(e.target.value)}
             className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary"
           >
-            <option value="">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="completed">Completed</option>
-            <option value="failed">Failed</option>
+            <option value="">{t("All statuses")}</option>
+            <option value="pending">{t("Pending")}</option>
+            <option value="processing">{t("Processing")}</option>
+            <option value="completed">{t("Completed")}</option>
+            <option value="failed">{t("Failed")}</option>
           </select>
         </div>
 
@@ -203,21 +202,19 @@ export default function SystemAdminQueue() {
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-4 py-3">Job ID</th>
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Queue</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Attempts</th>
-                <th className="px-4 py-3">Created</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-4 py-3">{t("Job ID")}</th>
+                <th className="px-4 py-3">{t("Name")}</th>
+                <th className="px-4 py-3">{t("Queue")}</th>
+                <th className="px-4 py-3">{t("Status")}</th>
+                <th className="px-4 py-3 text-right">{t("Attempts")}</th>
+                <th className="px-4 py-3">{t("Created")}</th>
+                <th className="px-4 py-3 text-right">{t("Actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-14 text-center text-muted-foreground">
-                    No jobs found.
-                  </td>
+                  <td colSpan={7} className="px-4 py-14 text-center text-muted-foreground">{t("No jobs found.")}</td>
                 </tr>
               ) : (
                 filtered.map((job) => {
@@ -233,7 +230,7 @@ export default function SystemAdminQueue() {
                       <td className="px-4 py-3">
                         <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${STATUS_TONE[job.status] ?? 'bg-muted text-muted-foreground'}`}>
                           <Icon className="h-3 w-3" />
-                          {job.status}
+                          {t(job.status)}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right text-muted-foreground">{job.attempts}</td>
@@ -244,7 +241,7 @@ export default function SystemAdminQueue() {
                             type="button"
                             onClick={() => handleRetry(job)}
                             className="rounded-lg p-2 text-muted-foreground hover:bg-primary-soft hover:text-primary"
-                            aria-label={`Retry ${job.id}`}
+                            aria-label={t("Retry {0}", [job.id])}
                           >
                             <FiRotateCw className="h-4 w-4" />
                           </button>
@@ -263,13 +260,14 @@ export default function SystemAdminQueue() {
 }
 
 function StatCard({ label, value, tone, bg, icon: Icon }) {
+  useLanguage()
   return (
     <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
       <div className={`inline-flex rounded-lg p-2.5 ${bg} ${tone}`}>
         <Icon className="h-5 w-5" />
       </div>
       <p className="mt-3 text-2xl font-bold text-foreground">{value}</p>
-      <p className="text-sm text-muted-foreground">{label}</p>
+      <p className="text-sm text-muted-foreground">{t(label)}</p>
     </div>
   )
 }

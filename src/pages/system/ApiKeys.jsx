@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiKey, FiPlus, FiRefreshCw, FiCopy, FiTrash2 } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -27,6 +29,7 @@ function generateKey() {
 }
 
 export default function SystemAdminApiKeys() {
+  useLanguage()
   const [keys, setKeys] = useState([])
   const [creating, setCreating] = useState(false)
   const [form, setForm] = useState({ name: '', permissions: 'read' })
@@ -55,9 +58,9 @@ export default function SystemAdminApiKeys() {
       setKeys(updated)
       saveApiKeys(updated)
       setForm({ name: '', permissions: 'read' })
-      toast.success('API key generated successfully')
+      toast.success(t("API key generated successfully"))
     } catch (error) {
-      toast.error('Unable to generate API key.')
+      toast.error(t("Unable to generate API key."))
     } finally {
       setCreating(false)
     }
@@ -66,30 +69,30 @@ export default function SystemAdminApiKeys() {
   const handleCopy = async (key) => {
     try {
       await navigator.clipboard.writeText(key)
-      toast.success('API key copied to clipboard')
+      toast.success(t("API key copied to clipboard"))
     } catch {
-      toast.error('Unable to copy API key.')
+      toast.error(t("Unable to copy API key."))
     }
   }
 
   const handleRevoke = (apiKey) => {
-    if (!window.confirm(`Revoke API key "${apiKey.name}"?`)) return
+    if (!window.confirm(t("Revoke API key \"{0}\"?", [apiKey.name]))) return
 
     const updated = keys.map((k) =>
       k.id === apiKey.id ? { ...k, status: 'revoked' } : k
     )
     setKeys(updated)
     saveApiKeys(updated)
-    toast.success('API key revoked')
+    toast.success(t("API key revoked"))
   }
 
   const handleDelete = (apiKey) => {
-    if (!window.confirm(`Delete API key "${apiKey.name}"?`)) return
+    if (!window.confirm(t("Delete API key \"{0}\"?", [apiKey.name]))) return
 
     const updated = keys.filter((k) => k.id !== apiKey.id)
     setKeys(updated)
     saveApiKeys(updated)
-    toast.success('API key deleted')
+    toast.success(t("API key deleted"))
   }
 
   const formatDate = (dateStr) => {
@@ -102,42 +105,40 @@ export default function SystemAdminApiKeys() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiKey className="h-5 w-5 text-primary" /> API Keys
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">Manage API keys for external integrations.</p>
+            <FiKey className="h-5 w-5 text-primary" />{t(" API Keys")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Manage API keys for external integrations.")}</p>
         </div>
         <button
           type="button"
           onClick={() => setKeys(loadApiKeys())}
           className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
         >
-          <FiRefreshCw className="h-4 w-4" /> Refresh
-        </button>
+          <FiRefreshCw className="h-4 w-4" />{t(" Refresh")}</button>
       </section>
 
       <form onSubmit={handleGenerate} className="rounded-xl border border-border bg-surface p-5 shadow-sm">
-        <h3 className="mb-4 font-semibold text-foreground">Generate New API Key</h3>
+        <h3 className="mb-4 font-semibold text-foreground">{t("Generate New API Key")}</h3>
         <div className="grid gap-3 md:grid-cols-3">
           <label className="block text-sm md:col-span-2">
-            <span className="mb-1 block font-medium text-foreground">Key Name</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Key Name")}</span>
             <input
               required
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="e.g. Mobile App Integration"
+              placeholder={t("e.g. Mobile App Integration")}
               className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary"
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">Permissions</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Permissions")}</span>
             <select
               value={form.permissions}
               onChange={(e) => setForm({ ...form, permissions: e.target.value })}
               className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary"
             >
-              <option value="read">Read Only</option>
-              <option value="read-write">Read & Write</option>
-              <option value="admin">Full Admin</option>
+              <option value="read">{t("Read Only")}</option>
+              <option value="read-write">{t("Read & Write")}</option>
+              <option value="admin">{t("Full Admin")}</option>
             </select>
           </label>
         </div>
@@ -147,7 +148,7 @@ export default function SystemAdminApiKeys() {
             disabled={creating}
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
           >
-            <FiPlus className="h-4 w-4" /> {creating ? 'Generating...' : 'Generate Key'}
+            <FiPlus className="h-4 w-4" /> {creating ? t("Generating...") : t("Generate Key")}
           </button>
         </div>
       </form>
@@ -157,20 +158,18 @@ export default function SystemAdminApiKeys() {
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Key</th>
-                <th className="px-4 py-3">Permissions</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Created</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-4 py-3">{t("Name")}</th>
+                <th className="px-4 py-3">{t("Key")}</th>
+                <th className="px-4 py-3">{t("Permissions")}</th>
+                <th className="px-4 py-3">{t("Status")}</th>
+                <th className="px-4 py-3">{t("Created")}</th>
+                <th className="px-4 py-3 text-right">{t("Actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {keys.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-14 text-center text-muted-foreground">
-                    No API keys yet. Generate one above to get started.
-                  </td>
+                  <td colSpan={6} className="px-4 py-14 text-center text-muted-foreground">{t("No API keys yet. Generate one above to get started.")}</td>
                 </tr>
               ) : (
                 keys.map((apiKey) => (
@@ -186,7 +185,7 @@ export default function SystemAdminApiKeys() {
                       <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${
                         apiKey.status === 'active' ? 'bg-success-soft text-success' : 'bg-danger-soft text-danger'
                       }`}>
-                        {apiKey.status}
+                        {t(apiKey.status)}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{formatDate(apiKey.created_at)}</td>
@@ -196,7 +195,7 @@ export default function SystemAdminApiKeys() {
                           type="button"
                           onClick={() => handleCopy(apiKey.key)}
                           className="rounded-lg p-2 text-muted-foreground hover:bg-primary-soft hover:text-primary"
-                          aria-label={`Copy ${apiKey.name}`}
+                          aria-label={t("Copy {0}", [apiKey.name])}
                         >
                           <FiCopy className="h-4 w-4" />
                         </button>
@@ -205,7 +204,7 @@ export default function SystemAdminApiKeys() {
                             type="button"
                             onClick={() => handleRevoke(apiKey)}
                             className="rounded-lg p-2 text-muted-foreground hover:bg-warning-soft hover:text-warning"
-                            aria-label={`Revoke ${apiKey.name}`}
+                            aria-label={t("Revoke {0}", [apiKey.name])}
                           >
                             <FiKey className="h-4 w-4" />
                           </button>
@@ -214,7 +213,7 @@ export default function SystemAdminApiKeys() {
                           type="button"
                           onClick={() => handleDelete(apiKey)}
                           className="rounded-lg p-2 text-muted-foreground hover:bg-danger-soft hover:text-danger"
-                          aria-label={`Delete ${apiKey.name}`}
+                          aria-label={t("Delete {0}", [apiKey.name])}
                         >
                           <FiTrash2 className="h-4 w-4" />
                         </button>

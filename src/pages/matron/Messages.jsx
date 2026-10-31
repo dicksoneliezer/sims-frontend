@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 // src/pages/matron/Messages.jsx
 import { useEffect, useRef, useState } from 'react'
 import { FiMail, FiRefreshCw, FiPlus, FiX, FiSend } from 'react-icons/fi'
@@ -8,6 +10,7 @@ import { formatDate } from '../../utils/format'
 const PAGE_SIZE = 20
 
 export default function MatronMessages() {
+  useLanguage()
   const [messages, setMessages] = useState([])
   const [meta, setMeta] = useState({ current_page: 1, per_page: PAGE_SIZE, total: 0, last_page: 1 })
   const [students, setStudents] = useState([])
@@ -39,7 +42,7 @@ export default function MatronMessages() {
         studentsLoaded.current = true
       })
       .catch(() => {
-        if (active) toast.error('Unable to load students.')
+        if (active) toast.error(t("Unable to load students."))
       })
       .finally(() => {
         if (active) setStudentsLoading(false)
@@ -64,7 +67,7 @@ export default function MatronMessages() {
           setMeta(res.data.meta || { current_page: page, per_page: PAGE_SIZE, total: data.length, last_page: 1 })
         })
         .catch(() => {
-          if (active) toast.error('Unable to load messages.')
+          if (active) toast.error(t("Unable to load messages."))
         })
         .finally(() => {
           if (active) setLoading(false)
@@ -85,19 +88,19 @@ export default function MatronMessages() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!form.student_id || !form.subject || !form.message) {
-      toast.error('Please fill all fields.')
+      toast.error(t("Please fill all fields."))
       return
     }
     try {
       setSaving(true)
       await api.post('/matron/messages', form)
-      toast.success('Message sent to parent.')
+      toast.success(t("Message sent to parent."))
       setShowForm(false)
       setForm({ student_id: '', subject: '', message: '' })
       setPage(1)
       setRefreshKey((k) => k + 1)
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Unable to send message.')
+      toast.error(err?.response?.data?.message || t("Unable to send message."))
     } finally {
       setSaving(false)
     }
@@ -112,11 +115,8 @@ export default function MatronMessages() {
       <section className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiMail className="h-5 w-5 text-primary" /> Messages to Parents
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Send messages to parents about boarding matters.
-          </p>
+            <FiMail className="h-5 w-5 text-primary" />{t(" Messages to Parents")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Send messages to parents about boarding matters.")}</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -124,14 +124,13 @@ export default function MatronMessages() {
             onClick={() => setRefreshKey((k) => k + 1)}
             className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
           >
-            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-          </button>
+            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
           <button
             type="button"
             onClick={() => setShowForm((v) => !v)}
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
           >
-            {showForm ? <FiX className="h-4 w-4" /> : <FiPlus className="h-4 w-4" />} {showForm ? 'Close' : 'New Message'}
+            {showForm ? <FiX className="h-4 w-4" /> : <FiPlus className="h-4 w-4" />} {showForm ? t("Close") : t("New Message")}
           </button>
         </div>
       </section>
@@ -139,10 +138,10 @@ export default function MatronMessages() {
       {/* Form */}
       {showForm && (
         <section className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-          <h3 className="font-semibold text-foreground">Send a new message</h3>
+          <h3 className="font-semibold text-foreground">{t("Send a new message")}</h3>
           <form onSubmit={handleSubmit} className="mt-4 space-y-4">
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-muted-foreground">Student (message goes to their parent)</span>
+              <span className="text-muted-foreground">{t("Student (message goes to their parent)")}</span>
               <select
                 name="student_id"
                 value={form.student_id}
@@ -151,14 +150,14 @@ export default function MatronMessages() {
                 disabled={studentsLoading}
                 className="rounded-lg border border-border bg-surface px-3 py-2 disabled:opacity-60"
               >
-                <option value="">{studentsLoading ? 'Loading students...' : 'Select student'}</option>
+                <option value="">{studentsLoading ? t("Loading students...") : t("Select student")}</option>
                 {students.map((s) => (
                   <option key={s.id} value={s.id}>{s.full_name} ({s.student_number})</option>
                 ))}
               </select>
             </label>
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-muted-foreground">Subject</span>
+              <span className="text-muted-foreground">{t("Subject")}</span>
               <input
                 type="text"
                 name="subject"
@@ -170,7 +169,7 @@ export default function MatronMessages() {
               />
             </label>
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-muted-foreground">Message</span>
+              <span className="text-muted-foreground">{t("Message")}</span>
               <textarea
                 name="message"
                 rows={5}
@@ -186,15 +185,13 @@ export default function MatronMessages() {
                 disabled={saving}
                 className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-60"
               >
-                <FiSend className="h-4 w-4" /> {saving ? 'Sending...' : 'Send message'}
+                <FiSend className="h-4 w-4" /> {saving ? t("Sending...") : t("Send message")}
               </button>
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
                 className="rounded-lg border border-border bg-surface px-4 py-2 text-sm"
-              >
-                Cancel
-              </button>
+              >{t("Cancel")}</button>
             </div>
           </form>
         </section>
@@ -203,31 +200,29 @@ export default function MatronMessages() {
       {/* Messages list */}
       <section className="rounded-xl border border-border bg-surface shadow-sm">
         <div className="border-b border-border px-4 py-3">
-          <h3 className="font-semibold text-foreground">Sent messages</h3>
+          <h3 className="font-semibold text-foreground">{t("Sent messages")}</h3>
           <p className="text-sm text-muted-foreground">
-            {meta.total} {meta.total === 1 ? 'message' : 'messages'} found
-          </p>
+            {meta.total} {meta.total === 1 ? t("message") : t("messages")}{t(" found")}</p>
         </div>
 
         <div className="divide-y divide-slate-100">
           {loading ? (
             <div className="py-14 text-center">
-              <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+              <div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
             </div>
           ) : messages.length === 0 ? (
-            <p className="px-4 py-14 text-center text-muted-foreground">No messages sent yet.</p>
+            <p className="px-4 py-14 text-center text-muted-foreground">{t("No messages sent yet.")}</p>
           ) : (
             messages.map((m) => (
               <article key={m.id} className="p-4">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <h3 className="font-semibold text-foreground">{m.subject}</h3>
-                    <p className="text-xs text-muted-foreground">
-                      To: {m.parent?.full_name ?? '—'} · About: {m.student?.full_name ?? '—'} · {formatDate(m.created_at)}
+                    <p className="text-xs text-muted-foreground">{t("To:")}{m.parent?.full_name ?? '—'}{t(" · About: ")}{m.student?.full_name ?? '—'} · {formatDate(m.created_at)}
                     </p>
                   </div>
                   <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${m.is_read ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning'}`}>
-                    {m.is_read ? 'Read' : 'Unread'}
+                    {m.is_read ? t("Read") : t("Unread")}
                   </span>
                 </div>
                 <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">{m.message}</p>
@@ -239,31 +234,24 @@ export default function MatronMessages() {
         {/* Pagination */}
         {!loading && messages.length > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-sm text-muted-foreground">
-            <p>
-              Showing <span className="font-medium text-foreground">{from}</span>–
-              <span className="font-medium text-foreground">{to}</span> of{' '}
-              <span className="font-medium text-foreground">{meta.total}</span> messages
-            </p>
+            <p>{t("Showing")}<span className="font-medium text-foreground">{from}</span>–
+              <span className="font-medium text-foreground">{to}</span>{t(" of")}{' '}
+              <span className="font-medium text-foreground">{meta.total}</span>{t(" messages")}</p>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={meta.current_page <= 1}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <span className="px-1">
-                Page {meta.current_page} of {Math.max(meta.last_page, 1)}
+              >{t("Previous")}</button>
+              <span className="px-1">{t("Page")}{meta.current_page}{t(" of ")}{Math.max(meta.last_page, 1)}
               </span>
               <button
                 type="button"
                 onClick={() => setPage((p) => Math.min(meta.last_page, p + 1))}
                 disabled={meta.current_page >= meta.last_page}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Next
-              </button>
+              >{t("Next")}</button>
             </div>
           </div>
         )}

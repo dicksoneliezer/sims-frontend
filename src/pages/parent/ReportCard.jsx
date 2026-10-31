@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiAward, FiRefreshCw, FiDownload } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -10,6 +12,7 @@ const SAMPLE_CHILDREN = [
 ]
 
 export default function ReportCard() {
+  useLanguage()
   const [children, setChildren] = useState([])
   const [selectedChild, setSelectedChild] = useState('')
   const [loading, setLoading] = useState(true)
@@ -45,7 +48,7 @@ export default function ReportCard() {
     setDownloading(true)
     setTimeout(() => {
       setDownloading(false)
-      toast.info('Report card download simulated. PDF generation coming soon.')
+      toast.info(t("Report card download simulated. PDF generation coming soon."))
     }, 800)
   }
 
@@ -54,24 +57,21 @@ export default function ReportCard() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiAward className="h-5 w-5 text-primary" /> Report Cards
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Download your child's report card.
-          </p>
+            <FiAward className="h-5 w-5 text-primary" />{t(" Report Cards")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Download your child's report card.")}</p>
         </div>
       </section>
 
       <section className="rounded-xl border border-border bg-surface p-5 shadow-sm space-y-4">
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-foreground">Select Child</span>
+          <span className="mb-1 block font-medium text-foreground">{t("Select Child")}</span>
           <select
             value={selectedChild}
             onChange={(e) => setSelectedChild(e.target.value)}
             disabled={loading}
             className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary"
           >
-            <option value="">Select a child</option>
+            <option value="">{t("Select a child")}</option>
             {children.map((child) => (
               <option key={child.id} value={child.id}>
                 {child.full_name} — {child.class}
@@ -86,14 +86,11 @@ export default function ReportCard() {
           disabled={!selectedChild || downloading}
           className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
         >
-          <FiDownload className="h-4 w-4" /> {downloading ? 'Generating...' : 'Download Report Card'}
+          <FiDownload className="h-4 w-4" /> {downloading ? t("Generating...") : t("Download Report Card")}
         </button>
 
         <div className="rounded-lg bg-muted p-4 text-xs text-muted-foreground">
-          <p>
-            Report cards will be generated as PDF files containing all term results, teacher
-            comments, and overall performance.
-          </p>
+          <p>{t("Report cards will be generated as PDF files containing all term results, teacher comments, and overall performance.")}</p>
         </div>
       </section>
     </div>

@@ -1,3 +1,5 @@
+import { getLanguage } from './i18n'
+
 export function formatMoney(value) {
   return new Intl.NumberFormat('en-TZ', {
     style: 'currency',
@@ -13,7 +15,7 @@ export function formatNumber(value) {
 export function formatDate(value, fallback = '—') {
   if (!value) return fallback
 
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat(getLanguage() === 'sw' ? 'sw-TZ' : 'en-GB', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',

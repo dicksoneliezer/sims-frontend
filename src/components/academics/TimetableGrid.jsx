@@ -1,11 +1,12 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { FiEdit2, FiTrash2 } from 'react-icons/fi'
 
 export function TimetableGrid({ slots, onEdit, onDelete }) {
+  useLanguage()
   if (!slots.length) {
     return (
-      <div className="px-6 py-14 text-center text-sm text-muted-foreground">
-        No timetable slots match the current filters.
-      </div>
+      <div className="px-6 py-14 text-center text-sm text-muted-foreground">{t("No timetable slots match the current filters.")}</div>
     )
   }
 
@@ -14,13 +15,13 @@ export function TimetableGrid({ slots, onEdit, onDelete }) {
       <table className="min-w-full divide-y divide-slate-200 text-sm">
         <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
           <tr>
-            <th className="px-4 py-3">Day</th>
-            <th className="px-4 py-3">Time</th>
-            <th className="px-4 py-3">Subject</th>
-            <th className="px-4 py-3">Class</th>
-            <th className="px-4 py-3">Teacher</th>
-            <th className="px-4 py-3">Room</th>
-            {(onEdit || onDelete) && <th className="px-4 py-3 text-right">Actions</th>}
+            <th className="px-4 py-3">{t("Day")}</th>
+            <th className="px-4 py-3">{t("Time")}</th>
+            <th className="px-4 py-3">{t("Subject")}</th>
+            <th className="px-4 py-3">{t("Class")}</th>
+            <th className="px-4 py-3">{t("Teacher")}</th>
+            <th className="px-4 py-3">{t("Room")}</th>
+            {(onEdit || onDelete) && <th className="px-4 py-3 text-right">{t("Actions")}</th>}
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -35,7 +36,7 @@ export function TimetableGrid({ slots, onEdit, onDelete }) {
                 <p className="text-xs text-muted-foreground">{slot.subject?.code}</p>
               </td>
               <td className="px-4 py-3 text-muted-foreground">{slot.class_name ?? '-'}</td>
-              <td className="px-4 py-3 text-muted-foreground">{slot.teacher?.full_name ?? 'Not assigned'}</td>
+              <td className="px-4 py-3 text-muted-foreground">{slot.teacher?.full_name ?? t("Not assigned")}</td>
               <td className="px-4 py-3 text-muted-foreground">{slot.room ?? '-'}</td>
               {(onEdit || onDelete) && (
                 <td className="px-4 py-3">
@@ -45,7 +46,7 @@ export function TimetableGrid({ slots, onEdit, onDelete }) {
                         type="button"
                         onClick={() => onEdit(slot)}
                         className="rounded-lg p-2 text-muted-foreground hover:bg-warning-soft hover:text-warning"
-                        aria-label="Edit slot"
+                        aria-label={t("Edit slot")}
                       >
                         <FiEdit2 className="h-4 w-4" />
                       </button>
@@ -55,7 +56,7 @@ export function TimetableGrid({ slots, onEdit, onDelete }) {
                         type="button"
                         onClick={() => onDelete(slot)}
                         className="rounded-lg p-2 text-muted-foreground hover:bg-danger-soft hover:text-danger"
-                        aria-label="Delete slot"
+                        aria-label={t("Delete slot")}
                       >
                         <FiTrash2 className="h-4 w-4" />
                       </button>

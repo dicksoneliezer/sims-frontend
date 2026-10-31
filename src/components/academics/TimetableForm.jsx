@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { createTimetable, updateTimetable } from '../../api/academics'
@@ -10,6 +12,7 @@ const errorClass = 'mt-1 text-xs text-danger'
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 export function TimetableForm({ slot, options, onClose, onSaved }) {
+  useLanguage()
   const isEdit = Boolean(slot)
   const {
     register,
@@ -46,10 +49,10 @@ export function TimetableForm({ slot, options, onClose, onSaved }) {
     try {
       if (isEdit) {
         await updateTimetable(slot.id, payload)
-        toast.success('Timetable slot updated')
+        toast.success(t("Timetable slot updated"))
       } else {
         await createTimetable(payload)
-        toast.success('Timetable slot created')
+        toast.success(t("Timetable slot created"))
       }
 
       onSaved()
@@ -59,7 +62,7 @@ export function TimetableForm({ slot, options, onClose, onSaved }) {
       Object.entries(data?.errors ?? {}).forEach(([field, messages]) => {
         setError(field, { type: 'server', message: messages[0] })
       })
-      toast.error(data?.message ?? 'Unable to save timetable slot.')
+      toast.error(data?.message ?? t("Unable to save timetable slot."))
     }
   }
 
@@ -67,15 +70,14 @@ export function TimetableForm({ slot, options, onClose, onSaved }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="class_id" className={labelClass}>
-            Class <span className="text-red-500">*</span>
+          <label htmlFor="class_id" className={labelClass}>{t("Class")}<span className="text-red-500">*</span>
           </label>
           <select
             id="class_id"
             className={`${inputClass} mt-1.5`}
-            {...register('class_id', { required: 'Class is required.' })}
+            {...register('class_id', { required: t("Class is required.") })}
           >
-            <option value="">Select class</option>
+            <option value="">{t("Select class")}</option>
             {options.classes.map((schoolClass) => (
               <option key={schoolClass.id} value={schoolClass.id}>
                 {schoolClass.name}
@@ -85,15 +87,14 @@ export function TimetableForm({ slot, options, onClose, onSaved }) {
           {errors.class_id && <p className={errorClass}>{errors.class_id.message}</p>}
         </div>
         <div>
-          <label htmlFor="subject_id" className={labelClass}>
-            Subject <span className="text-red-500">*</span>
+          <label htmlFor="subject_id" className={labelClass}>{t("Subject")}<span className="text-red-500">*</span>
           </label>
           <select
             id="subject_id"
             className={`${inputClass} mt-1.5`}
-            {...register('subject_id', { required: 'Subject is required.' })}
+            {...register('subject_id', { required: t("Subject is required.") })}
           >
-            <option value="">Select subject</option>
+            <option value="">{t("Select subject")}</option>
             {options.subjects.map((subject) => (
               <option key={subject.id} value={subject.id}>
                 {subject.code} - {subject.name}
@@ -103,11 +104,9 @@ export function TimetableForm({ slot, options, onClose, onSaved }) {
           {errors.subject_id && <p className={errorClass}>{errors.subject_id.message}</p>}
         </div>
         <div>
-          <label htmlFor="teacher_id" className={labelClass}>
-            Teacher
-          </label>
+          <label htmlFor="teacher_id" className={labelClass}>{t("Teacher")}</label>
           <select id="teacher_id" className={`${inputClass} mt-1.5`} {...register('teacher_id')}>
-            <option value="">Not assigned</option>
+            <option value="">{t("Not assigned")}</option>
             {options.teachers.map((teacher) => (
               <option key={teacher.id} value={teacher.id}>
                 {teacher.full_name}
@@ -117,13 +116,12 @@ export function TimetableForm({ slot, options, onClose, onSaved }) {
           {errors.teacher_id && <p className={errorClass}>{errors.teacher_id.message}</p>}
         </div>
         <div>
-          <label htmlFor="day_of_week" className={labelClass}>
-            Day <span className="text-red-500">*</span>
+          <label htmlFor="day_of_week" className={labelClass}>{t("Day")}<span className="text-red-500">*</span>
           </label>
           <select id="day_of_week" className={`${inputClass} mt-1.5`} {...register('day_of_week')}>
             {DAYS.map((day) => (
               <option key={day} value={day}>
-                {day}
+                {t(day)}
               </option>
             ))}
           </select>
@@ -131,48 +129,40 @@ export function TimetableForm({ slot, options, onClose, onSaved }) {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label htmlFor="start_time" className={labelClass}>
-              Start <span className="text-red-500">*</span>
+            <label htmlFor="start_time" className={labelClass}>{t("Start")}<span className="text-red-500">*</span>
             </label>
             <input
               id="start_time"
               type="time"
               className={`${inputClass} mt-1.5`}
-              {...register('start_time', { required: 'Start time is required.' })}
+              {...register('start_time', { required: t("Start time is required.") })}
             />
             {errors.start_time && <p className={errorClass}>{errors.start_time.message}</p>}
           </div>
           <div>
-            <label htmlFor="end_time" className={labelClass}>
-              End <span className="text-red-500">*</span>
+            <label htmlFor="end_time" className={labelClass}>{t("End")}<span className="text-red-500">*</span>
             </label>
             <input
               id="end_time"
               type="time"
               className={`${inputClass} mt-1.5`}
-              {...register('end_time', { required: 'End time is required.' })}
+              {...register('end_time', { required: t("End time is required.") })}
             />
             {errors.end_time && <p className={errorClass}>{errors.end_time.message}</p>}
           </div>
         </div>
         <div>
-          <label htmlFor="room" className={labelClass}>
-            Room
-          </label>
-          <input id="room" className={`${inputClass} mt-1.5`} placeholder="e.g. Room 1" {...register('room')} />
+          <label htmlFor="room" className={labelClass}>{t("Room")}</label>
+          <input id="room" className={`${inputClass} mt-1.5`} placeholder={t("e.g. Room 1")} {...register('room')} />
           {errors.room && <p className={errorClass}>{errors.room.message}</p>}
         </div>
         <div>
-          <label htmlFor="term" className={labelClass}>
-            Term
-          </label>
-          <input id="term" className={`${inputClass} mt-1.5`} placeholder="e.g. Term 1" {...register('term')} />
+          <label htmlFor="term" className={labelClass}>{t("Term")}</label>
+          <input id="term" className={`${inputClass} mt-1.5`} placeholder={t("e.g. Term 1")} {...register('term')} />
           {errors.term && <p className={errorClass}>{errors.term.message}</p>}
         </div>
         <div>
-          <label htmlFor="academic_year" className={labelClass}>
-            Academic year
-          </label>
+          <label htmlFor="academic_year" className={labelClass}>{t("Academic year")}</label>
           <input
             id="academic_year"
             className={`${inputClass} mt-1.5`}
@@ -188,15 +178,13 @@ export function TimetableForm({ slot, options, onClose, onSaved }) {
           type="button"
           onClick={onClose}
           className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
-        >
-          Cancel
-        </button>
+        >{t("Cancel")}</button>
         <button
           type="submit"
           disabled={isSubmitting}
           className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-60"
         >
-          {isSubmitting ? 'Saving...' : isEdit ? 'Save changes' : 'Create slot'}
+          {isSubmitting ? t("Saving...") : isEdit ? t("Save changes") : t("Create slot")}
         </button>
       </div>
     </form>

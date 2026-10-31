@@ -1,3 +1,5 @@
+import { t } from '../utils/i18n'
+import { useLanguage } from '../hooks/useLanguage'
 import { useEffect, useMemo, useState } from 'react'
 import {
   FiEdit2,
@@ -20,6 +22,7 @@ import { MODULES_BY_ROLE } from '../utils/constants'
 const PAGE_SIZE = 10
 
 export default function Teachers() {
+  useLanguage()
   const { user } = useAuth()
   const modules = useMemo(() => {
     const roleModules = MODULES_BY_ROLE[user.role] ?? []
@@ -55,7 +58,7 @@ export default function Teachers() {
         setMeta(response.meta)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load teachers.')
+        if (active) toast.error(t("Unable to load teachers."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -72,14 +75,14 @@ export default function Teachers() {
   }
 
   const handleDelete = async (teacher) => {
-    if (!window.confirm(`Delete ${teacher.full_name}? This removes their login and assignments.`)) return
+    if (!window.confirm(t("Delete {0}? This removes their login and assignments.", [teacher.full_name]))) return
 
     try {
       await deleteTeacher(teacher.id)
-      toast.success('Teacher deleted')
+      toast.success(t("Teacher deleted"))
       setRefreshKey((key) => key + 1)
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to delete teacher.')
+      toast.error(error.response?.data?.message ?? t("Unable to delete teacher."))
     }
   }
 
@@ -87,16 +90,13 @@ export default function Teachers() {
   const to = Math.min(meta.current_page * meta.per_page, meta.total)
 
   return (
-    <AppLayout modules={modules} title="Teachers">
+    <AppLayout modules={modules} title={t("Teachers")}>
       <div className="space-y-5">
         <section className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-              <FiUserCheck className="h-5 w-5 text-primary" /> Teachers
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Manage teacher accounts, class assignments and subject allocations.
-            </p>
+              <FiUserCheck className="h-5 w-5 text-primary" />{t(" Teachers")}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t("Manage teacher accounts, class assignments and subject allocations.")}</p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -107,15 +107,13 @@ export default function Teachers() {
               }}
               className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
             >
-              <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-            </button>
+              <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
             <button
               type="button"
               onClick={() => setForm({ teacher: null })}
               className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
             >
-              <FiPlus className="h-4 w-4" /> Add teacher
-            </button>
+              <FiPlus className="h-4 w-4" />{t(" Add teacher")}</button>
           </div>
         </section>
 
@@ -127,7 +125,7 @@ export default function Teachers() {
                 type="search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search name, username, email or employment ID"
+                placeholder={t("Search name, username, email or employment ID")}
                 className="w-full rounded-lg border border-border py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
@@ -136,9 +134,9 @@ export default function Teachers() {
               onChange={(event) => updateFilter('is_active', event.target.value)}
               className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 md:max-w-48"
             >
-              <option value="">All statuses</option>
-              <option value="1">Active</option>
-              <option value="0">Inactive</option>
+              <option value="">{t("All statuses")}</option>
+              <option value="1">{t("Active")}</option>
+              <option value="0">{t("Inactive")}</option>
             </select>
           </div>
 
@@ -146,27 +144,25 @@ export default function Teachers() {
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-3">Teacher</th>
-                  <th className="px-4 py-3">Contact</th>
-                  <th className="px-4 py-3">Employment ID</th>
-                  <th className="px-4 py-3 text-right">Classes</th>
-                  <th className="px-4 py-3 text-right">Subjects</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="px-4 py-3">{t("Teacher")}</th>
+                  <th className="px-4 py-3">{t("Contact")}</th>
+                  <th className="px-4 py-3">{t("Employment ID")}</th>
+                  <th className="px-4 py-3 text-right">{t("Classes")}</th>
+                  <th className="px-4 py-3 text-right">{t("Subjects")}</th>
+                  <th className="px-4 py-3">{t("Status")}</th>
+                  <th className="px-4 py-3 text-right">{t("Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-14 text-center">
-                      <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+                      <div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
                     </td>
                   </tr>
                 ) : teachers.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-14 text-center text-muted-foreground">
-                      No teachers match the current filters.
-                    </td>
+                    <td colSpan={7} className="px-4 py-14 text-center text-muted-foreground">{t("No teachers match the current filters.")}</td>
                   </tr>
                 ) : (
                   teachers.map((teacher) => (
@@ -203,7 +199,7 @@ export default function Teachers() {
                               : 'bg-muted text-muted-foreground'
                           }`}
                         >
-                          {teacher.is_active ? 'Active' : 'Inactive'}
+                          {teacher.is_active ? t("Active") : t("Inactive")}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -212,7 +208,7 @@ export default function Teachers() {
                             type="button"
                             onClick={() => setAssignments(teacher)}
                             className="rounded-lg p-2 text-muted-foreground hover:bg-primary-soft hover:text-primary"
-                            aria-label={`Assign ${teacher.full_name}`}
+                            aria-label={t("Assign {0}", [teacher.full_name])}
                           >
                             <FiLink className="h-4 w-4" />
                           </button>
@@ -220,7 +216,7 @@ export default function Teachers() {
                             type="button"
                             onClick={() => setForm({ teacher })}
                             className="rounded-lg p-2 text-muted-foreground hover:bg-warning-soft hover:text-warning"
-                            aria-label={`Edit ${teacher.full_name}`}
+                            aria-label={t("Edit {0}", [teacher.full_name])}
                           >
                             <FiEdit2 className="h-4 w-4" />
                           </button>
@@ -228,7 +224,7 @@ export default function Teachers() {
                             type="button"
                             onClick={() => handleDelete(teacher)}
                             className="rounded-lg p-2 text-muted-foreground hover:bg-danger-soft hover:text-danger"
-                            aria-label={`Delete ${teacher.full_name}`}
+                            aria-label={t("Delete {0}", [teacher.full_name])}
                           >
                             <FiTrash2 className="h-4 w-4" />
                           </button>
@@ -242,31 +238,24 @@ export default function Teachers() {
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-sm text-muted-foreground">
-            <p>
-              Showing <span className="font-medium text-foreground">{from}</span>-
-              <span className="font-medium text-foreground">{to}</span> of{' '}
-              <span className="font-medium text-foreground">{meta.total}</span> teachers
-            </p>
+            <p>{t("Showing")}<span className="font-medium text-foreground">{from}</span>-
+              <span className="font-medium text-foreground">{to}</span>{t(" of")}{' '}
+              <span className="font-medium text-foreground">{meta.total}</span>{t(" teachers")}</p>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setPage((current) => Math.max(1, current - 1))}
                 disabled={meta.current_page <= 1 || loading}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <span className="px-1">
-                Page {meta.current_page} of {Math.max(meta.last_page, 1)}
+              >{t("Previous")}</button>
+              <span className="px-1">{t("Page")}{meta.current_page}{t(" of ")}{Math.max(meta.last_page, 1)}
               </span>
               <button
                 type="button"
                 onClick={() => setPage((current) => Math.min(meta.last_page, current + 1))}
                 disabled={meta.current_page >= meta.last_page || loading}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Next
-              </button>
+              >{t("Next")}</button>
             </div>
           </div>
         </section>
@@ -274,8 +263,8 @@ export default function Teachers() {
 
       {form && (
         <Modal
-          title={form.teacher ? 'Edit teacher' : 'Add teacher'}
-          description="Teacher accounts can sign in and see only their assigned classes."
+          title={form.teacher ? t("Edit teacher") : t("Add teacher")}
+          description={t("Teacher accounts can sign in and see only their assigned classes.")}
           onClose={() => setForm(null)}
         >
           <TeacherForm
@@ -288,8 +277,8 @@ export default function Teachers() {
 
       {assignments && (
         <Modal
-          title={`Assignments - ${assignments.full_name}`}
-          description="Assign classes and subjects to scope this teacher's access."
+          title={t("Assignments - {0}", [assignments.full_name])}
+          description={t("Assign classes and subjects to scope this teacher's access.")}
           width="max-w-4xl"
           onClose={() => {
             setAssignments(null)

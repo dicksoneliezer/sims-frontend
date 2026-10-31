@@ -52,6 +52,91 @@ body {
   @apply bg-background text-foreground antialiased;
 }
 
+@layer base {
+  html { scrollbar-gutter: stable; }
+  body { line-height: 1.6; }
+  :where(button, a, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--theme-ring);
+    outline-offset: 3px;
+  }
+  :where(button, a, input, select, textarea) { -webkit-tap-highlight-color: transparent; }
+  :where(button, a) { touch-action: manipulation; }
+  :where(button:not(:disabled), select, summary) { cursor: pointer; }
+  :where(button:disabled, input:disabled, select:disabled, textarea:disabled) {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+  :where(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='hidden']):not([type='file']), select, textarea) {
+    min-height: 44px;
+    background-color: var(--theme-surface);
+    color: var(--theme-foreground);
+    border-radius: 0.625rem;
+  }
+  :where(input, textarea)::placeholder { color: var(--theme-muted-foreground); opacity: 0.8; }
+  :where(input, select, textarea)[aria-invalid='true'] { border-color: var(--theme-danger); }
+  :where(input[type='checkbox'], input[type='radio']) { accent-color: var(--theme-primary); }
+  :where(main, [role='dialog']) :where(button, a.inline-flex, a.flex) { min-height: 40px; }
+  :where(table) { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  :where(th) { font-weight: 600; white-space: nowrap; }
+  :where(th, td) { vertical-align: middle; }
+  :where(tbody tr) { border-color: var(--theme-border); }
+  :where(tbody tr:hover) { background-color: color-mix(in srgb, var(--theme-muted) 50%, transparent); }
+  :where(td button) { min-width: 36px; }
+  :where(h1, h2, h3) { text-wrap: balance; letter-spacing: -0.02em; }
+  :where(p) { text-wrap: pretty; }
+  :where(svg) { flex-shrink: 0; }
+  :where(main) { min-width: 0; }
+  :where(main > div > section.bg-surface, main > section.bg-surface) {
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--theme-foreground) 4%, transparent);
+  }
+  :where(.app-sidebar nav a) { min-height: 44px; }
+  :where(.app-sidebar nav a[aria-current='page']) { box-shadow: inset 3px 0 0 var(--theme-info); }
+  :where(.app-sidebar nav) { overscroll-behavior: contain; scrollbar-width: thin; }
+  :where(header h1) { overflow-wrap: anywhere; }
+  :where(header > div > div:first-child) { min-width: 0; }
+  :where(header > div > div:last-child) { flex-shrink: 0; }
+  @media (max-width: 640px) {
+    :where(input, select, textarea) { font-size: 1rem; }
+    :where(header h1) { font-size: 1rem; line-height: 1.4; }
+    :where(th, td) { padding-inline: 0.875rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: -5rem;
+  z-index: 100;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--theme-primary);
+  color: var(--theme-primary-foreground);
+}
+.skip-link:focus { top: 1rem; }
+
+/* Remain visible even on controls which previously opted out of the browser outline. */
+:is(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--theme-ring);
+  outline-offset: 3px;
+}
+@media (max-width: 640px) {
+  :is(input, select, textarea) { font-size: 1rem; }
+}
+
+/* Keep older status badges readable at night without changing their daytime colours. */
+[data-theme='dark'] :is(.bg-blue-50, .bg-blue-100, .hover\:bg-blue-100:hover) { background-color: var(--theme-primary-soft); }
+[data-theme='dark'] :is(.bg-green-50, .bg-green-100, .bg-emerald-50, .bg-emerald-100, .hover\:bg-emerald-100:hover) { background-color: var(--theme-success-soft); }
+[data-theme='dark'] :is(.bg-red-50, .bg-red-100) { background-color: var(--theme-danger-soft); }
+[data-theme='dark'] :is(.bg-orange-50, .bg-amber-50, .bg-yellow-50) { background-color: var(--theme-warning-soft); }
+[data-theme='dark'] :is(.text-blue-600, .text-blue-900) { color: var(--theme-info); }
+[data-theme='dark'] :is(.text-green-600, .text-emerald-900) { color: var(--theme-success); }
+[data-theme='dark'] :is(.text-red-500, .text-red-600) { color: var(--theme-danger); }
+[data-theme='dark'] :is(.text-orange-600, .text-amber-600) { color: var(--theme-warning); }
+[data-theme='dark'] :is(.border-blue-200, .border-emerald-200) { border-color: var(--theme-border); }
+
 /* Shared summary cards across the role dashboards. */
 .dashboard-stat-card {
   --stat-accent: var(--theme-primary);

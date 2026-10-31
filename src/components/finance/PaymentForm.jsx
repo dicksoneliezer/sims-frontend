@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { recordPayment } from '../../api/finance'
@@ -17,6 +19,7 @@ const METHODS = [
 ]
 
 export function PaymentForm({ invoice, onClose, onSaved }) {
+  useLanguage()
   const { register, handleSubmit, watch, setError, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
       amount: invoice?.balance ?? '',
@@ -40,7 +43,7 @@ export function PaymentForm({ invoice, onClose, onSaved }) {
         phone_number: values.phone_number || null,
       })
 
-      toast.success('Payment recorded')
+      toast.success(t("Payment recorded"))
       onSaved()
       onClose()
     } catch (error) {
@@ -51,7 +54,7 @@ export function PaymentForm({ invoice, onClose, onSaved }) {
         setError(field, { type: 'server', message: messages[0] })
       })
 
-      toast.error(data?.message ?? 'Unable to record payment.')
+      toast.error(data?.message ?? t("Unable to record payment."))
     }
   }
 
@@ -59,42 +62,42 @@ export function PaymentForm({ invoice, onClose, onSaved }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div className="rounded-lg border border-border bg-muted px-4 py-3 text-sm">
         <p className="font-medium text-foreground">{invoice.invoice_number}</p>
-        <p className="text-muted-foreground">{invoice.student?.full_name ?? 'Student'}</p>
-        <p className="mt-1 text-muted-foreground">Outstanding balance: <span className="font-semibold text-foreground">{formatMoney(invoice.balance)}</span></p>
+        <p className="text-muted-foreground">{invoice.student?.full_name ?? t("Student")}</p>
+        <p className="mt-1 text-muted-foreground">{t("Outstanding balance: ")}<span className="font-semibold text-foreground">{formatMoney(invoice.balance)}</span></p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="amount" className={labelClass}>Amount (TZS) <span className="text-red-500">*</span></label>
-          <input id="amount" type="number" min="0.01" step="0.01" className={`${inputClass} mt-1.5`} {...register('amount', { required: 'Amount is required.', min: { value: 0.01, message: 'Must be greater than zero.' } })} />
+          <label htmlFor="amount" className={labelClass}>{t("Amount (TZS) ")}<span className="text-red-500">*</span></label>
+          <input id="amount" type="number" min="0.01" step="0.01" className={`${inputClass} mt-1.5`} {...register('amount', { required: t("Amount is required."), min: { value: 0.01, message: t("Must be greater than zero.") } })} />
           {errors.amount && <p className={errorClass}>{errors.amount.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="payment_method" className={labelClass}>Method</label>
+          <label htmlFor="payment_method" className={labelClass}>{t("Method")}</label>
           <select id="payment_method" className={`${inputClass} mt-1.5`} {...register('payment_method')}>
-            {METHODS.map((methodItem) => <option key={methodItem.value} value={methodItem.value}>{methodItem.label}</option>)}
+            {METHODS.map((methodItem) => <option key={methodItem.value} value={methodItem.value}>{t(methodItem.label)}</option>)}
           </select>
         </div>
 
         {requiresPhone && (
           <div className="sm:col-span-2">
-            <label htmlFor="phone_number" className={labelClass}>Phone number <span className="text-red-500">*</span></label>
-            <input id="phone_number" className={`${inputClass} mt-1.5`} placeholder="+2557XXXXXXXX" {...register('phone_number', { required: 'Phone number is required for mobile money.' })} />
+            <label htmlFor="phone_number" className={labelClass}>{t("Phone number ")}<span className="text-red-500">*</span></label>
+            <input id="phone_number" className={`${inputClass} mt-1.5`} placeholder={t("+2557XXXXXXXX")} {...register('phone_number', { required: t("Phone number is required for mobile money.") })} />
             {errors.phone_number && <p className={errorClass}>{errors.phone_number.message}</p>}
           </div>
         )}
 
         <div className="sm:col-span-2">
-          <label htmlFor="description" className={labelClass}>Description</label>
+          <label htmlFor="description" className={labelClass}>{t("Description")}</label>
           <input id="description" className={`${inputClass} mt-1.5`} {...register('description')} />
         </div>
       </div>
 
       <div className="flex justify-end gap-3 border-t border-border pt-4">
-        <button type="button" onClick={onClose} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">Cancel</button>
+        <button type="button" onClick={onClose} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">{t("Cancel")}</button>
         <button type="submit" disabled={isSubmitting} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-emerald-700 disabled:opacity-60">
-          {isSubmitting ? 'Recording...' : 'Record payment'}
+          {isSubmitting ? t("Recording...") : t("Record payment")}
         </button>
       </div>
     </form>

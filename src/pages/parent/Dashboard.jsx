@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 // src/pages/parent/Dashboard.jsx
 import { useEffect, useState } from 'react'
 import {
@@ -23,6 +25,7 @@ const STAT_META = [
 ]
 
 export default function ParentDashboard() {
+  useLanguage()
   const [stats, setStats] = useState({
     children_count: 0,
     total_outstanding: 0,
@@ -59,7 +62,7 @@ export default function ParentDashboard() {
         setAnnouncements(annData.slice(0, 3))
       })
       .catch(() => {
-        if (active) toast.error('Unable to load dashboard data.')
+        if (active) toast.error(t("Unable to load dashboard data."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -71,20 +74,16 @@ export default function ParentDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <section className="overflow-hidden rounded-2xl bg-gradient-to-r from-brand to-primary px-6 py-7 text-primary-foreground sm:px-8">
-        <p className="text-xs font-medium uppercase tracking-widest text-brand-muted">
-          Parent workspace
-        </p>
-        <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">Welcome back!</h2>
-        <p className="mt-2 max-w-2xl text-sm text-brand-muted">
-          View your children's progress, fees, and payments all in one place.
-        </p>
+      <section className="overflow-hidden rounded-2xl bg-gradient-to-r from-brand to-primary px-6 py-7 text-brand-foreground sm:px-8">
+        <p className="text-xs font-medium uppercase tracking-widest text-brand-muted">{t("Parent workspace")}</p>
+        <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">{t("Welcome back!")}</h2>
+        <p className="mt-2 max-w-2xl text-sm text-brand-muted">{t("View your children's progress, fees, and payments all in one place.")}</p>
       </section>
 
       {/* Stats */}
       {loading ? (
         <div className="flex items-center justify-center py-14">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+          <div role="status" aria-label={t("Loading data")} className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
         </div>
       ) : (
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -96,7 +95,7 @@ export default function ParentDashboard() {
               <p className="mt-4 text-2xl font-semibold text-foreground">
                 {meta.money ? formatMoney(stats[meta.key] ?? 0) : (stats[meta.key] ?? 0)}
               </p>
-              <p className="text-sm text-muted-foreground">{meta.label}</p>
+              <p className="text-sm text-muted-foreground">{t(meta.label)}</p>
             </article>
           ))}
         </section>
@@ -107,23 +106,18 @@ export default function ParentDashboard() {
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <div>
             <h3 className="flex items-center gap-2 font-semibold text-foreground">
-              <FiBell className="h-4 w-4 text-primary" /> Recent announcements
-            </h3>
-            <p className="text-sm text-muted-foreground">School notices and important dates.</p>
+              <FiBell className="h-4 w-4 text-primary" />{t(" Recent announcements")}</h3>
+            <p className="text-sm text-muted-foreground">{t("School notices and important dates.")}</p>
           </div>
-          <Link to="/parent/announcements" className="text-sm font-medium text-primary hover:underline">
-            View all
-          </Link>
+          <Link to="/parent/announcements" className="text-sm font-medium text-primary hover:underline">{t("View all")}</Link>
         </div>
 
         {loading ? (
           <div className="px-6 py-10 text-center">
-            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+            <div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
           </div>
         ) : announcements.length === 0 ? (
-          <p className="px-6 py-10 text-center text-sm text-muted-foreground">
-            No announcements yet.
-          </p>
+          <p className="px-6 py-10 text-center text-sm text-muted-foreground">{t("No announcements yet.")}</p>
         ) : (
           <div className="divide-y divide-slate-100">
             {announcements.map((item) => (
@@ -139,45 +133,39 @@ export default function ParentDashboard() {
 
       {/* Quick Actions */}
       <section className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-        <h3 className="font-semibold text-foreground">Quick actions</h3>
-        <p className="mt-1 text-sm text-muted-foreground">Jump to the most common parent tasks.</p>
+        <h3 className="font-semibold text-foreground">{t("Quick actions")}</h3>
+        <p className="mt-1 text-sm text-muted-foreground">{t("Jump to the most common parent tasks.")}</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link
             to="/parent/payments"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover transition"
-          >
-            Make a payment <FiArrowRight className="h-4 w-4" />
+          >{t("Make a payment")}<FiArrowRight className="h-4 w-4" />
           </Link>
           <Link
             to="/parent/children"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiUsers className="h-4 w-4" /> My Children
-          </Link>
+            <FiUsers className="h-4 w-4" />{t(" My Children")}</Link>
           <Link
             to="/parent/balance"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiAlertCircle className="h-4 w-4" /> View balance
-          </Link>
+            <FiAlertCircle className="h-4 w-4" />{t(" View balance")}</Link>
           <Link
             to="/parent/history"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiClock className="h-4 w-4" /> Payment history
-          </Link>
+            <FiClock className="h-4 w-4" />{t(" Payment history")}</Link>
           <Link
             to="/parent/statement"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiDollarSign className="h-4 w-4" /> Statement of account
-          </Link>
+            <FiDollarSign className="h-4 w-4" />{t(" Statement of account")}</Link>
           <Link
             to="/parent/messages"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiBell className="h-4 w-4" /> Messages
-          </Link>
+            <FiBell className="h-4 w-4" />{t(" Messages")}</Link>
         </div>
       </section>
     </div>

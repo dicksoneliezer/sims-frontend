@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiDatabase, FiDownload, FiPlus, FiRefreshCw, FiTrash2 } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -18,6 +20,7 @@ function saveBackups(backups) {
 }
 
 export default function SystemAdminBackup() {
+  useLanguage()
   const [backups, setBackups] = useState([])
   const [creating, setCreating] = useState(false)
 
@@ -42,25 +45,25 @@ export default function SystemAdminBackup() {
       const updated = [newBackup, ...backups]
       setBackups(updated)
       saveBackups(updated)
-      toast.success('Backup created successfully')
+      toast.success(t("Backup created successfully"))
     } catch (error) {
-      toast.error('Unable to create backup.')
+      toast.error(t("Unable to create backup."))
     } finally {
       setCreating(false)
     }
   }
 
   const handleDelete = (backup) => {
-    if (!window.confirm(`Delete backup "${backup.filename}"?`)) return
+    if (!window.confirm(t("Delete backup \"{0}\"?", [backup.filename]))) return
 
     const updated = backups.filter((b) => b.id !== backup.id)
     setBackups(updated)
     saveBackups(updated)
-    toast.success('Backup deleted')
+    toast.success(t("Backup deleted"))
   }
 
   const handleDownload = (backup) => {
-    toast.info(`Downloading ${backup.filename}... (simulated)`)
+    toast.info(t("Downloading {0}... (simulated)", [backup.filename]))
   }
 
   const formatSize = (bytes) => {
@@ -81,9 +84,8 @@ export default function SystemAdminBackup() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiDatabase className="h-5 w-5 text-primary" /> Database Backup
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">Create and manage database backups.</p>
+            <FiDatabase className="h-5 w-5 text-primary" />{t(" Database Backup")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Create and manage database backups.")}</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -91,15 +93,14 @@ export default function SystemAdminBackup() {
             onClick={() => setBackups(loadBackups())}
             className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
           >
-            <FiRefreshCw className="h-4 w-4" /> Refresh
-          </button>
+            <FiRefreshCw className="h-4 w-4" />{t(" Refresh")}</button>
           <button
             type="button"
             onClick={handleCreateBackup}
             disabled={creating}
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
           >
-            <FiPlus className="h-4 w-4" /> {creating ? 'Creating...' : 'Create Backup'}
+            <FiPlus className="h-4 w-4" /> {creating ? t("Creating...") : t("Create Backup")}
           </button>
         </div>
       </section>
@@ -109,20 +110,18 @@ export default function SystemAdminBackup() {
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-4 py-3">Filename</th>
-                <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3 text-right">Size</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Created</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-4 py-3">{t("Filename")}</th>
+                <th className="px-4 py-3">{t("Type")}</th>
+                <th className="px-4 py-3 text-right">{t("Size")}</th>
+                <th className="px-4 py-3">{t("Status")}</th>
+                <th className="px-4 py-3">{t("Created")}</th>
+                <th className="px-4 py-3 text-right">{t("Actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {backups.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-14 text-center text-muted-foreground">
-                    No backups yet. Click "Create Backup" to create one.
-                  </td>
+                  <td colSpan={6} className="px-4 py-14 text-center text-muted-foreground">{t("No backups yet. Click \"Create Backup\" to create one.")}</td>
                 </tr>
               ) : (
                 backups.map((backup) => (
@@ -132,7 +131,7 @@ export default function SystemAdminBackup() {
                     <td className="px-4 py-3 text-right text-muted-foreground">{formatSize(backup.file_size)}</td>
                     <td className="px-4 py-3">
                       <span className="rounded-full bg-success-soft px-2.5 py-0.5 text-xs font-semibold text-success">
-                        {backup.status}
+                        {t(backup.status)}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{formatDate(backup.created_at)}</td>
@@ -142,7 +141,7 @@ export default function SystemAdminBackup() {
                           type="button"
                           onClick={() => handleDownload(backup)}
                           className="rounded-lg p-2 text-muted-foreground hover:bg-primary-soft hover:text-primary"
-                          aria-label={`Download ${backup.filename}`}
+                          aria-label={t("Download {0}", [backup.filename])}
                         >
                           <FiDownload className="h-4 w-4" />
                         </button>
@@ -150,7 +149,7 @@ export default function SystemAdminBackup() {
                           type="button"
                           onClick={() => handleDelete(backup)}
                           className="rounded-lg p-2 text-muted-foreground hover:bg-danger-soft hover:text-danger"
-                          aria-label={`Delete ${backup.filename}`}
+                          aria-label={t("Delete {0}", [backup.filename])}
                         >
                           <FiTrash2 className="h-4 w-4" />
                         </button>

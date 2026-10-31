@@ -1,3 +1,5 @@
+import { t } from '../utils/i18n'
+import { useLanguage } from '../hooks/useLanguage'
 import { useEffect, useMemo, useState } from 'react'
 import {
   FiEdit2,
@@ -38,6 +40,7 @@ function initials(name = '') {
 }
 
 function StudentAvatar({ student }) {
+  useLanguage()
   if (student.photo_url) {
     return (
       <img
@@ -56,6 +59,7 @@ function StudentAvatar({ student }) {
 }
 
 export default function Students() {
+  useLanguage()
   const { user } = useAuth()
   const role = user.role
   const prefix = ROLE_PREFIX[role]
@@ -99,7 +103,7 @@ export default function Students() {
         setClasses(response.filters?.classes ?? [])
       })
       .catch(() => {
-        if (active) toast.error('Unable to load students.')
+        if (active) toast.error(t("Unable to load students."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -116,14 +120,14 @@ export default function Students() {
   }
 
   const handleDelete = async (student) => {
-    if (!window.confirm(`Delete ${student.full_name}? This cannot be undone.`)) return
+    if (!window.confirm(t("Delete {0}? This cannot be undone.", [student.full_name]))) return
 
     try {
       await deleteStudent(student.id)
-      toast.success('Student deleted')
+      toast.success(t("Student deleted"))
       setRefreshKey((key) => key + 1)
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to delete student.')
+      toast.error(error.response?.data?.message ?? t("Unable to delete student."))
     }
   }
 
@@ -131,17 +135,16 @@ export default function Students() {
   const to = Math.min(meta.current_page * meta.per_page, meta.total)
 
   return (
-    <AppLayout modules={modules} title="Students">
+    <AppLayout modules={modules} title={t("Students")}>
       <div className="space-y-5">
         <section className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-              <FiUsers className="h-5 w-5 text-primary" /> Students
-            </h2>
+              <FiUsers className="h-5 w-5 text-primary" />{t(" Students")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {canManage
-                ? 'Manage student records, classes and balances.'
-                : 'Browse student records and academic history.'}
+                ? t("Manage student records, classes and balances.")
+                : t("Browse student records and academic history.")}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -150,16 +153,14 @@ export default function Students() {
               onClick={() => setRefreshKey((key) => key + 1)}
               className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
             >
-              <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-            </button>
+              <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
             {canManage && (
               <button
                 type="button"
                 onClick={() => setForm({ student: null })}
                 className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
               >
-                <FiPlus className="h-4 w-4" /> Add student
-              </button>
+                <FiPlus className="h-4 w-4" />{t(" Add student")}</button>
             )}
           </div>
         </section>
@@ -172,7 +173,7 @@ export default function Students() {
                 type="search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search name, number, phone or email"
+                placeholder={t("Search name, number, phone or email")}
                 className="w-full rounded-lg border border-border py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
@@ -182,7 +183,7 @@ export default function Students() {
               onChange={(event) => updateFilter('class', event.target.value)}
               className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             >
-              <option value="">All classes</option>
+              <option value="">{t("All classes")}</option>
               {classes.map((className) => (
                 <option key={className} value={className}>
                   {className}
@@ -195,10 +196,10 @@ export default function Students() {
               onChange={(event) => updateFilter('school_level', event.target.value)}
               className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             >
-              <option value="">All levels</option>
+              <option value="">{t("All levels")}</option>
               {Object.entries(SCHOOL_LEVELS).map(([value, label]) => (
                 <option key={value} value={value}>
-                  {label}
+                  {t(label)}
                 </option>
               ))}
             </select>
@@ -208,9 +209,9 @@ export default function Students() {
               onChange={(event) => updateFilter('is_active', event.target.value)}
               className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             >
-              <option value="">All statuses</option>
-              <option value="1">Active</option>
-              <option value="0">Inactive</option>
+              <option value="">{t("All statuses")}</option>
+              <option value="1">{t("Active")}</option>
+              <option value="0">{t("Inactive")}</option>
             </select>
           </div>
 
@@ -218,27 +219,25 @@ export default function Students() {
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-3">Student</th>
-                  <th className="px-4 py-3">Class</th>
-                  <th className="px-4 py-3">Level</th>
-                  <th className="px-4 py-3">Parent phone</th>
-                  <th className="px-4 py-3 text-right">Opening balance</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="px-4 py-3">{t("Student")}</th>
+                  <th className="px-4 py-3">{t("Class")}</th>
+                  <th className="px-4 py-3">{t("Level")}</th>
+                  <th className="px-4 py-3">{t("Parent phone")}</th>
+                  <th className="px-4 py-3 text-right">{t("Opening balance")}</th>
+                  <th className="px-4 py-3">{t("Status")}</th>
+                  <th className="px-4 py-3 text-right">{t("Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-14 text-center">
-                      <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+                      <div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
                     </td>
                   </tr>
                 ) : students.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-14 text-center text-muted-foreground">
-                      No students match the current filters.
-                    </td>
+                    <td colSpan={7} className="px-4 py-14 text-center text-muted-foreground">{t("No students match the current filters.")}</td>
                   </tr>
                 ) : (
                   students.map((student) => (
@@ -268,7 +267,7 @@ export default function Students() {
                               : 'bg-muted text-muted-foreground'
                           }`}
                         >
-                          {student.is_active ? 'Active' : 'Inactive'}
+                          {student.is_active ? t("Active") : t("Inactive")}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -277,7 +276,7 @@ export default function Students() {
                             type="button"
                             onClick={() => setDetailId(student.id)}
                             className="rounded-lg p-2 text-muted-foreground hover:bg-primary-soft hover:text-primary"
-                            aria-label={`View ${student.full_name}`}
+                            aria-label={t("View {0}", [student.full_name])}
                           >
                             <FiEye className="h-4 w-4" />
                           </button>
@@ -287,7 +286,7 @@ export default function Students() {
                                 type="button"
                                 onClick={() => setForm({ student })}
                                 className="rounded-lg p-2 text-muted-foreground hover:bg-warning-soft hover:text-warning"
-                                aria-label={`Edit ${student.full_name}`}
+                                aria-label={t("Edit {0}", [student.full_name])}
                               >
                                 <FiEdit2 className="h-4 w-4" />
                               </button>
@@ -295,7 +294,7 @@ export default function Students() {
                                 type="button"
                                 onClick={() => handleDelete(student)}
                                 className="rounded-lg p-2 text-muted-foreground hover:bg-danger-soft hover:text-danger"
-                                aria-label={`Delete ${student.full_name}`}
+                                aria-label={t("Delete {0}", [student.full_name])}
                               >
                                 <FiTrash2 className="h-4 w-4" />
                               </button>
@@ -311,31 +310,24 @@ export default function Students() {
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-sm text-muted-foreground">
-            <p>
-              Showing <span className="font-medium text-foreground">{from}</span>–
-              <span className="font-medium text-foreground">{to}</span> of{' '}
-              <span className="font-medium text-foreground">{meta.total}</span> students
-            </p>
+            <p>{t("Showing")}<span className="font-medium text-foreground">{from}</span>–
+              <span className="font-medium text-foreground">{to}</span>{t(" of")}{' '}
+              <span className="font-medium text-foreground">{meta.total}</span>{t(" students")}</p>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setPage((current) => Math.max(1, current - 1))}
                 disabled={meta.current_page <= 1 || loading}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <span className="px-1">
-                Page {meta.current_page} of {Math.max(meta.last_page, 1)}
+              >{t("Previous")}</button>
+              <span className="px-1">{t("Page")}{meta.current_page}{t(" of ")}{Math.max(meta.last_page, 1)}
               </span>
               <button
                 type="button"
                 onClick={() => setPage((current) => Math.min(meta.last_page, current + 1))}
                 disabled={meta.current_page >= meta.last_page || loading}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Next
-              </button>
+              >{t("Next")}</button>
             </div>
           </div>
         </section>
@@ -343,11 +335,11 @@ export default function Students() {
 
       {form && (
         <Modal
-          title={form.student ? 'Edit student' : 'Add student'}
+          title={form.student ? t("Edit student") : t("Add student")}
           description={
             form.student
-              ? `Update the record for ${form.student.full_name}.`
-              : 'Student numbers are generated automatically when left blank.'
+              ? t("Update the record for {0}.", [form.student.full_name])
+              : t("Student numbers are generated automatically when left blank.")
           }
           onClose={() => setForm(null)}
         >

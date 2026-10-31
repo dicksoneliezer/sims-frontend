@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { createAccountant, updateAccountant } from '../../api/people'
@@ -8,6 +10,7 @@ const labelClass = 'text-sm font-medium text-foreground'
 const errorClass = 'mt-1 text-xs text-danger'
 
 export function AccountantForm({ accountant, onClose, onSaved }) {
+  useLanguage()
   const isEdit = Boolean(accountant)
   const { register, handleSubmit, setError, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
@@ -30,10 +33,10 @@ export function AccountantForm({ accountant, onClose, onSaved }) {
     try {
       if (isEdit) {
         await updateAccountant(accountant.id, payload)
-        toast.success('Accountant updated')
+        toast.success(t("Accountant updated"))
       } else {
         await createAccountant(payload)
-        toast.success('Accountant created')
+        toast.success(t("Accountant created"))
       }
 
       onSaved()
@@ -46,7 +49,7 @@ export function AccountantForm({ accountant, onClose, onSaved }) {
         setError(field, { type: 'server', message: messages[0] })
       })
 
-      toast.error(data?.message ?? 'Unable to save accountant.')
+      toast.error(data?.message ?? t("Unable to save accountant."))
     }
   }
 
@@ -54,64 +57,61 @@ export function AccountantForm({ accountant, onClose, onSaved }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="username" className={labelClass}>Username <span className="text-red-500">*</span></label>
-          <input id="username" className={`${inputClass} mt-1.5`} {...register('username', { required: 'Username is required.' })} />
+          <label htmlFor="username" className={labelClass}>{t("Username ")}<span className="text-red-500">*</span></label>
+          <input id="username" className={`${inputClass} mt-1.5`} {...register('username', { required: t("Username is required.") })} />
           {errors.username && <p className={errorClass}>{errors.username.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="full_name" className={labelClass}>Full name <span className="text-red-500">*</span></label>
-          <input id="full_name" className={`${inputClass} mt-1.5`} {...register('full_name', { required: 'Full name is required.' })} />
+          <label htmlFor="full_name" className={labelClass}>{t("Full name ")}<span className="text-red-500">*</span></label>
+          <input id="full_name" className={`${inputClass} mt-1.5`} {...register('full_name', { required: t("Full name is required.") })} />
           {errors.full_name && <p className={errorClass}>{errors.full_name.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="email" className={labelClass}>Email</label>
+          <label htmlFor="email" className={labelClass}>{t("Email")}</label>
           <input id="email" type="email" className={`${inputClass} mt-1.5`} {...register('email')} />
           {errors.email && <p className={errorClass}>{errors.email.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="phone" className={labelClass}>Phone</label>
+          <label htmlFor="phone" className={labelClass}>{t("Phone")}</label>
           <input id="phone" className={`${inputClass} mt-1.5`} {...register('phone')} />
           {errors.phone && <p className={errorClass}>{errors.phone.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="nin_number" className={labelClass}>NIN number</label>
+          <label htmlFor="nin_number" className={labelClass}>{t("NIN number")}</label>
           <input id="nin_number" className={`${inputClass} mt-1.5`} {...register('nin_number')} />
           {errors.nin_number && <p className={errorClass}>{errors.nin_number.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="employment_id" className={labelClass}>Employment ID</label>
+          <label htmlFor="employment_id" className={labelClass}>{t("Employment ID")}</label>
           <input id="employment_id" className={`${inputClass} mt-1.5`} {...register('employment_id')} />
           {errors.employment_id && <p className={errorClass}>{errors.employment_id.message}</p>}
         </div>
 
         <div className="sm:col-span-2">
-          <label htmlFor="password" className={labelClass}>
-            Password {isEdit ? <span className="text-muted-foreground">(leave blank to keep current)</span> : <span className="text-red-500">*</span>}
+          <label htmlFor="password" className={labelClass}>{t("Password")}{isEdit ? <span className="text-muted-foreground">{t("(leave blank to keep current)")}</span> : <span className="text-red-500">*</span>}
           </label>
           <input
             id="password"
             type="password"
             className={`${inputClass} mt-1.5`}
-            {...register('password', isEdit ? {} : { required: 'Password is required.', minLength: { value: 8, message: 'At least 8 characters.' } })}
+            {...register('password', isEdit ? {} : { required: t("Password is required."), minLength: { value: 8, message: t("At least 8 characters.") } })}
           />
           {errors.password && <p className={errorClass}>{errors.password.message}</p>}
         </div>
       </div>
 
       <label className="flex items-center gap-2 text-sm text-foreground">
-        <input type="checkbox" className="h-4 w-4 rounded border-border text-primary focus:ring-blue-500" {...register('is_active')} />
-        Active account
-      </label>
+        <input type="checkbox" className="h-4 w-4 rounded border-border text-primary focus:ring-blue-500" {...register('is_active')} />{t("Active account")}</label>
 
       <div className="flex justify-end gap-3 border-t border-border pt-4">
-        <button type="button" onClick={onClose} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">Cancel</button>
+        <button type="button" onClick={onClose} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">{t("Cancel")}</button>
         <button type="submit" disabled={isSubmitting} className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-60">
-          {isSubmitting ? 'Saving...' : isEdit ? 'Update accountant' : 'Create accountant'}
+          {isSubmitting ? t("Saving...") : isEdit ? t("Update accountant") : t("Create accountant")}
         </button>
       </div>
     </form>

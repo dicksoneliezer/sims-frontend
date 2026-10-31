@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
@@ -22,6 +24,7 @@ const FIELDS = [
 ]
 
 export function SchoolProfilePanel() {
+  useLanguage()
   const { register, handleSubmit, reset, setError, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {},
   })
@@ -29,20 +32,20 @@ export function SchoolProfilePanel() {
   useEffect(() => {
     getSchoolSettings()
       .then((settings) => reset(settings ?? {}))
-      .catch(() => toast.error('Unable to load school settings.'))
+      .catch(() => toast.error(t("Unable to load school settings.")))
   }, [reset])
 
   const onSubmit = async (values) => {
     try {
       const updated = await updateSchoolSettings(values)
       reset(updated ?? values)
-      toast.success('School profile saved')
+      toast.success(t("School profile saved"))
     } catch (error) {
       const data = error.response?.data
       Object.entries(data?.errors ?? {}).forEach(([field, messages]) => {
         setError(field, { type: 'server', message: messages[0] })
       })
-      toast.error(data?.message ?? 'Unable to save school profile.')
+      toast.error(data?.message ?? t("Unable to save school profile."))
     }
   }
 
@@ -52,13 +55,13 @@ export function SchoolProfilePanel() {
         {FIELDS.map((field) => (
           <div key={field.name} className={field.name === 'school_name' || field.name === 'school_motto' ? 'sm:col-span-2' : ''}>
             <label htmlFor={field.name} className={labelClass}>
-              {field.label} {field.required && <span className="text-red-500">*</span>}
+              {t(field.label)} {field.required && <span className="text-red-500">*</span>}
             </label>
             <input
               id={field.name}
               type={field.type ?? 'text'}
               className={`${inputClass} mt-1.5`}
-              {...register(field.name, field.required ? { required: `${field.label} is required.` } : {})}
+              {...register(field.name, field.required ? { required: t('{0} is required.', [t(field.label)]) } : {})}
             />
             {errors[field.name] && <p className={errorClass}>{errors[field.name].message}</p>}
           </div>
@@ -66,14 +69,14 @@ export function SchoolProfilePanel() {
       </div>
 
       <div>
-        <label htmlFor="school_address" className={labelClass}>Address</label>
+        <label htmlFor="school_address" className={labelClass}>{t("Address")}</label>
         <textarea id="school_address" rows={3} className={`${inputClass} mt-1.5`} {...register('school_address')} />
         {errors.school_address && <p className={errorClass}>{errors.school_address.message}</p>}
       </div>
 
       <div className="flex justify-end border-t border-border pt-4">
         <button type="submit" disabled={isSubmitting} className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-60">
-          {isSubmitting ? 'Saving...' : 'Save school profile'}
+          {isSubmitting ? t("Saving...") : t("Save school profile")}
         </button>
       </div>
     </form>

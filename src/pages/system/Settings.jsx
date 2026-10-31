@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiSettings, FiSave } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -15,6 +17,7 @@ const DEFAULT_SETTINGS = {
 }
 
 export default function SystemAdminSettings() {
+  useLanguage()
   const [form, setForm] = useState(DEFAULT_SETTINGS)
   const [saving, setSaving] = useState(false)
 
@@ -37,9 +40,9 @@ export default function SystemAdminSettings() {
       // Kwa sasa tunahifadhi kwenye localStorage
       // Baadaye, tunaweza kubadilisha hii kuwa API call: await api.put('/system/settings', form)
       localStorage.setItem('system_settings', JSON.stringify(form))
-      toast.success('System settings saved')
+      toast.success(t("System settings saved"))
     } catch (error) {
-      toast.error('Unable to save settings.')
+      toast.error(t("Unable to save settings."))
     } finally {
       setSaving(false)
     }
@@ -49,15 +52,14 @@ export default function SystemAdminSettings() {
     <div className="space-y-5">
       <section>
         <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-          <FiSettings className="h-5 w-5 text-primary" /> System Settings
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">Configure global system settings.</p>
+          <FiSettings className="h-5 w-5 text-primary" />{t(" System Settings")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("Configure global system settings.")}</p>
       </section>
 
       <form onSubmit={handleSubmit} className="rounded-xl border border-border bg-surface p-6 shadow-sm">
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">School Name</span>
+            <span className="mb-1 block font-medium text-foreground">{t("School Name")}</span>
             <input
               value={form.school_name}
               onChange={(e) => setForm({ ...form, school_name: e.target.value })}
@@ -65,7 +67,7 @@ export default function SystemAdminSettings() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">School Motto</span>
+            <span className="mb-1 block font-medium text-foreground">{t("School Motto")}</span>
             <input
               value={form.school_motto}
               onChange={(e) => setForm({ ...form, school_motto: e.target.value })}
@@ -73,7 +75,7 @@ export default function SystemAdminSettings() {
             />
           </label>
           <label className="block text-sm sm:col-span-2">
-            <span className="mb-1 block font-medium text-foreground">School Address</span>
+            <span className="mb-1 block font-medium text-foreground">{t("School Address")}</span>
             <input
               value={form.school_address}
               onChange={(e) => setForm({ ...form, school_address: e.target.value })}
@@ -81,7 +83,7 @@ export default function SystemAdminSettings() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">School Phone</span>
+            <span className="mb-1 block font-medium text-foreground">{t("School Phone")}</span>
             <input
               value={form.school_phone}
               onChange={(e) => setForm({ ...form, school_phone: e.target.value })}
@@ -89,7 +91,7 @@ export default function SystemAdminSettings() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">School Email</span>
+            <span className="mb-1 block font-medium text-foreground">{t("School Email")}</span>
             <input
               type="email"
               value={form.school_email}
@@ -98,7 +100,7 @@ export default function SystemAdminSettings() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">Academic Year</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Academic Year")}</span>
             <input
               value={form.academic_year}
               onChange={(e) => setForm({ ...form, academic_year: e.target.value })}
@@ -106,19 +108,19 @@ export default function SystemAdminSettings() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">Current Term</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Current Term")}</span>
             <select
               value={form.current_term}
               onChange={(e) => setForm({ ...form, current_term: e.target.value })}
               className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary"
             >
-              <option value="Term 1">Term 1</option>
-              <option value="Term 2">Term 2</option>
-              <option value="Term 3">Term 3</option>
+              <option value="Term 1">{t("Term 1")}</option>
+              <option value="Term 2">{t("Term 2")}</option>
+              <option value="Term 3">{t("Term 3")}</option>
             </select>
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">Currency</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Currency")}</span>
             <input
               value={form.currency}
               onChange={(e) => setForm({ ...form, currency: e.target.value })}
@@ -126,7 +128,7 @@ export default function SystemAdminSettings() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-foreground">Timezone</span>
+            <span className="mb-1 block font-medium text-foreground">{t("Timezone")}</span>
             <input
               value={form.timezone}
               onChange={(e) => setForm({ ...form, timezone: e.target.value })}
@@ -141,7 +143,7 @@ export default function SystemAdminSettings() {
             disabled={saving}
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50"
           >
-            <FiSave className="h-4 w-4" /> {saving ? 'Saving...' : 'Save Settings'}
+            <FiSave className="h-4 w-4" /> {saving ? t("Saving...") : t("Save Settings")}
           </button>
         </div>
       </form>

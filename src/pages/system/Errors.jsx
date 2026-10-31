@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useMemo, useState } from 'react'
 import { FiAlertCircle, FiRefreshCw, FiTrash2, FiSearch, FiEye } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -64,6 +66,7 @@ const LEVEL_TONE = {
 }
 
 export default function SystemAdminErrors() {
+  useLanguage()
   const [errors, setErrors] = useState([])
   const [level, setLevel] = useState('')
   const [search, setSearch] = useState('')
@@ -84,16 +87,16 @@ export default function SystemAdminErrors() {
   }, [errors, level, search])
 
   const handleClear = () => {
-    if (!window.confirm('Clear all error logs?')) return
+    if (!window.confirm(t("Clear all error logs?"))) return
     setErrors([])
     saveErrors([])
-    toast.success('Error logs cleared')
+    toast.success(t("Error logs cleared"))
   }
 
   const handleRefresh = () => {
     const refreshed = loadErrors()
     setErrors(refreshed)
-    toast.success('Error logs refreshed')
+    toast.success(t("Error logs refreshed"))
   }
 
   const formatDate = (dateStr) => {
@@ -106,9 +109,8 @@ export default function SystemAdminErrors() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiAlertCircle className="h-5 w-5 text-primary" /> Error Logs
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">View application errors and exceptions.</p>
+            <FiAlertCircle className="h-5 w-5 text-primary" />{t(" Error Logs")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("View application errors and exceptions.")}</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -116,15 +118,13 @@ export default function SystemAdminErrors() {
             onClick={handleRefresh}
             className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
           >
-            <FiRefreshCw className="h-4 w-4" /> Refresh
-          </button>
+            <FiRefreshCw className="h-4 w-4" />{t(" Refresh")}</button>
           <button
             type="button"
             onClick={handleClear}
             className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-danger hover:bg-danger-soft"
           >
-            <FiTrash2 className="h-4 w-4" /> Clear Errors
-          </button>
+            <FiTrash2 className="h-4 w-4" />{t(" Clear Errors")}</button>
         </div>
       </section>
 
@@ -136,7 +136,7 @@ export default function SystemAdminErrors() {
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search errors by message or file"
+              placeholder={t("Search errors by message or file")}
               className="w-full rounded-lg border border-border py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </div>
@@ -145,10 +145,10 @@ export default function SystemAdminErrors() {
             onChange={(e) => setLevel(e.target.value)}
             className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary"
           >
-            <option value="">All levels</option>
-            <option value="warning">Warning</option>
-            <option value="error">Error</option>
-            <option value="critical">Critical</option>
+            <option value="">{t("All levels")}</option>
+            <option value="warning">{t("Warning")}</option>
+            <option value="error">{t("Error")}</option>
+            <option value="critical">{t("Critical")}</option>
           </select>
         </div>
 
@@ -156,19 +156,17 @@ export default function SystemAdminErrors() {
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-4 py-3">Level</th>
-                <th className="px-4 py-3">Message</th>
-                <th className="px-4 py-3">File</th>
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-4 py-3">{t("Level")}</th>
+                <th className="px-4 py-3">{t("Message")}</th>
+                <th className="px-4 py-3">{t("File")}</th>
+                <th className="px-4 py-3">{t("Date")}</th>
+                <th className="px-4 py-3 text-right">{t("Actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-14 text-center text-muted-foreground">
-                    No errors found.
-                  </td>
+                  <td colSpan={5} className="px-4 py-14 text-center text-muted-foreground">{t("No errors found.")}</td>
                 </tr>
               ) : (
                 filtered.map((error) => (
@@ -190,7 +188,7 @@ export default function SystemAdminErrors() {
                         type="button"
                         onClick={() => setSelectedError(error)}
                         className="rounded-lg p-2 text-muted-foreground hover:bg-primary-soft hover:text-primary"
-                        aria-label="View details"
+                        aria-label={t("View details")}
                       >
                         <FiEye className="h-4 w-4" />
                       </button>
@@ -205,21 +203,21 @@ export default function SystemAdminErrors() {
 
       {selectedError && (
         <Modal
-          title="Error Details"
+          title={t("Error Details")}
           description={`${selectedError.level.toUpperCase()} · ${formatDate(selectedError.created_at)}`}
           onClose={() => setSelectedError(null)}
         >
           <div className="space-y-4">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Message</p>
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("Message")}</p>
               <p className="mt-1 text-sm text-foreground">{selectedError.message}</p>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">File</p>
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("File")}</p>
               <p className="mt-1 text-sm text-foreground">{selectedError.file}:{selectedError.line}</p>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Stack Trace</p>
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("Stack Trace")}</p>
               <pre className="mt-1 max-h-64 overflow-auto rounded-lg bg-muted p-3 text-xs text-foreground">
                 {selectedError.trace}
               </pre>

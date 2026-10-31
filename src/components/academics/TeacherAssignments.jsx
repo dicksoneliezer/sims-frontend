@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiPlus, FiTrash2 } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -16,6 +18,7 @@ const selectClass =
 const labelClass = 'text-xs font-semibold uppercase tracking-wide text-muted-foreground'
 
 export function TeacherAssignments({ teacher, onClose, onChanged }) {
+  useLanguage()
   const [detail, setDetail] = useState(null)
   const [classes, setClasses] = useState([])
   const [subjects, setSubjects] = useState([])
@@ -30,7 +33,7 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
   const loadTeacher = () =>
     getTeacher(teacher.id)
       .then(setDetail)
-      .catch(() => toast.error('Unable to load teacher assignments.'))
+      .catch(() => toast.error(t("Unable to load teacher assignments.")))
 
   useEffect(() => {
     let active = true
@@ -43,7 +46,7 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
         setSubjects(subjectResponse.data)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load assignment options.')
+        if (active) toast.error(t("Unable to load assignment options."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -58,7 +61,7 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
     event.preventDefault()
 
     if (!classId) {
-      toast.error('Select a class first.')
+      toast.error(t("Select a class first."))
       return
     }
 
@@ -70,12 +73,12 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
         class_id: Number(classId),
         academic_year: classYear || null,
       })
-      toast.success('Class assigned')
+      toast.success(t("Class assigned"))
       setClassId('')
       await loadTeacher()
       onChanged?.()
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to assign class.')
+      toast.error(error.response?.data?.message ?? t("Unable to assign class."))
     } finally {
       setSaving(false)
     }
@@ -85,7 +88,7 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
     event.preventDefault()
 
     if (!subjectId) {
-      toast.error('Select a subject first.')
+      toast.error(t("Select a subject first."))
       return
     }
 
@@ -98,12 +101,12 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
         class_id: subjectClassId ? Number(subjectClassId) : null,
         academic_year: subjectYear || null,
       })
-      toast.success('Subject assigned')
+      toast.success(t("Subject assigned"))
       setSubjectId('')
       await loadTeacher()
       onChanged?.()
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to assign subject.')
+      toast.error(error.response?.data?.message ?? t("Unable to assign subject."))
     } finally {
       setSaving(false)
     }
@@ -112,22 +115,22 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
   const removeClass = async (assignment) => {
     try {
       await removeTeacherClass(assignment.id)
-      toast.success('Class assignment removed')
+      toast.success(t("Class assignment removed"))
       await loadTeacher()
       onChanged?.()
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to remove class assignment.')
+      toast.error(error.response?.data?.message ?? t("Unable to remove class assignment."))
     }
   }
 
   const removeSubject = async (assignment) => {
     try {
       await removeTeacherSubject(assignment.id)
-      toast.success('Subject assignment removed')
+      toast.success(t("Subject assignment removed"))
       await loadTeacher()
       onChanged?.()
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to remove subject assignment.')
+      toast.error(error.response?.data?.message ?? t("Unable to remove subject assignment."))
     }
   }
 
@@ -144,8 +147,8 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
       <div className="grid gap-5 lg:grid-cols-2">
         <section className="rounded-xl border border-border">
           <div className="border-b border-border px-4 py-3">
-            <h3 className="font-semibold text-foreground">Assigned classes</h3>
-            <p className="text-xs text-muted-foreground">Classes this teacher can access.</p>
+            <h3 className="font-semibold text-foreground">{t("Assigned classes")}</h3>
+            <p className="text-xs text-muted-foreground">{t("Classes this teacher can access.")}</p>
           </div>
           <ul className="divide-y divide-slate-100">
             {detail?.classes?.length ? (
@@ -153,26 +156,24 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
                 <li key={assignment.id} className="flex items-center justify-between gap-3 px-4 py-2.5">
                   <div>
                     <p className="text-sm font-medium text-foreground">{assignment.class_name}</p>
-                    <p className="text-xs text-muted-foreground">{assignment.academic_year ?? 'All years'}</p>
+                    <p className="text-xs text-muted-foreground">{assignment.academic_year ?? t("All years")}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => removeClass(assignment)}
                     className="rounded-lg p-1.5 text-muted-foreground hover:bg-danger-soft hover:text-danger"
-                    aria-label={`Remove ${assignment.class_name}`}
+                    aria-label={t("Remove {0}", [assignment.class_name])}
                   >
                     <FiTrash2 className="h-4 w-4" />
                   </button>
                 </li>
               ))
             ) : (
-              <li className="px-4 py-6 text-center text-sm text-muted-foreground">No classes assigned.</li>
+              <li className="px-4 py-6 text-center text-sm text-muted-foreground">{t("No classes assigned.")}</li>
             )}
           </ul>
           <form onSubmit={addClass} className="space-y-2 border-t border-border p-4">
-            <label className={labelClass} htmlFor="assign-class">
-              Add class
-            </label>
+            <label className={labelClass} htmlFor="assign-class">{t("Add class")}</label>
             <div className="flex gap-2">
               <select
                 id="assign-class"
@@ -180,7 +181,7 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
                 onChange={(event) => setClassId(event.target.value)}
                 className={selectClass}
               >
-                <option value="">Select class</option>
+                <option value="">{t("Select class")}</option>
                 {classes.map((schoolClass) => (
                   <option key={schoolClass.id} value={schoolClass.id}>
                     {schoolClass.name}
@@ -191,14 +192,14 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
                 value={classYear}
                 onChange={(event) => setClassYear(event.target.value)}
                 className={`${selectClass} max-w-28`}
-                placeholder="Year"
-                aria-label="Academic year"
+                placeholder={t("Year")}
+                aria-label={t("Academic year")}
               />
               <button
                 type="submit"
                 disabled={saving}
                 className="rounded-lg bg-primary px-3 py-2 text-primary-foreground hover:bg-primary-hover disabled:opacity-60"
-                aria-label="Assign class"
+                aria-label={t("Assign class")}
               >
                 <FiPlus className="h-4 w-4" />
               </button>
@@ -208,8 +209,8 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
 
         <section className="rounded-xl border border-border">
           <div className="border-b border-border px-4 py-3">
-            <h3 className="font-semibold text-foreground">Assigned subjects</h3>
-            <p className="text-xs text-muted-foreground">Subjects and classes this teacher teaches.</p>
+            <h3 className="font-semibold text-foreground">{t("Assigned subjects")}</h3>
+            <p className="text-xs text-muted-foreground">{t("Subjects and classes this teacher teaches.")}</p>
           </div>
           <ul className="divide-y divide-slate-100">
             {detail?.subjects?.length ? (
@@ -221,27 +222,25 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
                       <span className="text-xs text-muted-foreground">({assignment.subject_code})</span>
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {assignment.class_name ?? 'All classes'} - {assignment.academic_year ?? 'All years'}
+                      {assignment.class_name ?? t("All classes")} - {assignment.academic_year ?? t("All years")}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => removeSubject(assignment)}
                     className="rounded-lg p-1.5 text-muted-foreground hover:bg-danger-soft hover:text-danger"
-                    aria-label={`Remove ${assignment.subject_name}`}
+                    aria-label={t("Remove {0}", [assignment.subject_name])}
                   >
                     <FiTrash2 className="h-4 w-4" />
                   </button>
                 </li>
               ))
             ) : (
-              <li className="px-4 py-6 text-center text-sm text-muted-foreground">No subjects assigned.</li>
+              <li className="px-4 py-6 text-center text-sm text-muted-foreground">{t("No subjects assigned.")}</li>
             )}
           </ul>
           <form onSubmit={addSubject} className="space-y-2 border-t border-border p-4">
-            <label className={labelClass} htmlFor="assign-subject">
-              Add subject
-            </label>
+            <label className={labelClass} htmlFor="assign-subject">{t("Add subject")}</label>
             <div className="grid gap-2 sm:grid-cols-2">
               <select
                 id="assign-subject"
@@ -249,7 +248,7 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
                 onChange={(event) => setSubjectId(event.target.value)}
                 className={selectClass}
               >
-                <option value="">Select subject</option>
+                <option value="">{t("Select subject")}</option>
                 {subjects.map((subject) => (
                   <option key={subject.id} value={subject.id}>
                     {subject.code} - {subject.name}
@@ -260,9 +259,9 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
                 value={subjectClassId}
                 onChange={(event) => setSubjectClassId(event.target.value)}
                 className={selectClass}
-                aria-label="Class"
+                aria-label={t("Class")}
               >
-                <option value="">All classes</option>
+                <option value="">{t("All classes")}</option>
                 {classes.map((schoolClass) => (
                   <option key={schoolClass.id} value={schoolClass.id}>
                     {schoolClass.name}
@@ -275,16 +274,14 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
                 value={subjectYear}
                 onChange={(event) => setSubjectYear(event.target.value)}
                 className={`${selectClass} max-w-32`}
-                placeholder="Year"
-                aria-label="Academic year"
+                placeholder={t("Year")}
+                aria-label={t("Academic year")}
               />
               <button
                 type="submit"
                 disabled={saving}
                 className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover disabled:opacity-60"
-              >
-                Add subject
-              </button>
+              >{t("Add subject")}</button>
             </div>
           </form>
         </section>
@@ -295,9 +292,7 @@ export function TeacherAssignments({ teacher, onClose, onChanged }) {
           type="button"
           onClick={onClose}
           className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
-        >
-          Done
-        </button>
+        >{t("Done")}</button>
       </div>
     </div>
   )

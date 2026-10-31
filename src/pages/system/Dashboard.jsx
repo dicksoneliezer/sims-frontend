@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 // src/pages/system/Dashboard.jsx
 import { useEffect, useState } from 'react'
 import {
@@ -24,6 +26,7 @@ const STAT_META = [
 ]
 
 export default function SystemAdminDashboard() {
+  useLanguage()
   const [stats, setStats] = useState({
     usersCount: 0,
     activeUsers: 0,
@@ -56,7 +59,7 @@ export default function SystemAdminDashboard() {
           errorsCount: data.errors_count ?? 0,
         })
       } catch (err) {
-        toast.error('Unable to load dashboard data.')
+        toast.error(t("Unable to load dashboard data."))
       } finally {
         setLoading(false)
       }
@@ -67,20 +70,16 @@ export default function SystemAdminDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <section className="overflow-hidden rounded-2xl bg-gradient-to-r from-brand to-primary px-6 py-7 text-primary-foreground sm:px-8">
-        <p className="text-xs font-medium uppercase tracking-widest text-brand-muted">
-          System workspace
-        </p>
-        <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">Welcome back!</h2>
-        <p className="mt-2 max-w-2xl text-sm text-brand-muted">
-          Monitor server health, manage sessions, review logs, and maintain the platform.
-        </p>
+      <section className="overflow-hidden rounded-2xl bg-gradient-to-r from-brand to-primary px-6 py-7 text-brand-foreground sm:px-8">
+        <p className="text-xs font-medium uppercase tracking-widest text-brand-muted">{t("System workspace")}</p>
+        <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">{t("Welcome back!")}</h2>
+        <p className="mt-2 max-w-2xl text-sm text-brand-muted">{t("Monitor server health, manage sessions, review logs, and maintain the platform.")}</p>
       </section>
 
       {/* Stats */}
       {loading ? (
         <div className="flex items-center justify-center py-14">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+          <div role="status" aria-label={t("Loading data")} className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
         </div>
       ) : (
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -90,7 +89,7 @@ export default function SystemAdminDashboard() {
                 <meta.icon className="h-5 w-5" />
               </div>
               <p className="mt-4 text-2xl font-semibold text-foreground">{stats[meta.key] ?? 0}</p>
-              <p className="text-sm text-muted-foreground">{meta.label}</p>
+              <p className="text-sm text-muted-foreground">{t(meta.label)}</p>
             </article>
           ))}
         </section>
@@ -98,57 +97,50 @@ export default function SystemAdminDashboard() {
 
       {/* Quick Actions */}
       <section className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-        <h3 className="font-semibold text-foreground">Quick actions</h3>
-        <p className="mt-1 text-sm text-muted-foreground">Jump to the most common system tasks.</p>
+        <h3 className="font-semibold text-foreground">{t("Quick actions")}</h3>
+        <p className="mt-1 text-sm text-muted-foreground">{t("Jump to the most common system tasks.")}</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link
             to="/system/settings"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover transition"
           >
-            <FiActivity className="h-4 w-4" /> System Settings <FiArrowRight className="h-4 w-4" />
+            <FiActivity className="h-4 w-4" />{t(" System Settings ")}<FiArrowRight className="h-4 w-4" />
           </Link>
           <Link
             to="/system/sessions"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiUsers className="h-4 w-4" /> User Sessions
-          </Link>
+            <FiUsers className="h-4 w-4" />{t(" User Sessions")}</Link>
           <Link
             to="/system/logs"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiFileText className="h-4 w-4" /> System Logs
-          </Link>
+            <FiFileText className="h-4 w-4" />{t(" System Logs")}</Link>
           <Link
             to="/system/errors"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiAlertCircle className="h-4 w-4" /> Error Logs
-          </Link>
+            <FiAlertCircle className="h-4 w-4" />{t(" Error Logs")}</Link>
           <Link
             to="/system/cache"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiDatabase className="h-4 w-4" /> Cache Management
-          </Link>
+            <FiDatabase className="h-4 w-4" />{t(" Cache Management")}</Link>
           <Link
             to="/system/backup"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiList className="h-4 w-4" /> Database Backup
-          </Link>
+            <FiList className="h-4 w-4" />{t(" Database Backup")}</Link>
           <Link
             to="/system/queue"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiActivity className="h-4 w-4" /> Queue Monitor
-          </Link>
+            <FiActivity className="h-4 w-4" />{t(" Queue Monitor")}</Link>
           <Link
             to="/system/api-keys"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition"
           >
-            <FiFileText className="h-4 w-4" /> API Keys
-          </Link>
+            <FiFileText className="h-4 w-4" />{t(" API Keys")}</Link>
         </div>
       </section>
     </div>

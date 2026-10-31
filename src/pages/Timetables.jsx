@@ -1,3 +1,5 @@
+import { t } from '../utils/i18n'
+import { useLanguage } from '../hooks/useLanguage'
 import { useEffect, useMemo, useState } from 'react'
 import {
   FiCalendar,
@@ -26,6 +28,7 @@ const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
 const EMPTY_FILTERS = { classes: [], subjects: [], teachers: [], terms: [], years: [] }
 
 export default function Timetables() {
+  useLanguage()
   const { user } = useAuth()
   const isAdmin = user.role === 'super_admin'
   const isAcademic = user.role === 'academic_teacher'
@@ -67,7 +70,7 @@ export default function Timetables() {
         setSelectedChild((current) => current || response.data[0]?.id || '')
       })
       .catch(() => {
-        if (active) toast.error('Unable to load linked children.')
+        if (active) toast.error(t("Unable to load linked children."))
       })
 
     return () => {
@@ -95,7 +98,7 @@ export default function Timetables() {
         if (response.filters) setFilters(response.filters)
       })
       .catch(() => {
-        if (active) toast.error('Unable to load timetable.')
+        if (active) toast.error(t("Unable to load timetable."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -111,14 +114,14 @@ export default function Timetables() {
   }
 
   const handleDelete = async (slot) => {
-    if (!window.confirm('Delete this timetable slot?')) return
+    if (!window.confirm(t("Delete this timetable slot?"))) return
 
     try {
       await deleteTimetable(slot.id)
-      toast.success('Timetable slot deleted')
+      toast.success(t("Timetable slot deleted"))
       setRefreshKey((key) => key + 1)
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to delete timetable slot.')
+      toast.error(error.response?.data?.message ?? t("Unable to delete timetable slot."))
     }
   }
 
@@ -130,14 +133,14 @@ export default function Timetables() {
         <section className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-              <FiCalendar className="h-5 w-5 text-primary" /> {title}
+              <FiCalendar className="h-5 w-5 text-primary" /> {t(title)}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {isAdmin
-                ? 'Build the master timetable and manage the school class list.'
+                ? t("Build the master timetable and manage the school class list.")
                 : isAcademic
-                  ? 'Review the master timetable across classes and teachers.'
-                  : `Weekly schedule for ${ROLE_LABELS[user.role]?.toLowerCase() ?? 'you'}.`}
+                  ? t("Review the master timetable across classes and teachers.")
+                  : t("Weekly schedule for {0}.", [t(ROLE_LABELS[user.role]?.toLowerCase() ?? 'you')])}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -150,8 +153,7 @@ export default function Timetables() {
                     view === 'timetable' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'
                   }`}
                 >
-                  <FiGrid className="h-4 w-4" /> Timetable
-                </button>
+                  <FiGrid className="h-4 w-4" />{t(" Timetable")}</button>
                 <button
                   type="button"
                   onClick={() => setView('classes')}
@@ -159,8 +161,7 @@ export default function Timetables() {
                     view === 'classes' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'
                   }`}
                 >
-                  <FiUsers className="h-4 w-4" /> Classes
-                </button>
+                  <FiUsers className="h-4 w-4" />{t(" Classes")}</button>
               </div>
             )}
             {view === 'timetable' && (
@@ -172,8 +173,7 @@ export default function Timetables() {
                 }}
                 className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
               >
-                <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-              </button>
+                <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
             )}
             {isAdmin && view === 'timetable' && (
               <button
@@ -181,17 +181,14 @@ export default function Timetables() {
                 onClick={() => setForm({ slot: null })}
                 className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
               >
-                <FiPlus className="h-4 w-4" /> Add slot
-              </button>
+                <FiPlus className="h-4 w-4" />{t(" Add slot")}</button>
             )}
           </div>
         </section>
 
         {isParent && (
           <section className="rounded-xl border border-border bg-surface p-4 shadow-sm">
-            <label htmlFor="child" className="text-sm font-medium text-foreground">
-              Child
-            </label>
+            <label htmlFor="child" className="text-sm font-medium text-foreground">{t("Child")}</label>
             <select
               id="child"
               value={selectedChild}
@@ -199,11 +196,11 @@ export default function Timetables() {
               className="mt-1.5 w-full rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 sm:max-w-sm"
             >
               {children.length === 0 ? (
-                <option value="">No linked children</option>
+                <option value="">{t("No linked children")}</option>
               ) : (
                 children.map((child) => (
                   <option key={child.id} value={child.id}>
-                    {child.full_name} - {child.class ?? 'No class'}
+                    {child.full_name} - {child.class ?? t("No class")}
                   </option>
                 ))
               )}
@@ -224,9 +221,9 @@ export default function Timetables() {
                   value={query.class_id}
                   onChange={(event) => updateFilter('class_id', event.target.value)}
                   className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  aria-label="Filter by class"
+                  aria-label={t("Filter by class")}
                 >
-                  <option value="">All classes</option>
+                  <option value="">{t("All classes")}</option>
                   {filters.classes.map((schoolClass) => (
                     <option key={schoolClass.id} value={schoolClass.id}>
                       {schoolClass.name}
@@ -237,9 +234,9 @@ export default function Timetables() {
                   value={query.teacher_id}
                   onChange={(event) => updateFilter('teacher_id', event.target.value)}
                   className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  aria-label="Filter by teacher"
+                  aria-label={t("Filter by teacher")}
                 >
-                  <option value="">All teachers</option>
+                  <option value="">{t("All teachers")}</option>
                   {filters.teachers.map((teacher) => (
                     <option key={teacher.id} value={teacher.id}>
                       {teacher.full_name}
@@ -250,9 +247,9 @@ export default function Timetables() {
                   value={query.subject_id}
                   onChange={(event) => updateFilter('subject_id', event.target.value)}
                   className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  aria-label="Filter by subject"
+                  aria-label={t("Filter by subject")}
                 >
-                  <option value="">All subjects</option>
+                  <option value="">{t("All subjects")}</option>
                   {filters.subjects.map((subject) => (
                     <option key={subject.id} value={subject.id}>
                       {subject.code} - {subject.name}
@@ -263,12 +260,12 @@ export default function Timetables() {
                   value={query.day_of_week}
                   onChange={(event) => updateFilter('day_of_week', event.target.value)}
                   className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  aria-label="Filter by day"
+                  aria-label={t("Filter by day")}
                 >
-                  <option value="">All days</option>
+                  <option value="">{t("All days")}</option>
                   {DAYS.map((day) => (
                     <option key={day} value={day}>
-                      {day}
+                      {t(day)}
                     </option>
                   ))}
                 </select>
@@ -276,9 +273,9 @@ export default function Timetables() {
                   value={query.term}
                   onChange={(event) => updateFilter('term', event.target.value)}
                   className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  aria-label="Filter by term"
+                  aria-label={t("Filter by term")}
                 >
-                  <option value="">All terms</option>
+                  <option value="">{t("All terms")}</option>
                   {filters.terms.map((term) => (
                     <option key={term} value={term}>
                       {term}
@@ -290,12 +287,10 @@ export default function Timetables() {
 
             {loading ? (
               <div className="flex items-center justify-center py-16">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+                <div role="status" aria-label={t("Loading data")} className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
               </div>
             ) : isParent && !selectedChild ? (
-              <div className="px-6 py-14 text-center text-sm text-muted-foreground">
-                No child is linked to this account yet.
-              </div>
+              <div className="px-6 py-14 text-center text-sm text-muted-foreground">{t("No child is linked to this account yet.")}</div>
             ) : (
               <TimetableGrid
                 slots={slots}
@@ -309,8 +304,8 @@ export default function Timetables() {
 
       {form && (
         <Modal
-          title={form.slot ? 'Edit timetable slot' : 'Add timetable slot'}
-          description="Class and teacher conflicts are blocked automatically."
+          title={form.slot ? t("Edit timetable slot") : t("Add timetable slot")}
+          description={t("Class and teacher conflicts are blocked automatically.")}
           onClose={() => setForm(null)}
         >
           <TimetableForm

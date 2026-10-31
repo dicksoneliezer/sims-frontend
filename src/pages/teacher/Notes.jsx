@@ -1,3 +1,5 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiEdit2, FiPlus, FiRefreshCw, FiSearch, FiTrash2 } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -17,6 +19,7 @@ const emptyForm = {
 }
 
 export default function TeacherNotes() {
+  useLanguage()
   const [notes, setNotes] = useState([])
   const [students, setStudents] = useState([])
   const [search, setSearch] = useState('')
@@ -34,7 +37,7 @@ export default function TeacherNotes() {
         if (active) setStudents(response.data ?? [])
       })
       .catch(() => {
-        if (active) toast.error('Unable to load your students.')
+        if (active) toast.error(t("Unable to load your students."))
       })
 
     return () => {
@@ -51,7 +54,7 @@ export default function TeacherNotes() {
         if (active) setNotes(response.data ?? [])
       })
       .catch(() => {
-        if (active) toast.error('Unable to load notes.')
+        if (active) toast.error(t("Unable to load notes."))
       })
       .finally(() => {
         if (active) setLoading(false)
@@ -88,31 +91,31 @@ export default function TeacherNotes() {
     try {
       if (form.id) {
         await updateNote(form.id, payload)
-        toast.success('Note updated')
+        toast.success(t("Note updated"))
       } else {
         await createNote(payload)
-        toast.success('Note created')
+        toast.success(t("Note created"))
       }
 
       setForm(null)
       setRefreshKey((key) => key + 1)
     } catch (error) {
       const errors = error.response?.data?.errors
-      toast.error(errors ? Object.values(errors).flat()[0] : error.response?.data?.message ?? 'Unable to save note.')
+      toast.error(errors ? Object.values(errors).flat()[0] : error.response?.data?.message ?? t("Unable to save note."))
     } finally {
       setSaving(false)
     }
   }
 
   const handleDelete = async (note) => {
-    if (!window.confirm(`Delete note "${note.title}"?`)) return
+    if (!window.confirm(t("Delete note \"{0}\"?", [note.title]))) return
 
     try {
       await deleteNote(note.id)
-      toast.success('Note deleted')
+      toast.success(t("Note deleted"))
       setRefreshKey((key) => key + 1)
     } catch (error) {
-      toast.error(error.response?.data?.message ?? 'Unable to delete note.')
+      toast.error(error.response?.data?.message ?? t("Unable to delete note."))
     }
   }
 
@@ -121,16 +124,14 @@ export default function TeacherNotes() {
     <div className="space-y-5">
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-foreground">Teacher notes</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Record academic, attendance and performance observations for your students.</p>
+          <h2 className="text-xl font-semibold text-foreground">{t("Teacher notes")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Record academic, attendance and performance observations for your students.")}</p>
         </div>
         <div className="flex items-center gap-2">
           <button type="button" onClick={() => setRefreshKey((key) => key + 1)} className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted">
-            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-          </button>
+            <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
           <button type="button" onClick={openCreate} className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover">
-            <FiPlus className="h-4 w-4" /> New note
-          </button>
+            <FiPlus className="h-4 w-4" />{t(" New note")}</button>
         </div>
       </section>
 
@@ -142,20 +143,20 @@ export default function TeacherNotes() {
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search note title or content"
+              placeholder={t("Search note title or content")}
               className="w-full rounded-lg border border-border py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </div>
           <select value={type} onChange={(event) => setType(event.target.value)} className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
-            <option value="">All note types</option>
+            <option value="">{t("All note types")}</option>
             {TYPES.map((item) => <option key={item} value={item} className="capitalize">{item}</option>)}
           </select>
         </div>
 
         {loading ? (
-          <div className="py-14 text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></div>
+          <div className="py-14 text-center"><div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></div>
         ) : notes.length === 0 ? (
-          <p className="px-4 py-14 text-center text-muted-foreground">No notes match your filters.</p>
+          <p className="px-4 py-14 text-center text-muted-foreground">{t("No notes match your filters.")}</p>
         ) : (
           <div className="grid gap-4 p-4 lg:grid-cols-2">
             {notes.map((note) => (
@@ -164,17 +165,17 @@ export default function TeacherNotes() {
                   <div>
                     <h3 className="font-semibold text-foreground">{note.title}</h3>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {note.student ? `${note.student.full_name} · ${note.student.student_number}` : 'General note'} · {formatDate(note.created_at)}
+                      {note.student ? `${note.student.full_name} · ${note.student.student_number}` : t("General note")} · {formatDate(note.created_at)}
                     </p>
                   </div>
                   <span className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-semibold capitalize text-primary">{note.type}</span>
                 </div>
                 <p className="mt-3 whitespace-pre-line text-sm text-muted-foreground">{note.note}</p>
                 <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
-                  <span className={`text-xs font-medium ${note.is_read ? 'text-success' : 'text-muted-foreground'}`}>{note.is_read ? 'Read by student' : 'Not yet read'}</span>
+                  <span className={`text-xs font-medium ${note.is_read ? 'text-success' : 'text-muted-foreground'}`}>{note.is_read ? t("Read by student") : t("Not yet read")}</span>
                   <div className="flex gap-1">
-                    <button type="button" onClick={() => openEdit(note)} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-primary" aria-label="Edit note"><FiEdit2 className="h-4 w-4" /></button>
-                    <button type="button" onClick={() => handleDelete(note)} className="rounded-lg p-1.5 text-muted-foreground hover:bg-danger-soft hover:text-danger" aria-label="Delete note"><FiTrash2 className="h-4 w-4" /></button>
+                    <button type="button" onClick={() => openEdit(note)} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-primary" aria-label={t("Edit note")}><FiEdit2 className="h-4 w-4" /></button>
+                    <button type="button" onClick={() => handleDelete(note)} className="rounded-lg p-1.5 text-muted-foreground hover:bg-danger-soft hover:text-danger" aria-label={t("Delete note")}><FiTrash2 className="h-4 w-4" /></button>
                   </div>
                 </div>
               </article>
@@ -184,34 +185,34 @@ export default function TeacherNotes() {
       </section>
 
       {form && (
-        <Modal title={form.id ? 'Edit note' : 'New note'} onClose={() => setForm(null)}>
+        <Modal title={form.id ? t("Edit note") : t("New note")} onClose={() => setForm(null)}>
           <form onSubmit={handleSubmit} className="space-y-4">
             <label className="block text-sm">
-              <span className="mb-1 block font-medium text-foreground">Student (optional)</span>
+              <span className="mb-1 block font-medium text-foreground">{t("Student (optional)")}</span>
               <select value={form.student_id} onChange={(event) => setForm({ ...form, student_id: event.target.value })} className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary">
-                <option value="">General note</option>
+                <option value="">{t("General note")}</option>
                 {students.map((student) => <option key={student.id} value={student.id}>{student.full_name} ({student.student_number})</option>)}
               </select>
             </label>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block text-sm">
-                <span className="mb-1 block font-medium text-foreground">Title</span>
+                <span className="mb-1 block font-medium text-foreground">{t("Title")}</span>
                 <input required maxLength={150} value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary" />
               </label>
               <label className="block text-sm">
-                <span className="mb-1 block font-medium text-foreground">Type</span>
+                <span className="mb-1 block font-medium text-foreground">{t("Type")}</span>
                 <select value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value })} className="w-full rounded-lg border border-border px-3 py-2 capitalize outline-none focus:border-primary">
                   {TYPES.map((item) => <option key={item} value={item}>{item}</option>)}
                 </select>
               </label>
             </div>
             <label className="block text-sm">
-              <span className="mb-1 block font-medium text-foreground">Note</span>
+              <span className="mb-1 block font-medium text-foreground">{t("Note")}</span>
               <textarea required rows={5} maxLength={5000} value={form.note} onChange={(event) => setForm({ ...form, note: event.target.value })} className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-primary" />
             </label>
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setForm(null)} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">Cancel</button>
-              <button type="submit" disabled={saving} className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50">{saving ? 'Saving...' : 'Save note'}</button>
+              <button type="button" onClick={() => setForm(null)} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">{t("Cancel")}</button>
+              <button type="submit" disabled={saving} className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-50">{saving ? t("Saving...") : t("Save note")}</button>
             </div>
           </form>
         </Modal>

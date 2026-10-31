@@ -1,9 +1,12 @@
+import { t } from '../../utils/i18n'
+import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
 import { FiUsers, FiRefreshCw, FiSearch } from 'react-icons/fi'
 import { toast } from 'react-toastify'
 import api from '../../api/axios'
 
 export default function AcademicStudents() {
+  useLanguage()
   const [students, setStudents] = useState([])
   const [classes, setClasses] = useState([])
   const [loading, setLoading] = useState(true)
@@ -23,7 +26,7 @@ export default function AcademicStudents() {
         }
       })
       .catch(() => {
-        if (active) toast.error('Unable to load classes.')
+        if (active) toast.error(t("Unable to load classes."))
       })
     return () => { active = false }
   }, [])
@@ -46,7 +49,7 @@ export default function AcademicStudents() {
           }
         })
         .catch(() => {
-          if (active) toast.error('Unable to load students.')
+          if (active) toast.error(t("Unable to load students."))
         })
         .finally(() => {
           if (active) setLoading(false)
@@ -64,13 +67,11 @@ export default function AcademicStudents() {
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
-            <FiUsers className="h-5 w-5 text-primary" /> All Students
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">View all students by class and level.</p>
+            <FiUsers className="h-5 w-5 text-primary" />{t(" All Students")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("View all students by class and level.")}</p>
         </div>
         <button type="button" onClick={() => setRefreshKey((key) => key + 1)} className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground hover:bg-muted">
-          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-        </button>
+          <FiRefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />{t(" Refresh")}</button>
       </section>
 
       <section className="rounded-xl border border-border bg-surface shadow-sm">
@@ -81,7 +82,7 @@ export default function AcademicStudents() {
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search student by name or number"
+              placeholder={t("Search student by name or number")}
               className="w-full rounded-lg border border-border py-2 pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </div>
@@ -90,7 +91,7 @@ export default function AcademicStudents() {
             onChange={(event) => setClassId(event.target.value)}
             className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary"
           >
-            <option value="">All classes</option>
+            <option value="">{t("All classes")}</option>
             {classes.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
@@ -103,32 +104,30 @@ export default function AcademicStudents() {
             onChange={(event) => setSchoolLevel(event.target.value)}
             className="rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-primary"
           >
-            <option value="">All levels</option>
-            <option value="pre_primary">Pre-primary</option>
-            <option value="primary">Primary</option>
-            <option value="secondary">Secondary</option>
+            <option value="">{t("All levels")}</option>
+            <option value="pre_primary">{t("Pre-primary")}</option>
+            <option value="primary">{t("Primary")}</option>
+            <option value="secondary">{t("Secondary")}</option>
           </select>
-          <p className="ml-auto text-sm text-muted-foreground md:col-span-2 self-center">
-            Showing <span className="font-semibold text-foreground">{students.length}</span> student(s)
-          </p>
+          <p className="ml-auto text-sm text-muted-foreground md:col-span-2 self-center">{t("Showing")}<span className="font-semibold text-foreground">{students.length}</span>{t(" student(s)")}</p>
         </div>
 
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-4 py-3">Student No</th>
-                <th className="px-4 py-3">Full Name</th>
-                <th className="px-4 py-3">Class</th>
-                <th className="px-4 py-3">Level</th>
-                <th className="px-4 py-3">Parent Phone</th>
+                <th className="px-4 py-3">{t("Student No")}</th>
+                <th className="px-4 py-3">{t("Full Name")}</th>
+                <th className="px-4 py-3">{t("Class")}</th>
+                <th className="px-4 py-3">{t("Level")}</th>
+                <th className="px-4 py-3">{t("Parent Phone")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading ? (
-                <tr><td colSpan={5} className="px-4 py-14 text-center"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></td></tr>
+                <tr><td colSpan={5} className="px-4 py-14 text-center"><div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></td></tr>
               ) : students.length === 0 ? (
-                <tr><td colSpan={5} className="px-4 py-14 text-center text-muted-foreground">No students found.</td></tr>
+                <tr><td colSpan={5} className="px-4 py-14 text-center text-muted-foreground">{t("No students found.")}</td></tr>
               ) : students.map((student) => (
                 <tr key={student.id} className="hover:bg-muted/70">
                   <td className="px-4 py-3 font-medium text-foreground">{student.student_number}</td>
