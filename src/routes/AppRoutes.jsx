@@ -14,6 +14,7 @@ import { PrivateRoute } from './PrivateRoute'
 
 const AdminCategories = lazy(() => import('../pages/admin/Categories'))
 const AdminCategoryDashboard = lazy(() => import('../pages/admin/Categories').then((module) => ({ default: module.AdminCategoryDashboard })))
+const AdminClasses = lazy(() => import('../pages/admin/Classes'))                    // <-- MPYA
 const Students = lazy(() => import('../pages/Students'))
 const Subjects = lazy(() => import('../pages/Subjects'))
 const Teachers = lazy(() => import('../pages/Teachers'))
@@ -151,6 +152,7 @@ const TIMETABLE_ROUTES = [
 ]
 
 const MODULE_ROUTES = [
+  { path: '/admin/classes', role: 'super_admin', element: <AdminClasses /> },  // <-- MPYA
   { path: '/admin/parents', role: 'super_admin', element: <Parents /> },
   { path: '/admin/accountants', role: 'super_admin', element: <Accountants /> },
   { path: '/admin/fee-structure', role: 'super_admin', element: <FeeStructure /> },

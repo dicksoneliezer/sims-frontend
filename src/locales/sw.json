@@ -1681,5 +1681,7 @@
   "{0} is required.": "{0} inahitajika.",
   "Good effort": "Juhudi nzuri",
   "Can improve": "Anaweza kufanya vizuri zaidi",
-  "Needs more work": "Anahitaji juhudi zaidi"
+  "Needs more work": "Anahitaji juhudi zaidi",
+  "Choose a JPG, PNG or WebP image.": "Chagua picha ya JPG, PNG au WebP.",
+  "The photo must be 2 MB or smaller.": "Ukubwa wa picha usizidi MB 2."
 }

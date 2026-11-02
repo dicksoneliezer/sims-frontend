@@ -1,3 +1,4 @@
+import { ProfilePhotoCard } from '../../components/common/ProfilePhotoCard'
 import { t } from '../../utils/i18n'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
@@ -9,6 +10,9 @@ import { useAuth } from '../../hooks/useAuth'
 export default function ParentProfile() {
   useLanguage()
   const { user } = useAuth()
+  const profileName = user?.full_name ?? ''
+  const profileEmail = user?.email ?? ''
+  const profilePhone = user?.phone ?? ''
   const [form, setForm] = useState({
     full_name: '',
     email: '',
@@ -23,14 +27,8 @@ export default function ParentProfile() {
   const [savingPassword, setSavingPassword] = useState(false)
 
   useEffect(() => {
-    if (user) {
-      setForm({
-        full_name: user.full_name ?? '',
-        email: user.email ?? '',
-        phone: user.phone ?? '',
-      })
-    }
-  }, [user])
+    setForm({ full_name: profileName, email: profileEmail, phone: profilePhone })
+  }, [profileName, profileEmail, profilePhone])
 
   const handleSave = async (e) => {
     e.preventDefault()
@@ -87,6 +85,8 @@ export default function ParentProfile() {
           <FiUser className="h-5 w-5 text-primary" />{t(" My Profile")}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{t("Update your personal details and change your password.")}</p>
       </section>
+
+      <ProfilePhotoCard />
 
       {/* Personal details */}
       <form onSubmit={handleSave} className="rounded-xl border border-border bg-surface p-6 shadow-sm">

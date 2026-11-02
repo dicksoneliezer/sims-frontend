@@ -1,8 +1,11 @@
+// src/components/students/StudentForm.jsx
 import { t } from '../../utils/i18n'
 import { useLanguage } from '../../hooks/useLanguage'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { createStudent, updateStudent } from '../../api/students'
+import api from '../../api/axios'
 
 const LEVELS = [
   { value: 'pre_primary', label: 'Pre-primary' },
@@ -19,6 +22,9 @@ const errorClass = 'mt-1 text-xs text-danger'
 export function StudentForm({ student, onClose, onSaved }) {
   useLanguage()
   const isEdit = Boolean(student)
+  const [classes, setClasses] = useState([])
+  const [classesLoading, setClassesLoading] = useState(true)
+
   const {
     register,
     handleSubmit,
@@ -28,7 +34,7 @@ export function StudentForm({ student, onClose, onSaved }) {
     defaultValues: {
       full_name: student?.full_name ?? '',
       student_number: student?.student_number ?? '',
-      class: student?.class ?? '',
+      class_id: student?.class_id ?? '',
       school_level: student?.school_level ?? 'secondary',
       gender: student?.gender ?? 'male',
       date_of_birth: student?.date_of_birth ?? '',
@@ -41,12 +47,53 @@ export function StudentForm({ student, onClose, onSaved }) {
     },
   })
 
+  // =========================================
+  // Load classes kwa dropdown
+  // =========================================
+  useEffect(() => {
+    let active = true
+    setClassesLoading(true)
+
+    api
+      .get('/admin/classes', { params: { per_page: 100 } })
+      .then((res) => {
+        if (!active) return
+        const data = Array.isArray(res.data?.data)
+          ? res.data.data
+          : Array.isArray(res.data)
+          ? res.data
+          : []
+        setClasses(data)
+      })
+      .catch(() => {
+        if (active) toast.error(t('Unable to load classes.'))
+      })
+      .finally(() => {
+        if (active) setClassesLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [])
+
   const onSubmit = async (values) => {
     const payload = {
       ...values,
       opening_balance: values.opening_balance === '' ? 0 : Number(values.opening_balance),
-      // HAKIKISHA is_active ni boolean halisi (true / false)
-      is_active: values.is_active === true || values.is_active === 'true' || values.is_active === 'on' || values.is_active === 1 || values.is_active === '1',
+      is_active:
+        values.is_active === true ||
+        values.is_active === 'true' ||
+        values.is_active === 'on' ||
+        values.is_active === 1 ||
+        values.is_active === '1',
+    }
+
+    // class_id inatumwa kama namba (au null kama haipo)
+    if (payload.class_id === '' || payload.class_id === null || payload.class_id === undefined) {
+      payload.class_id = null
+    } else {
+      payload.class_id = Number(payload.class_id)
     }
 
     if (!values.photo?.[0]) {
@@ -61,10 +108,10 @@ export function StudentForm({ student, onClose, onSaved }) {
     try {
       if (isEdit) {
         await updateStudent(student.id, payload)
-        toast.success(t("Student updated"))
+        toast.success(t('Student updated'))
       } else {
         await createStudent(payload)
-        toast.success(t("Student created"))
+        toast.success(t('Student created'))
       }
 
       onSaved()
@@ -77,7 +124,7 @@ export function StudentForm({ student, onClose, onSaved }) {
         setError(field, { type: 'server', message: messages[0] })
       })
 
-      toast.error(data?.message ?? t("Unable to save student."))
+      toast.error(data?.message ?? t('Unable to save student.'))
     }
   }
 
@@ -85,42 +132,60 @@ export function StudentForm({ student, onClose, onSaved }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <label htmlFor="full_name" className={labelClass}>{t("Full name")}<span className="text-red-500">*</span>
+          <label htmlFor="full_name" className={labelClass}>
+            {t('Full name')}<span className="text-red-500">*</span>
           </label>
           <input
             id="full_name"
             className={`${inputClass} mt-1.5`}
-            placeholder={t("e.g. Amina Hassan")}
-            {...register('full_name', { required: t("Full name is required.") })}
+            placeholder={t('e.g. Amina Hassan')}
+            {...register('full_name', { required: t('Full name is required.') })}
           />
           {errors.full_name && <p className={errorClass}>{errors.full_name.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="student_number" className={labelClass}>{t("Student number")}</label>
+          <label htmlFor="student_number" className={labelClass}>{t('Student number')}</label>
           <input
             id="student_number"
             className={`${inputClass} mt-1.5 disabled:bg-muted disabled:text-muted-foreground`}
-            placeholder={t("Auto-generated if empty")}
+            placeholder={t('Auto-generated if empty')}
             disabled={isEdit}
             {...register('student_number')}
           />
           {errors.student_number && <p className={errorClass}>{errors.student_number.message}</p>}
         </div>
 
+        {/* =========================================
+            CLASS — sasa ni dropdown (sio text input)
+           ========================================= */}
         <div>
-          <label htmlFor="class" className={labelClass}>{t("Class")}</label>
-          <input
-            id="class"
-            className={`${inputClass} mt-1.5`}
-            placeholder={t("e.g. Form 1A")}
-            {...register('class')}
-          />
-          {errors.class && <p className={errorClass}>{errors.class.message}</p>}
+          <label htmlFor="class_id" className={labelClass}>{t('Class')}</label>
+          <select
+            id="class_id"
+            className={`${inputClass} mt-1.5 disabled:bg-muted disabled:text-muted-foreground`}
+            disabled={classesLoading}
+            {...register('class_id')}
+          >
+            <option value="">
+              {classesLoading ? t('Loading classes...') : t('Select class')}
+            </option>
+            {classes.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name} {c.section ? `(${c.section})` : ''}
+              </option>
+            ))}
+          </select>
+          {errors.class_id && <p className={errorClass}>{errors.class_id.message}</p>}
+          {!classesLoading && classes.length === 0 && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t('No classes available. Ask admin to create classes first.')}
+            </p>
+          )}
         </div>
 
         <div>
-          <label htmlFor="school_level" className={labelClass}>{t("School level")}</label>
+          <label htmlFor="school_level" className={labelClass}>{t('School level')}</label>
           <select id="school_level" className={`${inputClass} mt-1.5`} {...register('school_level')}>
             {LEVELS.map((level) => (
               <option key={level.value} value={level.value}>
@@ -132,16 +197,16 @@ export function StudentForm({ student, onClose, onSaved }) {
         </div>
 
         <div>
-          <label htmlFor="gender" className={labelClass}>{t("Gender")}</label>
+          <label htmlFor="gender" className={labelClass}>{t('Gender')}</label>
           <select id="gender" className={`${inputClass} mt-1.5`} {...register('gender')}>
-            <option value="male">{t("Male")}</option>
-            <option value="female">{t("Female")}</option>
+            <option value="male">{t('Male')}</option>
+            <option value="female">{t('Female')}</option>
           </select>
           {errors.gender && <p className={errorClass}>{errors.gender.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="date_of_birth" className={labelClass}>{t("Date of birth")}</label>
+          <label htmlFor="date_of_birth" className={labelClass}>{t('Date of birth')}</label>
           <input
             id="date_of_birth"
             type="date"
@@ -152,18 +217,18 @@ export function StudentForm({ student, onClose, onSaved }) {
         </div>
 
         <div>
-          <label htmlFor="parent_phone" className={labelClass}>{t("Parent phone")}</label>
+          <label htmlFor="parent_phone" className={labelClass}>{t('Parent phone')}</label>
           <input
             id="parent_phone"
             className={`${inputClass} mt-1.5`}
-            placeholder={t("+2557XXXXXXXX")}
+            placeholder={t('+2557XXXXXXXX')}
             {...register('parent_phone')}
           />
           {errors.parent_phone && <p className={errorClass}>{errors.parent_phone.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="email" className={labelClass}>{t("Email")}</label>
+          <label htmlFor="email" className={labelClass}>{t('Email')}</label>
           <input
             id="email"
             type="email"
@@ -175,31 +240,31 @@ export function StudentForm({ student, onClose, onSaved }) {
         </div>
 
         <div>
-          <label htmlFor="residence" className={labelClass}>{t("Residence")}</label>
+          <label htmlFor="residence" className={labelClass}>{t('Residence')}</label>
           <input
             id="residence"
             className={`${inputClass} mt-1.5`}
-            placeholder={t("e.g. Mikocheni")}
+            placeholder={t('e.g. Mikocheni')}
             {...register('residence')}
           />
           {errors.residence && <p className={errorClass}>{errors.residence.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="opening_balance" className={labelClass}>{t("Opening balance (TZS)")}</label>
+          <label htmlFor="opening_balance" className={labelClass}>{t('Opening balance (TZS)')}</label>
           <input
             id="opening_balance"
             type="number"
             min="0"
             step="0.01"
             className={`${inputClass} mt-1.5`}
-            {...register('opening_balance', { min: { value: 0, message: t("Cannot be negative.") } })}
+            {...register('opening_balance', { min: { value: 0, message: t('Cannot be negative.') } })}
           />
           {errors.opening_balance && <p className={errorClass}>{errors.opening_balance.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="as_of_date" className={labelClass}>{t("Balance as of")}</label>
+          <label htmlFor="as_of_date" className={labelClass}>{t('Balance as of')}</label>
           <input
             id="as_of_date"
             type="date"
@@ -210,7 +275,7 @@ export function StudentForm({ student, onClose, onSaved }) {
         </div>
 
         <div>
-          <label htmlFor="photo" className={labelClass}>{t("Photo")}</label>
+          <label htmlFor="photo" className={labelClass}>{t('Photo')}</label>
           <input
             id="photo"
             type="file"
@@ -227,20 +292,24 @@ export function StudentForm({ student, onClose, onSaved }) {
           type="checkbox"
           className="h-4 w-4 rounded border-border text-primary focus:ring-blue-500"
           {...register('is_active')}
-        />{t("Active student")}</label>
+        />
+        {t('Active student')}
+      </label>
 
       <div className="flex justify-end gap-3 border-t border-border pt-4">
         <button
           type="button"
           onClick={onClose}
           className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
-        >{t("Cancel")}</button>
+        >
+          {t('Cancel')}
+        </button>
         <button
           type="submit"
           disabled={isSubmitting}
           className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover disabled:opacity-60"
         >
-          {isSubmitting ? t("Saving...") : isEdit ? t("Update student") : t("Create student")}
+          {isSubmitting ? t('Saving...') : isEdit ? t('Update student') : t('Create student')}
         </button>
       </div>
     </form>

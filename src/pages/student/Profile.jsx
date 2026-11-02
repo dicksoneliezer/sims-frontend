@@ -1,3 +1,4 @@
+import { ProfilePhotoCard } from '../../components/common/ProfilePhotoCard'
 import { t } from '../../utils/i18n'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
@@ -91,15 +92,7 @@ export default function StudentProfile() {
 
       {/* Profile details */}
       <div className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-2xl font-semibold text-primary-foreground">
-            {profile.full_name?.charAt(0) || '?'}
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-foreground">{profile.full_name}</h3>
-            <p className="text-sm text-muted-foreground">{profile.student_number}</p>
-          </div>
-        </div>
+        <ProfilePhotoCard fullName={profile.full_name} subtitle={profile.student_number} embedded />
 
         <dl className="grid gap-4 sm:grid-cols-2">
           <div>

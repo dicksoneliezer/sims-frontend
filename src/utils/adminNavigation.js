@@ -1,3 +1,4 @@
+// src/utils/adminNavigation.js
 import {
   FiArchive, FiBarChart2, FiBookOpen, FiCalendar, FiDollarSign,
   FiFileText, FiLayers, FiSettings, FiUser, FiUserCheck, FiUsers,
@@ -18,6 +19,7 @@ export const ADMIN_NAV_SECTIONS = [
   {
     id: 'academics', label: 'Academics', icon: FiBookOpen,
     items: [
+      { label: 'Classes', icon: FiLayers, path: '/admin/classes' },        // ← MPYA
       { label: 'Subjects', icon: FiBookOpen, path: '/admin/subjects' },
       { label: 'Timetables', icon: FiCalendar, path: '/admin/timetables' },
     ],
