@@ -1,3 +1,4 @@
+import { SchoolImage } from '../../components/common/SchoolImage'
 import { t } from '../../utils/i18n'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
@@ -63,7 +64,7 @@ export default function Children() {
               <article key={child.id} className="flex flex-col rounded-xl border border-border bg-surface p-5 shadow-sm">
                 <div className="flex items-center gap-3">
                   {child.photo_url ? (
-                    <img src={child.photo_url} alt={child.full_name} className="h-14 w-14 rounded-full object-cover" />
+                    <SchoolImage src={child.photo_url} alt={child.full_name} className="h-14 w-14 rounded-full object-cover" />
                   ) : (
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft text-primary"><FiUser className="h-6 w-6" /></div>
                   )}

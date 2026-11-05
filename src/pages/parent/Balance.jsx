@@ -1,3 +1,4 @@
+import { FinancialSummary } from '../../components/finance/FinancialSummary'
 import { t } from '../../utils/i18n'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
@@ -96,6 +97,7 @@ export default function Balance() {
                 </div>
               </div>
 
+              <div className="p-4"><FinancialSummary summary={child} /></div>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-slate-200 text-sm">
                   <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">

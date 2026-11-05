@@ -19,6 +19,7 @@ export function InvoiceForm({ invoice, onClose, onSaved }) {
     defaultValues: {
       student_id: invoice?.student_id ?? '',
       description: invoice?.description ?? '',
+      period: invoice?.period ?? '',
       amount: invoice?.amount ?? '',
       due_date: invoice?.due_date ?? '',
     },
@@ -52,6 +53,7 @@ export function InvoiceForm({ invoice, onClose, onSaved }) {
       if (isEdit) {
         await updateInvoice(invoice.id, {
           description: payload.description,
+          period: payload.period,
           amount: payload.amount,
           due_date: payload.due_date,
         })
@@ -88,6 +90,8 @@ export function InvoiceForm({ invoice, onClose, onSaved }) {
           </select>
           {errors.student_id && <p className={errorClass}>{errors.student_id.message}</p>}
         </div>
+
+        <div className="sm:col-span-2"><label htmlFor="period" className={labelClass}>{t('Period')} *</label><input id="period" placeholder="Term 1 2026" className={`${inputClass} mt-1.5`} {...register('period', { required: t('This field is required.'), maxLength: 80 })} />{errors.period && <p className={errorClass}>{errors.period.message}</p>}</div>
 
         <div>
           <label htmlFor="amount" className={labelClass}>{t("Amount (TZS) ")}<span className="text-red-500">*</span></label>

@@ -1,3 +1,4 @@
+import { SchoolImage } from '../common/SchoolImage'
 import { t } from '../../utils/i18n'
 import { useLanguage } from '../../hooks/useLanguage'
 import dayjs from 'dayjs'
@@ -128,7 +129,7 @@ export function StudentDetails({ studentId, rolePrefix, canViewReports, showFina
         <div className="space-y-5">
           <div className="flex flex-wrap items-center gap-4">
             {student.photo_url ? (
-              <img
+              <SchoolImage
                 src={student.photo_url}
                 alt={student.full_name}
                 className="h-16 w-16 rounded-full object-cover ring-2 ring-slate-200"

@@ -139,3 +139,10 @@ export function listChildInvoices(studentId) {
 export function listChildPayments(studentId) {
   return api.get(`/parent/children/${studentId}/payments`).then((response) => response.data)
 }
+
+export const getBillingReport = (params = {}) => api.get('/accountant/billing', { params }).then(r => r.data)
+export const getBillingFeeStructures = () => api.get('/accountant/billing/fee-structures').then(r => r.data.data)
+export const confirmControlNumber = (id, data) => api.post(`/accountant/control-numbers/${id}/confirm`, data).then(r => r.data.data)
+export const transferBillingCredit = (prefix, data) => api.post(`/${prefix}/billing/transfer-credit`, data).then(r => r.data.data)
+export const getStudentBilling = () => api.get('/student/billing').then(r => r.data.data)
+export const requestStudentControlNumber = data => api.post('/student/billing/control-number', data).then(r => r.data.data)

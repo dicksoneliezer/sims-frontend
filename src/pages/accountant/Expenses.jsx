@@ -1,3 +1,4 @@
+import { SchoolFileLink } from '../../components/common/SchoolFileLink'
 import { t } from '../../utils/i18n'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
@@ -132,9 +133,9 @@ export default function Expenses() {
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
                       {expense.receipt_url && (
-                        <a href={expense.receipt_url} target="_blank" rel="noreferrer" className="rounded-lg p-2 text-muted-foreground hover:bg-primary-soft hover:text-primary" aria-label={t("View receipt for {0}", [expense.expense_number])}>
+                        <SchoolFileLink href={expense.receipt_url} target="_blank" rel="noreferrer" className="rounded-lg p-2 text-muted-foreground hover:bg-primary-soft hover:text-primary" aria-label={t("View receipt for {0}", [expense.expense_number])}>
                           <FiPaperclip className="h-4 w-4" />
-                        </a>
+                        </SchoolFileLink>
                       )}
                       <button type="button" onClick={() => setForm({ expense })} className="rounded-lg p-2 text-muted-foreground hover:bg-warning-soft hover:text-warning" aria-label={t("Edit {0}", [expense.expense_number])}>
                         <FiEdit2 className="h-4 w-4" />

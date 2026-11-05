@@ -57,7 +57,9 @@ export function isAdminItemActive(path, location) {
     return (current.get('tab') || 'school') === (target.searchParams.get('tab') || 'school')
   }
   if (target.pathname === '/admin/users') {
-    return (current.get('role') || '') === (target.searchParams.get('role') || '')
+    const targetRole = target.searchParams.get('role') || ''
+    const currentRole = current.get('role') || ''
+    return targetRole ? currentRole === targetRole : currentRole !== 'store_keeper'
   }
   return true
 }

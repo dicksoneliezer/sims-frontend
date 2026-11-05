@@ -1,3 +1,4 @@
+import { SchoolImage } from './SchoolImage'
 import { useRef, useState } from 'react'
 import { FiCamera, FiUser } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -45,7 +46,7 @@ export function ProfilePhotoCard({ fullName, subtitle, embedded = false }) {
       <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
         <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-primary-soft text-primary">
           {imageUrl && failedImage !== imageUrl ? (
-            <img src={imageUrl} alt={fullName ?? user?.full_name ?? t('Photo')} onError={() => setFailedImage(imageUrl)} className="h-full w-full object-cover" />
+            <SchoolImage src={imageUrl} alt={fullName ?? user?.full_name ?? t('Photo')} onError={() => setFailedImage(imageUrl)} className="h-full w-full object-cover" />
           ) : <FiUser className="h-10 w-10" />}
         </div>
         <div className="min-w-0">

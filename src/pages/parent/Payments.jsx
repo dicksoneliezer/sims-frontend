@@ -6,7 +6,6 @@ import { toast } from 'react-toastify'
 import {
   cancelParentPayment,
   listParentPayments,
-  payParentPayment,
 } from '../../api/finance'
 import { Modal } from '../../components/common/Modal'
 import { ParentPaymentForm } from '../../components/finance/ParentPaymentForm'
@@ -17,57 +16,9 @@ const PAGE_SIZE = 10
 const inputClass =
   'w-full rounded-lg border border-border px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20'
 
-function PayModal({ payment, onClose, onPaid }) {
+function PayModal({ payment, onClose }) {
   useLanguage()
-  const [phone, setPhone] = useState('')
-  const [saving, setSaving] = useState(false)
-  const requiresPhone = ['mpesa', 'tigopesa', 'airtel'].includes(payment.payment_method)
-
-  const pay = async (event) => {
-    event.preventDefault()
-
-    if (requiresPhone && !phone.trim()) {
-      toast.error(t("Enter the mobile money phone number."))
-      return
-    }
-
-    setSaving(true)
-
-    try {
-      await payParentPayment(payment.id, { payment_method: payment.payment_method, phone_number: phone.trim() || undefined })
-      toast.success(t("Payment completed successfully"))
-      onPaid()
-      onClose()
-    } catch (error) {
-      toast.error(error.response?.data?.message ?? t("Unable to complete payment."))
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  return (
-    <form onSubmit={pay} className="space-y-4">
-      <div className="rounded-lg border border-border bg-muted px-4 py-3 text-sm">
-        <p className="font-semibold text-foreground">{payment.control_number}</p>
-        <p className="text-muted-foreground">{payment.student?.full_name} · {payment.invoice?.invoice_number ?? '—'}</p>
-        <p className="mt-1 text-muted-foreground">{t("Amount: ")}<span className="font-semibold text-foreground">{formatMoney(payment.amount)}</span></p>
-      </div>
-
-      {requiresPhone && (
-        <div>
-          <label htmlFor="pay-phone" className="text-sm font-medium text-foreground">{t("Phone number ")}<span className="text-red-500">*</span></label>
-          <input id="pay-phone" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder={t("+2557XXXXXXXX")} className={`${inputClass} mt-1.5`} />
-        </div>
-      )}
-
-      <div className="flex justify-end gap-3 border-t border-border pt-4">
-        <button type="button" onClick={onClose} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">{t("Cancel")}</button>
-        <button type="submit" disabled={saving} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-emerald-700 disabled:opacity-60">
-          {saving ? t("Processing...") : t("Pay now")}
-        </button>
-      </div>
-    </form>
-  )
+  return <div className="space-y-4"><div className="rounded-xl bg-primary-soft p-4 text-primary"><p className="break-all font-semibold">{payment.control_number}</p><p className="mt-2">{formatMoney(payment.amount)}</p><p className="mt-1 text-sm">{t('Pending confirmation')}</p></div><p className="text-sm text-foreground">{t('Pay using the official details provided by your school accountant and quote this control number. Your balance changes only after the accountant confirms receipt.')}</p><button type="button" className="min-h-11 w-full rounded-lg bg-primary px-4 py-2 font-semibold text-primary-foreground" onClick={onClose}>{t('Done')}</button></div>
 }
 
 export default function Payments() {
@@ -203,7 +154,7 @@ export default function Payments() {
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
                       {payment.status === 'pending' && !payment.is_expired && (
-                        <button type="button" onClick={() => setPaying(payment)} className="rounded-lg p-2 text-muted-foreground hover:bg-success-soft hover:text-success" aria-label={t("Pay {0}", [payment.control_number])}>
+                        <button type="button" onClick={() => setPaying(payment)} className="rounded-lg p-2 text-muted-foreground hover:bg-success-soft hover:text-success" aria-label={t("View payment instructions for {0}", [payment.control_number])}>
                           <FiCreditCard className="h-4 w-4" />
                         </button>
                       )}
@@ -237,7 +188,7 @@ export default function Payments() {
       )}
 
       {paying && (
-        <Modal title={t("Complete payment")} description={t("Pay control number {0}.", [paying.control_number])} onClose={() => setPaying(null)}>
+        <Modal title={t("Payment instructions")} description={t("Pay control number {0}.", [paying.control_number])} onClose={() => setPaying(null)}>
           <PayModal payment={paying} onClose={() => setPaying(null)} onPaid={() => setRefreshKey((key) => key + 1)} />
         </Modal>
       )}

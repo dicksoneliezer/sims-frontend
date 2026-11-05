@@ -1,3 +1,4 @@
+import { SchoolImage } from '../components/common/SchoolImage'
 import { t } from '../utils/i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import { useEffect, useState } from 'react'
@@ -127,7 +128,7 @@ export default function Profile() {
             <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
               <div className="flex flex-col items-center text-center">
                 {profile?.profile_pic_url ? (
-                  <img src={photoUrl(profile.profile_pic_url)} alt={profile.full_name} className="h-24 w-24 rounded-full object-cover" />
+                  <SchoolImage src={photoUrl(profile.profile_pic_url)} alt={profile.full_name} className="h-24 w-24 rounded-full object-cover" />
                 ) : (
                   <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary-soft text-3xl font-semibold text-primary">
                     {(profile?.full_name ?? 'U').split(' ').slice(0, 2).map((part) => part[0]).join('').toUpperCase()}

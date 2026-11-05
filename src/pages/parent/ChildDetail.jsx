@@ -1,3 +1,8 @@
+import { FinancialSummary } from '../../components/finance/FinancialSummary'
+import { ParentPaymentForm } from '../../components/finance/ParentPaymentForm'
+import { CreditTransferForm } from '../../components/finance/CreditTransferForm'
+import { Modal } from '../../components/common/Modal'
+import { SchoolImage } from '../../components/common/SchoolImage'
 import { t } from '../../utils/i18n'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
@@ -18,6 +23,8 @@ export default function ChildDetail() {
   const [payments, setPayments] = useState([])
   const [summary, setSummary] = useState({ total_invoiced: 0, total_paid: 0, total_outstanding: 0 })
   const [tab, setTab] = useState('invoices')
+  const [billingForm, setBillingForm] = useState(null)
+  const [refreshKey, setRefreshKey] = useState(0)
   const [loading, setLoading] = useState(true)
   const [results, setResults] = useState(null)
   const [attendance, setAttendance] = useState(null)
@@ -46,7 +53,7 @@ export default function ChildDetail() {
     return () => {
       active = false
     }
-  }, [id])
+  }, [id, refreshKey])
 
   useEffect(() => {
     if (!['results', 'attendance', 'notes'].includes(tab)) return undefined
@@ -92,7 +99,7 @@ export default function ChildDetail() {
           <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
             <div className="flex flex-wrap items-center gap-4">
               {child.photo_url ? (
-                <img src={child.photo_url} alt={child.full_name} className="h-16 w-16 rounded-full object-cover" />
+                <SchoolImage src={child.photo_url} alt={child.full_name} className="h-16 w-16 rounded-full object-cover" />
               ) : (
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-soft text-primary"><FiUser className="h-7 w-7" /></div>
               )}
@@ -103,20 +110,7 @@ export default function ChildDetail() {
               </div>
             </div>
 
-            <dl className="mt-5 grid gap-3 border-t border-border pt-4 sm:grid-cols-3">
-              <div className="rounded-lg bg-muted p-3">
-                <dt className="text-xs text-muted-foreground">{t("Total invoiced")}</dt>
-                <dd className="mt-1 font-semibold text-foreground">{formatMoney(summary.total_invoiced)}</dd>
-              </div>
-              <div className="rounded-lg bg-success-soft p-3">
-                <dt className="text-xs text-success">{t("Total paid")}</dt>
-                <dd className="mt-1 font-semibold text-success">{formatMoney(summary.total_paid)}</dd>
-              </div>
-              <div className="rounded-lg bg-danger-soft p-3">
-                <dt className="text-xs text-danger">{t("Outstanding")}</dt>
-                <dd className="mt-1 font-semibold text-danger">{formatMoney(summary.total_outstanding)}</dd>
-              </div>
-            </dl>
+            <div className="mt-5 border-t border-border pt-4"><FinancialSummary summary={summary} /><div className="mt-4 flex flex-wrap gap-2"><button type="button" className="min-h-11 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground" onClick={() => setBillingForm('control')}>{t('Generate control number')}</button>{Number(summary.credit_balance) > 0 && <button type="button" className="min-h-11 rounded-lg border border-border px-4 py-2 text-sm text-foreground" onClick={() => setBillingForm('transfer')}>{t('Transfer credit')}</button>}<button type="button" className="min-h-11 rounded-lg border border-border px-4 py-2 text-sm text-foreground" onClick={() => setRefreshKey(v => v + 1)}>{t('Refresh')}</button></div></div>
           </section>
 
           <section className="rounded-xl border border-border bg-surface shadow-sm">
@@ -209,7 +203,7 @@ export default function ChildDetail() {
                     <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
                       <tr>
                         <th className="px-4 py-3">{t("Invoice")}</th>
-                        <th className="px-4 py-3">{t("Due date")}</th>
+                        <th className="px-4 py-3">{t("Period")}</th><th className="px-4 py-3">{t("Due date")}</th>
                         <th className="px-4 py-3 text-right">{t("Amount")}</th>
                         <th className="px-4 py-3 text-right">{t("Paid")}</th>
                         <th className="px-4 py-3 text-right">{t("Balance")}</th>
@@ -218,13 +212,14 @@ export default function ChildDetail() {
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {invoices.length === 0 ? (
-                        <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">{t("No invoices yet.")}</td></tr>
+                        <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">{t("No invoices yet.")}</td></tr>
                       ) : invoices.map((invoice) => (
                         <tr key={invoice.id} className="hover:bg-muted/70">
                           <td className="px-4 py-3">
                             <p className="font-medium text-foreground">{invoice.invoice_number}</p>
                             <p className="max-w-xs truncate text-xs text-muted-foreground">{invoice.description ?? invoice.fee_structure?.name ?? '—'}</p>
                           </td>
+                          <td className="px-4 py-3 text-muted-foreground">{invoice.period}</td>
                           <td className="px-4 py-3 text-muted-foreground">
                             <p>{formatDate(invoice.due_date)}</p>
                             {invoice.is_overdue && <p className="text-xs font-medium text-danger">{invoice.days_overdue}{t(" day(s) overdue")}</p>}
@@ -270,6 +265,7 @@ export default function ChildDetail() {
           </section>
         </>
       )}
+      {billingForm && <Modal title={billingForm === 'control' ? 'Generate control number' : 'Transfer credit'} onClose={() => setBillingForm(null)}>{billingForm === 'control' ? <ParentPaymentForm defaultStudentId={id} onClose={() => setBillingForm(null)} onSaved={() => setRefreshKey(v => v + 1)} /> : <CreditTransferForm sourceStudentId={id} onClose={() => setBillingForm(null)} onSaved={() => setRefreshKey(v => v + 1)} />}</Modal>}
     </div>
   )
 }

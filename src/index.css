@@ -90,7 +90,7 @@ body {
     box-shadow: 0 2px 8px color-mix(in srgb, var(--theme-foreground) 4%, transparent);
   }
   :where(.app-sidebar nav a) { min-height: 44px; }
-  :where(.app-sidebar nav a[aria-current='page']) { box-shadow: inset 3px 0 0 var(--theme-info); }
+  :where(.app-sidebar nav a:is([aria-current='page'], [aria-current='location'])) { box-shadow: inset 3px 0 0 var(--theme-info); }
   :where(.app-sidebar nav) { overscroll-behavior: contain; scrollbar-width: thin; }
   :where(header h1) { overflow-wrap: anywhere; }
   :where(header > div > div:first-child) { min-width: 0; }
@@ -116,6 +116,25 @@ body {
   color: var(--theme-primary-foreground);
 }
 .skip-link:focus { top: 1rem; }
+
+/* Native popup options do not reliably inherit the select's colours on Windows. */
+select,
+select option,
+select optgroup {
+  background-color: var(--theme-surface);
+  color: var(--theme-foreground);
+}
+[data-theme='dark'] select,
+[data-theme='dark'] select option,
+[data-theme='dark'] select optgroup { color-scheme: dark; }
+[data-theme='light'] select,
+[data-theme='light'] select option,
+[data-theme='light'] select optgroup { color-scheme: light; }
+select option:checked:not(:disabled) {
+  background-color: var(--theme-primary);
+  color: var(--theme-primary-foreground);
+}
+select option:disabled { color: var(--theme-muted-foreground); }
 
 /* Remain visible even on controls which previously opted out of the browser outline. */
 :is(a, button, input, select, textarea, [tabindex]):focus-visible {

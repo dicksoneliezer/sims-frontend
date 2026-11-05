@@ -1,3 +1,4 @@
+import { SchoolImage } from '../components/common/SchoolImage'
 import { t } from '../utils/i18n'
 import { useLanguage } from '../hooks/useLanguage'
 import { useEffect, useMemo, useState } from 'react'
@@ -43,7 +44,7 @@ function StudentAvatar({ student }) {
   useLanguage()
   if (student.photo_url) {
     return (
-      <img
+      <SchoolImage
         src={student.photo_url}
         alt={student.full_name}
         className="h-10 w-10 rounded-full object-cover ring-2 ring-slate-100"

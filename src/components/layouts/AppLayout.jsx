@@ -1,3 +1,4 @@
+import { SidebarBrand } from '../common/SidebarBrand'
 import { t } from '../../utils/i18n'
 import { useLanguage } from '../../hooks/useLanguage'
 // src/components/layouts/AppLayout.jsx
@@ -23,10 +24,11 @@ import { ProfileMenu } from '../common/ProfileMenu'
 import { SidebarLogout } from '../common/SidebarLogout'
 import { LanguageSwitch } from '../common/LanguageSwitch'
 import { ThemeToggle } from '../common/ThemeToggle'
+import { PortalSidebarLinks, PortalModuleTabs } from '../common/PortalNavigation'
 import { PageBoundary } from '../common/PageBoundary'
 import { useDialogFocus } from '../../hooks/useDialogFocus'
 import { useAuth } from '../../hooks/useAuth'
-import { getAdminDashboardPath, getAdminSection, isAdminItemActive } from '../../utils/adminNavigation'
+import { getAdminDashboardPath, getAdminSection } from '../../utils/adminNavigation'
 import { getHomePath, getModulePath, ROLE_LABELS } from '../../utils/constants'
 
 function initials(name = '') {
@@ -93,15 +95,7 @@ export function AppLayout({ modules = [], title = 'Dashboard', children }) {
 
   const sidebar = () => (
     <div className="app-sidebar flex h-full flex-col bg-sidebar text-sidebar-muted">
-      <div className="flex items-center gap-3 px-6 py-6">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary font-bold text-primary-foreground">
-          S
-        </div>
-        <div>
-          <p className="text-sm font-semibold tracking-wide text-sidebar-foreground">{t("SIMS")}</p>
-          <p className="text-xs text-sidebar-muted">{t("Student Information")}</p>
-        </div>
-      </div>
+      <SidebarBrand subtitle="Student Information" />
 
       <nav aria-label={t("Main navigation")} className="flex-1 space-y-1 overflow-y-auto px-3 py-2">
         {/* Dashboard */}
@@ -138,9 +132,7 @@ export function AppLayout({ modules = [], title = 'Dashboard', children }) {
               <div className="pt-3">
                 <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-sidebar-muted">{t(selectedSection.label)}</p>
                 <div className="space-y-0.5">
-                  {selectedSection.items.map((item) =>
-                    renderItem(item.label, item.icon, item.path, isAdminItemActive(item.path, location)),
-                  )}
+                  <PortalSidebarLinks role={user?.role} links={selectedSection.items} onNavigate={() => setOpen(false)} />
                 </div>
               </div>
             )}
@@ -248,7 +240,10 @@ export function AppLayout({ modules = [], title = 'Dashboard', children }) {
           </div>
         </header>
 
-        <main id="main-content" tabIndex={-1} className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-8"><PageBoundary key={location.pathname}>{children}</PageBoundary></main>
+        <main id="main-content" tabIndex={-1} className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-8">
+          {isAdmin && selectedSection && <PortalModuleTabs role={user?.role} links={selectedSection.items} />}
+          <PageBoundary key={location.pathname}>{children}</PageBoundary>
+        </main>
       </div>
     </div>
   )

@@ -1,3 +1,4 @@
+import { FinancialSummary } from '../../components/finance/FinancialSummary'
 import { t } from '../../utils/i18n'
 import { useLanguage } from '../../hooks/useLanguage'
 // src/pages/student/Dashboard.jsx
@@ -32,6 +33,7 @@ export default function StudentDashboard() {
     unread_notes: 0,
   })
   const [loading, setLoading] = useState(true)
+  const [financialSummary, setFinancialSummary] = useState(null)
 
   useEffect(() => {
     let active = true
@@ -41,6 +43,7 @@ export default function StudentDashboard() {
       .then((res) => {
         if (!active) return
         const data = res.data?.data?.stats ?? res.data?.stats ?? {}
+        setFinancialSummary(res.data?.data?.financial_summary)
         setStats({
           average_marks: data.average_marks ?? 0,
           attendance_rate: data.attendance_rate ?? 0,
@@ -73,6 +76,8 @@ export default function StudentDashboard() {
         <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">{t("Welcome back!")}</h2>
         <p className="mt-2 max-w-2xl text-sm text-brand-muted">{t("View your results, attendance, timetable, and more.")}</p>
       </section>
+
+      {financialSummary && <FinancialSummary summary={financialSummary} />}
 
       {/* Stats */}
       {loading ? (

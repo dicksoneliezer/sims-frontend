@@ -10,7 +10,7 @@ const inputClass =
 const labelClass = 'text-sm font-medium text-foreground'
 const errorClass = 'mt-1 text-xs text-danger'
 
-const ROLE_OPTIONS = Object.entries(ROLE_LABELS)
+const ROLE_OPTIONS = Object.entries(ROLE_LABELS).filter(([role]) => !['super_admin', 'system_admin'].includes(role))
 
 export function UserForm({ user, onClose, onSaved }) {
   useLanguage()
@@ -92,7 +92,7 @@ export function UserForm({ user, onClose, onSaved }) {
         <div>
           <label htmlFor="role" className={labelClass}>{t("Role ")}<span className="text-red-500">*</span></label>
           <select id="role" className={`${inputClass} mt-1.5`} {...register('role', { required: t("Role is required.") })}>
-            {ROLE_OPTIONS.map(([value, label]) => (
+            {(user?.role === 'super_admin' ? [['super_admin', ROLE_LABELS.super_admin]] : ROLE_OPTIONS).map(([value, label]) => (
               <option key={value} value={value}>{t(label)}</option>
             ))}
           </select>

@@ -1,3 +1,4 @@
+import { FinancialSummary } from '../../components/finance/FinancialSummary'
 import { ProfilePhotoCard } from '../../components/common/ProfilePhotoCard'
 import { t } from '../../utils/i18n'
 import { useLanguage } from '../../hooks/useLanguage'
@@ -10,6 +11,7 @@ export default function StudentProfile() {
   useLanguage()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [financialSummary, setFinancialSummary] = useState(null)
   const [passwordForm, setPasswordForm] = useState({
     current_password: '',
     password: '',
@@ -23,7 +25,7 @@ export default function StudentProfile() {
 
     api.get('/student/profile')
       .then((res) => {
-        if (active) setProfile(res.data.data || res.data)
+        if (active) { setProfile(res.data.data || res.data); setFinancialSummary(res.data.financial_summary) }
       })
       .catch(() => {
         if (active) toast.error(t("Unable to load profile."))
@@ -87,6 +89,7 @@ export default function StudentProfile() {
 
   return (
     <div className="space-y-6">
+      {financialSummary && <FinancialSummary summary={financialSummary} />}
       <h2 className="flex items-center gap-2 text-xl font-semibold text-foreground">
         <FiUser className="h-5 w-5 text-primary" />{t(" My Profile")}</h2>
 

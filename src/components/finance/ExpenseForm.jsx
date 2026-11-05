@@ -1,3 +1,4 @@
+import { SchoolFileLink } from '../common/SchoolFileLink'
 import { t } from '../../utils/i18n'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useForm } from 'react-hook-form'
@@ -115,7 +116,7 @@ export function ExpenseForm({ expense, onClose, onSaved }) {
           <input id="receipt" type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" className={`${inputClass} mt-1.5 file:mr-3 file:rounded file:border-0 file:bg-muted file:px-2 file:py-1 file:text-xs`} {...register('receipt')} />
           {expense?.receipt_url && (
             <div className="mt-2 flex items-center justify-between rounded-lg bg-muted px-3 py-2 text-xs text-muted-foreground">
-              <a href={expense.receipt_url} target="_blank" rel="noreferrer" className="font-medium text-primary hover:underline">{t("View current receipt")}</a>
+              <SchoolFileLink href={expense.receipt_url} target="_blank" rel="noreferrer" className="font-medium text-primary hover:underline">{t("View current receipt")}</SchoolFileLink>
               <label className="flex items-center gap-1.5"><input type="checkbox" className="h-3.5 w-3.5" {...register('remove_receipt')} />{t(" Remove")}</label>
             </div>
           )}

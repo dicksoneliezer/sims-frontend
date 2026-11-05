@@ -41,7 +41,7 @@ export default function AccountantPayments() {
     let active = true
     setLoading(true)
 
-    listTransactions({ ...query, page, per_page: PAGE_SIZE })
+    listTransactions({ ...query, type: 'payment', page, per_page: PAGE_SIZE })
       .then((response) => {
         if (!active) return
         setTransactions(response.data)

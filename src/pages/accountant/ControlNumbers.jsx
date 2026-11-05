@@ -1,3 +1,4 @@
+import { PaymentForm } from '../../components/finance/PaymentForm'
 import { t } from '../../utils/i18n'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useEffect, useState } from 'react'
@@ -20,6 +21,7 @@ export default function ControlNumbers() {
   const [refreshKey, setRefreshKey] = useState(0)
   const [loading, setLoading] = useState(true)
   const [formOpen, setFormOpen] = useState(false)
+  const [confirming, setConfirming] = useState(null)
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -141,6 +143,7 @@ export default function ControlNumbers() {
                   </td>
                   <td className="px-4 py-3">
                     <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusClass(payment.status)}`}>{t(payment.status)}</span>
+                    {payment.status === 'pending' && !payment.is_expired && <button type="button" onClick={() => setConfirming(payment)} className="mt-2 block min-h-10 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground">{t('Confirm receipt')}</button>}
                     {payment.is_expired && <p className="mt-0.5 text-xs text-warning">{t("Expired")}</p>}
                   </td>
                 </tr>
@@ -164,6 +167,7 @@ export default function ControlNumbers() {
           <ControlNumberForm onClose={() => setFormOpen(false)} onSaved={() => setRefreshKey((key) => key + 1)} />
         </Modal>
       )}
+      {confirming && <Modal title="Confirm received payment" onClose={() => setConfirming(null)}><PaymentForm payment={confirming} onClose={() => setConfirming(null)} onSaved={() => setRefreshKey(v => v + 1)} /></Modal>}
     </div>
   )
 }

@@ -17,24 +17,14 @@ import { toast } from 'react-toastify'
 import api from '../../api/axios'
 
 const STAT_META = [
-  { key: 'usersCount', label: 'Total Users', icon: FiUsers, tone: 'bg-primary-soft text-primary' },
-  { key: 'activeUsers', label: 'Active Users', icon: FiUserCheck, tone: 'bg-success-soft text-success' },
-  { key: 'studentsCount', label: 'Total Students', icon: FiUsers, tone: 'bg-info-soft text-info' },
-  { key: 'logsCount', label: 'System Logs', icon: FiFileText, tone: 'bg-warning-soft text-warning' },
-  { key: 'backupsCount', label: 'Database Backups', icon: FiDatabase, tone: 'bg-primary-soft text-primary' },
-  { key: 'errorsCount', label: 'Error Logs', icon: FiAlertCircle, tone: 'bg-danger-soft text-danger' },
+  { key: 'schools_count', label: 'Schools', icon: FiUsers, tone: 'bg-primary-soft text-primary' },
+  { key: 'active_schools', label: 'Active schools', icon: FiUserCheck, tone: 'bg-success-soft text-success' },
+  { key: 'school_admins', label: 'School administrators', icon: FiUsers, tone: 'bg-info-soft text-info' },
 ]
 
 export default function SystemAdminDashboard() {
   useLanguage()
-  const [stats, setStats] = useState({
-    usersCount: 0,
-    activeUsers: 0,
-    studentsCount: 0,
-    logsCount: 0,
-    backupsCount: 0,
-    errorsCount: 0,
-  })
+  const [stats, setStats] = useState({})
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -42,23 +32,9 @@ export default function SystemAdminDashboard() {
       try {
         setLoading(true)
 
-        const [dashboardRes, studentsRes] = await Promise.all([
-          api.get('/system/dashboard').catch(() => ({ data: { data: {} } })),
-          api.get('/system/students').catch(() => ({ data: { data: [] } })),
-        ])
-
-        const data = dashboardRes.data.data || {}
-        const students = Array.isArray(studentsRes.data) ? studentsRes.data : studentsRes.data.data || []
-
-        setStats({
-          usersCount: data.users_count ?? data.total_users ?? 0,
-          activeUsers: data.active_users ?? 0,
-          studentsCount: students.length || data.students_count || 0,
-          logsCount: data.logs_count ?? 0,
-          backupsCount: data.backups_count ?? 0,
-          errorsCount: data.errors_count ?? 0,
-        })
-      } catch (err) {
+        const response = await api.get('/system/dashboard')
+        setStats(response.data.data?.stats ?? {})
+      } catch {
         toast.error(t("Unable to load dashboard data."))
       } finally {
         setLoading(false)
@@ -101,10 +77,10 @@ export default function SystemAdminDashboard() {
         <p className="mt-1 text-sm text-muted-foreground">{t("Jump to the most common system tasks.")}</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link
-            to="/system/settings"
+            to="/system/schools"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary-hover transition"
           >
-            <FiActivity className="h-4 w-4" />{t(" System Settings ")}<FiArrowRight className="h-4 w-4" />
+            <FiActivity className="h-4 w-4" />{t("Schools")}<FiArrowRight className="h-4 w-4" />
           </Link>
           <Link
             to="/system/sessions"

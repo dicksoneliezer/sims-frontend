@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { AccountantLayout } from '../components/layouts/AccountantLayout'
 import { StudentLayout } from '../components/layouts/StudentLayout'
@@ -34,6 +34,8 @@ const Settings = lazy(() => import('../pages/admin/Settings'))
 const AccountantDashboard = lazy(() => import('../pages/accountant/Dashboard'))
 const AccountantStudents = lazy(() => import('../pages/accountant/Students'))
 const AccountantPayments = lazy(() => import('../pages/accountant/Payments'))
+const BillingReport = lazy(() => import('../pages/accountant/Billing'))
+const StudentBilling = lazy(() => import('../pages/student/Billing'))
 const Invoices = lazy(() => import('../pages/accountant/Invoices'))
 const Expenses = lazy(() => import('../pages/accountant/Expenses'))
 const Debts = lazy(() => import('../pages/accountant/Debts'))
@@ -68,6 +70,7 @@ const TeacherMessages = lazy(() => import('../pages/teacher/Messages'))
 const TeacherProfile = lazy(() => import('../pages/teacher/Profile'))
 
 // Parent Pages
+const ParentSchools = lazy(() => import('../pages/parent/Schools'))
 const ParentDashboard = lazy(() => import('../pages/parent/Dashboard'))
 const Children = lazy(() => import('../pages/parent/Children'))
 const ChildDetail = lazy(() => import('../pages/parent/ChildDetail'))
@@ -106,6 +109,7 @@ const StoreKeeperReports = lazy(() => import('../pages/storekeeper/Reports'))   
 const StoreKeeperProfile = lazy(() => import('../pages/storekeeper/Profile'))    // <-- MPYA
 
 // System Admin Pages
+const SystemSchools = lazy(() => import('../pages/system/Schools'))
 const SystemAdminDashboard = lazy(() => import('../pages/system/Dashboard'))
 const SystemAdminSettings = lazy(() => import('../pages/system/Settings'))
 const SystemAdminBackup = lazy(() => import('../pages/system/Backup'))
@@ -196,6 +200,7 @@ export default function AppRoutes() {
         <Route index element={<AccountantDashboard />} />
         <Route path="students" element={<AccountantStudents />} />
         <Route path="payments" element={<AccountantPayments />} />
+        <Route path="billing" element={<BillingReport />} />
         <Route path="invoices" element={<Invoices />} />
         <Route path="control-numbers" element={<ControlNumbers />} />
         <Route path="expenses" element={<Expenses />} />
@@ -216,6 +221,7 @@ export default function AppRoutes() {
         }
       >
         <Route index element={<StudentDashboard />} />
+        <Route path="billing" element={<StudentBilling />} />
         <Route path="results" element={<StudentResults />} />
         <Route path="attendance" element={<StudentAttendance />} />
         <Route path="notes" element={<StudentNotes />} />
@@ -253,23 +259,26 @@ export default function AppRoutes() {
         path="/parent"
         element={
           <PrivateRoute roles={['parent']}>
-            <ParentLayout />
+            <Outlet />
           </PrivateRoute>
         }
       >
-        <Route index element={<ParentDashboard />} />
-        <Route path="children" element={<Children />} />
-        <Route path="children/:id" element={<ChildDetail />} />
-        <Route path="payments" element={<Payments />} />
-        <Route path="history" element={<History />} />
-        <Route path="balance" element={<Balance />} />
-        <Route path="statement" element={<ParentStatement />} />
-        <Route path="announcements" element={<ParentAnnouncements />} />
-        <Route path="messages" element={<ParentMessages />} />
-        <Route path="gallery" element={<ParentGallery />} />
-        <Route path="documents" element={<ParentDocuments />} />
-        <Route path="report-card" element={<ParentReportCard />} />
-        <Route path="profile" element={<ParentProfile />} />
+        <Route index element={<ParentSchools />} />
+        <Route element={<ParentLayout />}>
+          <Route path="dashboard" element={<ParentDashboard />} />
+          <Route path="children" element={<Children />} />
+          <Route path="children/:id" element={<ChildDetail />} />
+          <Route path="payments" element={<Payments />} />
+          <Route path="history" element={<History />} />
+          <Route path="balance" element={<Balance />} />
+          <Route path="statement" element={<ParentStatement />} />
+          <Route path="announcements" element={<ParentAnnouncements />} />
+          <Route path="messages" element={<ParentMessages />} />
+          <Route path="gallery" element={<ParentGallery />} />
+          <Route path="documents" element={<ParentDocuments />} />
+          <Route path="report-card" element={<ParentReportCard />} />
+          <Route path="profile" element={<ParentProfile />} />
+        </Route>
       </Route>
 
       {/* ACADEMIC ROUTES */}
@@ -323,6 +332,7 @@ export default function AppRoutes() {
         }
       >
         <Route index element={<SystemAdminDashboard />} />
+        <Route path="schools" element={<SystemSchools />} />
         <Route path="settings" element={<SystemAdminSettings />} />
         <Route path="backup" element={<SystemAdminBackup />} />
         <Route path="logs" element={<SystemAdminLogs />} />

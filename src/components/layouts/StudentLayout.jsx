@@ -1,3 +1,4 @@
+import { SidebarBrand } from '../common/SidebarBrand'
 import { t } from '../../utils/i18n'
 import { useLanguage } from '../../hooks/useLanguage'
 // src/components/layouts/StudentLayout.jsx
@@ -14,11 +15,12 @@ import {
   FiMenu,
   FiX,
 } from 'react-icons/fi'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { ProfileMenu } from '../common/ProfileMenu'
 import { SidebarLogout } from '../common/SidebarLogout'
 import { LanguageSwitch } from '../common/LanguageSwitch'
 import { ThemeToggle } from '../common/ThemeToggle'
+import { PortalSidebarLinks, PortalModuleTabs } from '../common/PortalNavigation'
 import { PageBoundary } from '../common/PageBoundary'
 import { useDialogFocus } from '../../hooks/useDialogFocus'
 import { useAuth } from '../../hooks/useAuth'
@@ -29,6 +31,7 @@ function initials(name = '') {
 
 const STUDENT_LINKS = [
   { label: 'Dashboard', path: '/student', icon: FiGrid, end: true },
+  { label: 'Billing', path: '/student/billing', icon: FiFileText },
   { label: 'My Results', path: '/student/results', icon: FiAward },
   { label: 'Attendance', path: '/student/attendance', icon: FiCheckSquare },
   { label: 'Assignments', path: '/student/assignments', icon: FiClipboard }, // <-- MPYA
@@ -52,33 +55,10 @@ export function StudentLayout({ title = 'Student Portal', children }) {
 
   const sidebar = (
     <div className="app-sidebar flex h-full flex-col bg-sidebar text-sidebar-muted">
-      <div className="flex items-center gap-3 px-6 py-6">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary font-bold text-primary-foreground">S</div>
-        <div>
-          <p className="text-sm font-semibold tracking-wide text-sidebar-foreground">{t("SIMS")}</p>
-          <p className="text-xs text-sidebar-muted">{t("Student Portal")}</p>
-        </div>
-      </div>
+      <SidebarBrand subtitle="Student Portal" />
 
       <nav aria-label={t("Main navigation")} className="flex-1 space-y-1 overflow-y-auto px-3 py-2">
-        {STUDENT_LINKS.map((link) => (
-          <NavLink
-            key={link.label}
-            to={link.path}
-            end={link.end}
-            onClick={() => setOpen(false)}
-            className={({ isActive }) =>
-              `flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
-                isActive
-                  ? 'bg-primary text-primary-foreground font-medium'
-                  : 'text-sidebar-muted hover:bg-sidebar-hover hover:text-brand-foreground'
-              }`
-            }
-          >
-            <link.icon className="h-4 w-4" />
-            {t(link.label)}
-          </NavLink>
-        ))}
+        <PortalSidebarLinks role={user?.role} links={STUDENT_LINKS} onNavigate={() => setOpen(false)} />
       </nav>
 
       <div className="border-t border-sidebar-border p-4">
@@ -128,6 +108,7 @@ export function StudentLayout({ title = 'Student Portal', children }) {
           </div>
         </header>
         <main id="main-content" tabIndex={-1} className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-8">
+          <PortalModuleTabs role={user?.role} links={STUDENT_LINKS} />
           <PageBoundary key={location.pathname}>{children || <Outlet />}</PageBoundary>
         </main>
       </div>

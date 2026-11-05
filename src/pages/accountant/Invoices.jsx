@@ -117,6 +117,7 @@ export default function Invoices() {
               <tr>
                 <th className="px-4 py-3">{t("Invoice")}</th>
                 <th className="px-4 py-3">{t("Student")}</th>
+                <th className="px-4 py-3">{t("Period")}</th>
                 <th className="px-4 py-3 text-right">{t("Amount")}</th>
                 <th className="px-4 py-3 text-right">{t("Paid")}</th>
                 <th className="px-4 py-3 text-right">{t("Balance")}</th>
@@ -127,9 +128,9 @@ export default function Invoices() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading ? (
-                <tr><td colSpan={8} className="px-4 py-14 text-center"><div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></td></tr>
+                <tr><td colSpan={9} className="px-4 py-14 text-center"><div role="status" aria-label={t("Loading data")} className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" /></td></tr>
               ) : invoices.length === 0 ? (
-                <tr><td colSpan={8} className="px-4 py-14 text-center text-muted-foreground">{t("No invoices found.")}</td></tr>
+                <tr><td colSpan={9} className="px-4 py-14 text-center text-muted-foreground">{t("No invoices found.")}</td></tr>
               ) : invoices.map((invoice) => (
                 <tr key={invoice.id} className="hover:bg-muted/70">
                   <td className="px-4 py-3">
@@ -140,6 +141,7 @@ export default function Invoices() {
                     <p>{invoice.student?.full_name ?? '—'}</p>
                     <p className="text-xs text-muted-foreground">{invoice.student?.class ?? invoice.student?.student_number ?? ''}</p>
                   </td>
+                  <td className="px-4 py-3 text-muted-foreground">{invoice.period}</td>
                   <td className="px-4 py-3 text-right text-foreground">{formatMoney(invoice.amount)}</td>
                   <td className="px-4 py-3 text-right text-success">{formatMoney(invoice.amount_paid)}</td>
                   <td className="px-4 py-3 text-right font-semibold text-foreground">{formatMoney(invoice.balance)}</td>

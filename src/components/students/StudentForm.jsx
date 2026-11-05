@@ -110,8 +110,8 @@ export function StudentForm({ student, onClose, onSaved }) {
         await updateStudent(student.id, payload)
         toast.success(t('Student updated'))
       } else {
-        await createStudent(payload)
-        toast.success(t('Student created'))
+        const created = await createStudent(payload)
+        toast.success(`${t('Student created')} · ${t('Username')}: ${created.username}`, { autoClose: 10000 })
       }
 
       onSaved()
